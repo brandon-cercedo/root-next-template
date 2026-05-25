@@ -9,7 +9,8 @@
     "lint": "eslint",
     "format": "prettier --write --ignore-unknown --config .prettierrc ./src",
     "format:check": "prettier --check --ignore-unknown --config .prettierrc ./src",
-    "prepare": "husky"
+    "prepare": "husky",
+    "commitlint": "commitlint --edit"
   },
   "dependencies": {
     "next": "16.2.6",
@@ -17,6 +18,9 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.0.1",
+    "@commitlint/config-conventional": "^21.0.1",
+    "@commitlint/types": "^21.0.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
