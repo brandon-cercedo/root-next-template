@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write --ignore-unknown --config .prettierrc ./src",
-    "format:check": "prettier --check --ignore-unknown --config .prettierrc ./src"
+    "format:check": "prettier --check --ignore-unknown --config .prettierrc ./src",
+    "prepare": "husky"
   },
   "dependencies": {
     "next": "16.2.6",
@@ -23,6 +24,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
     "prettier": "3.8.3",
     "tailwindcss": "^4",
     "typescript": "^5"
