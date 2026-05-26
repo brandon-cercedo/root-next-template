@@ -5,17 +5,19 @@ import prettier from "eslint-config-prettier/flat";
 import checkFile from "eslint-plugin-check-file";
 import unusedImports from "eslint-plugin-unused-imports";
 
+/**
+ * @see {@link https://nextjs.org/docs/app/api-reference/config/eslint#setup-eslint | ESLint Plugin}
+ */
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   prettier,
-  // Override default ignores of eslint-config-next.
   globalIgnores([
-    // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "node_modules/**",
   ]),
   {
     plugins: {
@@ -57,6 +59,11 @@ const eslintConfig = defineConfig([
         },
       ],
       "import/newline-after-import": "error",
+      "no-eval": "error",
+      curly: "error",
+      "prefer-const": "error",
+      "no-var": "error",
+      "no-console": "off",
       "check-file/filename-naming-convention": [
         "error",
         {
@@ -73,6 +80,13 @@ const eslintConfig = defineConfig([
         "error",
         {
           "src/**/!(__tests__)": "KEBAB_CASE",
+        },
+      ],
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-namespace": [
+        "error",
+        {
+          allowDeclarations: true,
         },
       ],
     },
