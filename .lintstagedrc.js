@@ -1,4 +1,4 @@
-const path = require("path"); // eslint-disable-line @typescript-eslint/no-require-imports
+const path = require("path");
 
 const buildEslintCommand = (filenames) =>
   `eslint --fix ${filenames
