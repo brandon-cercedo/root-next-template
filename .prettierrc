@@ -4,6 +4,7 @@
   "bracketSpacing": true,
   "endOfLine": "lf",
   "insertPragma": false,
+  "plugins": ["prettier-plugin-tailwindcss"],
   "printWidth": 79,
   "proseWrap": "preserve",
   "quoteProps": "as-needed",
@@ -11,6 +12,8 @@
   "semi": true,
   "singleQuote": false,
   "tabWidth": 2,
+  "tailwindFunctions": ["clsx", "mergeClsx"],
+  "tailwindStylesheet": "./src/app/globals.css",
   "trailingComma": "es5",
   "useTabs": false
 }
