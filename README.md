@@ -10,21 +10,21 @@ A base template to build `Next.js` applications.
 
 ### 💻 Tech Stack
 
-| Tool                                                                                       | Version | Description                          |
-| ------------------------------------------------------------------------------------------ | ------- | ------------------------------------ |
-| [Next.js](https://nextjs.org/)                                                             | 16.2.6  | App framework                        |
-| [React](https://react.dev/)                                                                | 19.2.4  | UI library                           |
-| [TypeScript](https://www.typescriptlang.org/)                                              | ^5.9.3  | Typed JavaScript                     |
-| [Tailwind CSS](https://tailwindcss.com/)                                                   | ^4.3.0  | Styling library                      |
-| [ESLint](https://eslint.org/)                                                              | ^9.39.4 | Linting tool                         |
-| [Prettier](https://prettier.io/)                                                           | 3.8.3   | Formatting tool                      |
-| [Vitest](https://vitest.dev/)                                                              | ^4.1.7  | Unit tests tool                      |
-| [Husky](https://typicode.github.io/husky/)                                                 | ^9.1.7  | Git hooks tool                       |
-| [lint-staged](https://github.com/lint-staged/lint-staged)                                  | ^17.0.5 | Run tasks against staged git files   |
-| [Commitlint](https://commitlint.js.org/)                                                   | ^21.0.1 | Lint git commit messages             |
-| [eslint-plugin-unused-imports](https://github.com/sweepline/eslint-plugin-unused-imports)  | ^4.4.1  | Remove unused imports                |
-| [eslint-plugin-check-file](https://github.com/dukeluo/eslint-plugin-check-file)            | ^3.3.1  | Check file/folder naming conventions |
-| [prettier-plugin-tailwindcss](https://github.com/tailwindlabs/prettier-plugin-tailwindcss) | ^0.8.0  | Sort Tailwind CSS classes            |
+| Tool                                                                                       | Description                          |
+| ------------------------------------------------------------------------------------------ | ------------------------------------ |
+| [Next.js v16](https://nextjs.org/)                                                         | App framework                        |
+| [React v19](https://react.dev/)                                                            | UI library                           |
+| [TypeScript v5](https://www.typescriptlang.org/)                                           | Typed JavaScript                     |
+| [Tailwind CSS v4](https://tailwindcss.com/)                                                | Styling library                      |
+| [ESLint v9](https://eslint.org/)                                                           | Linting tool                         |
+| [Prettier](https://prettier.io/)                                                           | Formatting tool                      |
+| [Vitest](https://vitest.dev/)                                                              | Unit tests tool                      |
+| [Husky](https://typicode.github.io/husky/)                                                 | Git hooks tool                       |
+| [lint-staged](https://github.com/lint-staged/lint-staged)                                  | Run tasks against staged git files   |
+| [Commitlint](https://commitlint.js.org/)                                                   | Lint git commit messages             |
+| [eslint-plugin-unused-imports](https://github.com/sweepline/eslint-plugin-unused-imports)  | Remove unused imports                |
+| [eslint-plugin-check-file](https://github.com/dukeluo/eslint-plugin-check-file)            | Check file/folder naming conventions |
+| [prettier-plugin-tailwindcss](https://github.com/tailwindlabs/prettier-plugin-tailwindcss) | Sort Tailwind CSS classes            |
 
 ## 🚀 Getting Started
 
@@ -32,7 +32,7 @@ A base template to build `Next.js` applications.
 
 - [Node.js v24.16.0](https://nodejs.org/en)
 - [nvm (Node Version Manager)](https://github.com/nvm-sh/nvm)
-- [pnpm v10.33.4](https://pnpm.io/)
+- [pnpm v10.34.3](https://pnpm.io/)
 
 ### ⚙️ Installation
 
