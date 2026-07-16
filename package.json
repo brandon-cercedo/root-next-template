@@ -18,7 +18,8 @@
     "type:check": "tsc --noEmit",
     "prepare": "husky",
     "precommit": "lint-staged",
-    "commitlint": "commitlint --edit"
+    "commitlint": "commitlint --edit",
+    "skills:install": "pnpx skills experimental_install"
   },
   "dependencies": {
     "clsx": "^2.1.1",
