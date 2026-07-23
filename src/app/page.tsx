@@ -34,6 +34,29 @@ export default function Home() {
             center.
           </p>
         </div>
+        <div className="inline-flex w-full flex-wrap items-center justify-center gap-2 sm:justify-start">
+          <span className="inline-flex items-center gap-x-1.5 rounded-full bg-gray-900 px-3 py-1.5 text-xs font-medium text-white dark:bg-white dark:text-neutral-800">
+            Badge
+          </span>
+          <span className="inline-flex items-center gap-x-1.5 rounded-full bg-gray-500 px-3 py-1.5 text-xs font-medium text-white dark:bg-neutral-500">
+            Badge
+          </span>
+          <span className="inline-flex items-center gap-x-1.5 rounded-full bg-teal-500 px-3 py-1.5 text-xs font-medium text-white">
+            Badge
+          </span>
+          <span className="inline-flex items-center gap-x-1.5 rounded-full bg-blue-600 px-3 py-1.5 text-xs font-medium text-white dark:bg-blue-500">
+            Badge
+          </span>
+          <span className="inline-flex items-center gap-x-1.5 rounded-full bg-red-500 px-3 py-1.5 text-xs font-medium text-white">
+            Badge
+          </span>
+          <span className="inline-flex items-center gap-x-1.5 rounded-full bg-yellow-500 px-3 py-1.5 text-xs font-medium text-white">
+            Badge
+          </span>
+          <span className="bg-plain inline-flex items-center gap-x-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-gray-800 dark:text-white">
+            Badge
+          </span>
+        </div>
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <a
             className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] md:w-[158px] dark:hover:bg-[#ccc]"
