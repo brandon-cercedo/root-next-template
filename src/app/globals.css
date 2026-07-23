@@ -1,5 +1,23 @@
 @import "tailwindcss";
 
+@import "../../node_modules/preline/variants.css";
+@source "../../node_modules/preline/dist/*.js";
+@plugin "@tailwindcss/forms";
+
+/**
+ * Preline UI styles
+ */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  a {
+    cursor: pointer;
+  }
+}
+
+/* Default hover styles on all devices */
+@custom-variant hover (&:hover);
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
