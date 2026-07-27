@@ -43,3 +43,4 @@ next-env.d.ts
 # project specific
 .agents/**
 /prisma/types/generated
+scripts/helpers/
