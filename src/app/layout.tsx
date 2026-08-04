@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 
 import { PrelineScriptDynamic } from "@/components/preline/PrelineScript";
+import { ThemeProvider } from "@/hooks/use-theme";
 
 import type { Metadata } from "next";
 
@@ -35,12 +36,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning={true}>
       <body
         className={`${inter.className} hs-overlay-body-open bg-white antialiased transition-colors dark:bg-neutral-900`}
       >
-        {children}
-        <PrelineScriptDynamic />
+        <ThemeProvider>
+          {children}
+          <PrelineScriptDynamic />
+        </ThemeProvider>
       </body>
     </html>
   );

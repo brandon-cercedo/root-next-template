@@ -1,6 +1,7 @@
 import { LucideMenu, LucideX } from "lucide-react";
 
 import AppLogo from "@/components/brand/AppLogo";
+import { ThemeToggleDynamic } from "@/components/theme/ThemeToggle";
 
 export default function BaseNavbar({
   children,
@@ -36,6 +37,9 @@ export default function BaseNavbar({
         >
           <div className="mt-5 flex flex-col gap-5 sm:mt-0 sm:flex-row sm:items-center sm:justify-end sm:ps-5">
             {children}
+            <div>
+              <ThemeToggleDynamic />
+            </div>
           </div>
         </div>
       </nav>
