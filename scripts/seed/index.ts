@@ -32,7 +32,7 @@ function isDBProduction() {
   const { DATABASE_URL, SHADOW_DATABASE_URL } = envs;
 
   if (
-    DATABASE_URL?.includes("localhost") &&
+    DATABASE_URL.includes("localhost") &&
     SHADOW_DATABASE_URL?.includes("localhost")
   ) {
     return false;

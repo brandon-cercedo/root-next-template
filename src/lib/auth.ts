@@ -62,8 +62,8 @@ export const authOptions: NextAuthOptions = {
   },
   providers: [
     GoogleProvider({
-      clientId: envs.GOOGLE_CLIENT_ID!,
-      clientSecret: envs.GOOGLE_CLIENT_SECRET!,
+      clientId: envs.GOOGLE_CLIENT_ID,
+      clientSecret: envs.GOOGLE_CLIENT_SECRET,
     }),
     CredentialsProvider({
       name: "Credentials",
