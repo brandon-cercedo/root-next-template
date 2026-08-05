@@ -3,3 +3,8 @@ minimumReleaseAge: 43200 # 30 days in minutes
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+
+onlyBuiltDependencies:
+  - "@prisma/engines"
+  - esbuild
+  - prisma

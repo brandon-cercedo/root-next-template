@@ -6,6 +6,12 @@ generator client {
   output   = "../prisma/types/generated"
 }
 
+generator custom_generator {
+  provider     = "prisma-generator-fake-data"
+  output       = "./utils/fake-data.ts"
+  emptyValueAs = "null"
+}
+
 datasource db {
   provider = "postgresql"
 }

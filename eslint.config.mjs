@@ -19,6 +19,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     "node_modules/**",
     ".agents/**",
+    "prisma/utils/fake-data.ts",
   ]),
   {
     plugins: {

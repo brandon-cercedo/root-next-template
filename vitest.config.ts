@@ -10,6 +10,16 @@ export default defineConfig({
     coverage: {
       include: ["src/**/*.ts", "src/**/*.tsx"],
     },
+    env: {
+      DATABASE_URL: "postgres://postgres:postgres@localhost:5432/test_db",
+      SHADOW_DATABASE_URL:
+        "postgres://postgres:postgres@localhost:5432/test_db_shadow",
+      NEXTAUTH_URL: "http://localhost:3000",
+      NEXTAUTH_SECRET: "test-secret",
+      GOOGLE_CLIENT_ID: "test-google-client-id",
+      GOOGLE_CLIENT_SECRET: "test-google-client-secret",
+      NEXT_PUBLIC_BASE_URL: "http://localhost:3000",
+    },
   },
   resolve: {
     tsconfigPaths: true,
