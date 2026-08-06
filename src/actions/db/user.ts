@@ -33,6 +33,7 @@ export async function getFullUser(): Promise<FullUser | null> {
 
   const fullUser: FullUser = {
     ...user,
+    password: null,
   };
 
   return fullUser;
