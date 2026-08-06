@@ -61,6 +61,46 @@ const eslintConfig = defineConfig([
         },
       ],
       "import/newline-after-import": "error",
+      "import/no-restricted-paths": [
+        "error",
+        {
+          zones: [
+            // No cross-feature imports
+            {
+              target: "./src/features/auth",
+              from: "./src/features",
+              except: ["./auth"],
+            },
+            {
+              target: "./src/features/home",
+              from: "./src/features",
+              except: ["./home"],
+            },
+            {
+              target: "./src/features/marketing",
+              from: "./src/features",
+              except: ["./marketing"],
+            },
+            // Features must not import from app
+            {
+              target: "./src/features",
+              from: "./src/app",
+            },
+            // Shared must not import from features or app
+            {
+              target: [
+                "./src/components",
+                "./src/hooks",
+                "./src/lib",
+                "./src/actions",
+                "./src/assets",
+                "./src/testing",
+              ],
+              from: ["./src/features", "./src/app"],
+            },
+          ],
+        },
+      ],
       "no-eval": "error",
       curly: "error",
       "prefer-const": "error",
