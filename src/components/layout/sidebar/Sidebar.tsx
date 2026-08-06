@@ -3,12 +3,14 @@
 import { LucideMessageCircleQuestionMark } from "lucide-react";
 import Link from "next/link";
 
+import { FullUser } from "@/actions/db/user";
 import AppLogo from "@/components/brand/AppLogo";
 import { OVERLAY_IDS } from "@/components/constants";
 import { paths } from "@/lib/config/paths";
 
 import { getSidebarSections } from "./config";
 import SidebarContent from "./SidebarContent";
+import UserMenu from "./UserMenu";
 
 function SidebarHeader() {
   return (
@@ -39,7 +41,7 @@ function SidebarFooter() {
   );
 }
 
-export default function Sidebar() {
+export default function Sidebar({ user }: { user: FullUser }) {
   const sections = getSidebarSections();
   return (
     <aside
@@ -52,6 +54,9 @@ export default function Sidebar() {
       <div className="relative flex h-full max-h-full flex-col justify-between gap-3 py-3">
         <div className="flex size-full flex-col overflow-y-auto">
           <SidebarHeader />
+          <div className="flex w-full border-y border-gray-200 px-2 py-2 duration-300 dark:border-neutral-700">
+            <UserMenu user={user} />
+          </div>
           <SidebarContent sections={sections} />
         </div>
         <SidebarFooter />

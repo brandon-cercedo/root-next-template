@@ -8,10 +8,10 @@ function Header() {
   return (
     <BaseNavbar>
       <Link
-        href={paths.dashboard.home()}
+        href={paths.auth.signIn()}
         className="font-medium text-gray-600 hover:text-gray-400 focus:text-gray-400 focus:outline-hidden dark:text-neutral-400 dark:hover:text-neutral-500 dark:focus:text-neutral-500"
       >
-        Dashboard
+        Log in
       </Link>
     </BaseNavbar>
   );
@@ -33,7 +33,7 @@ function Content() {
         </p>
         <div className="mt-5 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
           <Link
-            href={paths.dashboard.home()}
+            href={paths.auth.signIn()}
             className="inline-flex items-center gap-x-2 rounded-lg border border-transparent bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700 focus:bg-blue-700 focus:outline-hidden disabled:pointer-events-none disabled:opacity-50"
             target="parent"
           >
