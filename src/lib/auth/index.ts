@@ -4,7 +4,7 @@ import { Account, NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
-import { CredentialsSchema } from "@/features/auth/schema";
+import { CredentialsSchema } from "@/lib/auth/schema";
 import { envs } from "@/lib/config/envs";
 import { paths } from "@/lib/config/paths";
 import prisma from "@/lib/prisma-client";
