@@ -10,7 +10,6 @@ import { User } from "../../../prisma/types/generated/client";
 export async function getUser() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    console.error("[getUser] No session found");
     return null;
   }
 
