@@ -43,4 +43,5 @@ next-env.d.ts
 # project specific
 .agents/**
 /prisma/types/generated
+/prisma/utils/fake-data.ts
 scripts/helpers/
