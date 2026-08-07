@@ -3,8 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getFullUser, getUser } from "@/actions/db/user";
 import prisma from "@/lib/prisma-client";
-
-import { fakeUserComplete } from "../../../../prisma/utils/fake-data";
+import { fakeUserComplete } from "@/prisma/utils/fake-data";
 
 vi.mock("next-auth", () => ({
   getServerSession: vi.fn(),

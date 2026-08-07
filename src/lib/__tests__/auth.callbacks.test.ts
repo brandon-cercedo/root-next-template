@@ -3,8 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authOptions } from "@/lib/auth";
 import { paths } from "@/lib/config/paths";
 import prisma from "@/lib/prisma-client";
-
-import { fakeUserComplete } from "../../../prisma/utils/fake-data";
+import { fakeUserComplete } from "@/prisma/utils/fake-data";
 
 vi.mock("@/lib/config/envs", () => ({
   envs: {

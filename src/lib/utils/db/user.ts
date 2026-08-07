@@ -1,4 +1,4 @@
-import { User } from "../../../../prisma/types/generated/client";
+import { User } from "@/prisma/types/client";
 
 export function composeUserDisplayName(user: User) {
   const name = user.name?.trim();
