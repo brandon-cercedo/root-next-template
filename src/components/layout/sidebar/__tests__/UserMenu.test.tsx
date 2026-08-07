@@ -4,8 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import UserMenu from "@/components/layout/sidebar/UserMenu";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { paths } from "@/lib/config/paths";
-
-import { fakeUserComplete } from "../../../../../prisma/utils/fake-data";
+import { fakeUserComplete } from "@/prisma/utils/fake-data";
 
 vi.mock("@/components/theme/ThemeSelector", () => ({
   ThemeSelectorDynamic: () => <div data-testid="theme-selector" />,

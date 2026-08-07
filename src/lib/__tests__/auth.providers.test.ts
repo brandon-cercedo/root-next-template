@@ -3,8 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma-client";
-
-import { fakeUserComplete } from "../../../prisma/utils/fake-data";
+import { fakeUserComplete } from "@/prisma/utils/fake-data";
 
 import type { CredentialsConfig } from "next-auth/providers/credentials";
 

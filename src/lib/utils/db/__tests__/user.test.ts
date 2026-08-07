@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { composeUserDisplayName } from "@/lib/utils/db/user";
-
-import { fakeUserComplete } from "../../../../../prisma/utils/fake-data";
+import { fakeUserComplete } from "@/prisma/utils/fake-data";
 
 describe("composeUserDisplayName", () => {
   it("should return the first name when name is present", () => {

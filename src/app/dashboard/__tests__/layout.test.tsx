@@ -4,8 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { OVERLAY_IDS } from "@/components/constants";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { paths } from "@/lib/config/paths";
-
-import { fakeUserComplete } from "../../../../prisma/utils/fake-data";
+import { fakeUserComplete } from "@/prisma/utils/fake-data";
 
 const getFullUser = vi.fn();
 const redirect = vi.fn((url: string) => {
