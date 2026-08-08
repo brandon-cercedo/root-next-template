@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { FullUser, getFullUser } from "@/actions/db/user";
 import Sidebar from "@/components/layout/sidebar/Sidebar";
-import { UserProvider } from "@/features/auth/components/UserProvider";
+import { UserProvider } from "@/hooks/use-user";
 import { paths } from "@/lib/config/paths";
 
 export const metadata: Metadata = {

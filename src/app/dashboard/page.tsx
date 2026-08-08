@@ -1,7 +1,7 @@
 "use client";
 
-import { useUser } from "@/features/auth/components/UserProvider";
 import HomeView from "@/features/home/components/HomeView";
+import { useUser } from "@/hooks/use-user";
 
 export default function Home() {
   const { user } = useUser();

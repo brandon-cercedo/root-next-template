@@ -11,7 +11,7 @@ const mockUser = {
   email: "john@example.com",
 };
 
-vi.mock("@/features/auth/components/UserProvider", () => ({
+vi.mock("@/hooks/use-user", () => ({
   useUser: () => ({ user: mockUser }),
 }));
 
