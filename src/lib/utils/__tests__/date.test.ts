@@ -20,7 +20,7 @@ describe("getTimeOfDay", () => {
     { hour: 20, expected: "evening" },
     { hour: 21, expected: "night" },
     { hour: 4, expected: "night" },
-  ])("returns $expected at hour $hour", ({ hour, expected }) => {
+  ])("should return $expected at hour $hour", ({ hour, expected }) => {
     vi.setSystemTime(new Date(2026, 0, 1, hour, 0, 0));
     expect(getTimeOfDay()).toBe(expected);
   });

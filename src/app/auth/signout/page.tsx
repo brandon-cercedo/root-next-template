@@ -3,7 +3,7 @@
 import { signOut } from "next-auth/react";
 import { useEffect } from "react";
 
-import SignOutView from "@/features/auth/components/SignOutView";
+import SignOutView from "@/app/auth/signout/_components/SignOutView";
 import { paths } from "@/lib/config/paths";
 
 export default function SignOutPage() {

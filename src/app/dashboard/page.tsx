@@ -1,10 +1,5 @@
-"use client";
-
-import HomeView from "@/features/home/components/HomeView";
-import { useUser } from "@/hooks/use-user";
+import HomeView from "@/app/dashboard/_components/HomeView";
 
 export default function Home() {
-  const { user } = useUser();
-
-  return <HomeView user={user} />;
+  return <HomeView />;
 }

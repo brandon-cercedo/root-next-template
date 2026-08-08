@@ -25,7 +25,7 @@ export default function GreetingMessage({ user }: GreetingMessageProps) {
   const nameColor = getNameColor();
 
   return (
-    <div className="min-h-[76px] p-5 text-center text-3xl font-semibold">
+    <div className="min-h-19 p-5 text-center text-3xl font-semibold">
       <TypingText
         onInit={(typewriter) => {
           typewriter

@@ -3,18 +3,15 @@
 import { LucideHome } from "lucide-react";
 import { Fragment } from "react";
 
-import { FullUser } from "@/actions/db/user";
 import Navbar from "@/components/layout/Navbar";
 import PageContainer from "@/components/layout/PageContainer";
+import GreetingMessage from "@/features/home/components/GreetingMessage";
+import { useUser } from "@/hooks/use-user";
 import { paths } from "@/lib/config/paths";
 
-import GreetingMessage from "./GreetingMessage";
+export default function HomeView() {
+  const { user } = useUser();
 
-interface HomeViewProps {
-  user: FullUser;
-}
-
-export default function HomeView({ user }: HomeViewProps) {
   return (
     <Fragment>
       <Navbar

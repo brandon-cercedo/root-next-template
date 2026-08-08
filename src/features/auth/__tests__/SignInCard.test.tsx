@@ -2,7 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import SignInView from "@/features/auth/components/SignInView";
+import SignInCard from "@/features/auth/components/SignInCard";
 
 const mockSignIn = vi.fn();
 
@@ -10,7 +10,7 @@ vi.mock("next-auth/react", () => ({
   signIn: (...args: unknown[]) => mockSignIn(...args),
 }));
 
-describe("SignInView", () => {
+describe("SignInCard", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -23,7 +23,7 @@ describe("SignInView", () => {
     mockSignIn.mockResolvedValue({ ok: true, error: null });
     const user = userEvent.setup();
 
-    render(<SignInView />);
+    render(<SignInCard />);
 
     await user.type(
       screen.getByLabelText("Email address"),
@@ -42,7 +42,7 @@ describe("SignInView", () => {
   it("should call signIn with google when Google button is clicked", async () => {
     const user = userEvent.setup();
 
-    render(<SignInView />);
+    render(<SignInCard />);
 
     await user.click(
       screen.getByRole("button", { name: "Sign in with Google" })
