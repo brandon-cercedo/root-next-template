@@ -43,11 +43,24 @@ Enforced by ESLint / Prettier / Commitlint — follow these over conflicting pro
   - File length: max 300 lines.
   - Semicolons: true.
   - Quotes: double quotes.
+- Imports:
+  - Import direction: app → features → shared.
+    - App (`src/app`):
+      - only import from features and shared.
+      - `*View.tsx` lives in `_components` and are used to compose the page.
+    - Features (`src/features`):
+      - only import from shared.
+      - each feature is self-contained.
+    - Shared (`src/components`, `src/hooks`, `src/lib`, `src/actions`, `src/assets`,
+      `src/testing`):
+      - only import from other shared folders.
 - Git and GitHub conventions:
   - Commits:
     - Use Conventional Commits.
     - Pattern: `<type>(<optional_scope>): <subject>`.
-  - Pull requests: same pattern as commits.
+  - Pull requests:
+    - Pattern: `<type>(<task_id>): <subject>`.
+    - Example: `feat(123): add new feature`.
 - Tests:
   - Framework: Vitest + Testing Library.
   - File naming: `src/**/*.{test,spec}.ts(x)?`.
