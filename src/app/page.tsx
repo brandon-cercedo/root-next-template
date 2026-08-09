@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { getUser } from "@/actions/db/user";
-import LandingView from "@/features/marketing/components/LandingView";
+import LandingView from "@/app/_components/LandingView";
 import { paths } from "@/lib/config/paths";
 
 export default async function Landing() {

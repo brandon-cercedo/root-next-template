@@ -122,24 +122,20 @@ function GoogleSignIn() {
   );
 }
 
-export default function SignInView() {
+export default function SignInCard() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="mx-auto w-full max-w-md p-6">
-        <div className="flex flex-col items-center gap-5 rounded-xl border border-gray-200 bg-white p-4 shadow-2xs sm:p-7 dark:border-neutral-700 dark:bg-neutral-900">
-          <div className="text-center">
-            <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">
-              Sign in
-            </h1>
-          </div>
-          <div className="flex w-full flex-col gap-4">
-            <GoogleSignIn />
-            <div className="flex items-center text-xs text-gray-400 uppercase before:me-6 before:flex-1 before:border-t before:border-gray-200 after:ms-6 after:flex-1 after:border-t after:border-gray-200 dark:text-neutral-500 dark:before:border-neutral-600 dark:after:border-neutral-600">
-              Or
-            </div>
-            <CredentialsSignIn />
-          </div>
+    <div className="flex flex-col items-center gap-5 rounded-xl border border-gray-200 bg-white p-4 shadow-2xs sm:p-7 dark:border-neutral-700 dark:bg-neutral-900">
+      <div className="text-center">
+        <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">
+          Sign in
+        </h1>
+      </div>
+      <div className="flex w-full flex-col gap-4">
+        <GoogleSignIn />
+        <div className="flex items-center text-xs text-gray-400 uppercase before:me-6 before:flex-1 before:border-t before:border-gray-200 after:ms-6 after:flex-1 after:border-t after:border-gray-200 dark:text-neutral-500 dark:before:border-neutral-600 dark:after:border-neutral-600">
+          Or
         </div>
+        <CredentialsSignIn />
       </div>
     </div>
   );
