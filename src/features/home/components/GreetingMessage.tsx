@@ -1,3 +1,5 @@
+import { escape } from "lodash";
+
 import TypingText from "@/components/ui/TypingText";
 import { getTimeOfDay } from "@/lib/utils/date";
 import { composeUserDisplayName } from "@/lib/utils/db/user";
@@ -21,7 +23,7 @@ interface GreetingMessageProps {
 
 export default function GreetingMessage({ user }: GreetingMessageProps) {
   const timeOfDay = getTimeOfDay();
-  const name = composeUserDisplayName(user);
+  const name = escape(composeUserDisplayName(user));
   const nameColor = getNameColor();
 
   return (
