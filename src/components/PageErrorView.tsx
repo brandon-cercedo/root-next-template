@@ -1,8 +1,11 @@
 "use client";
 
 import { LucideChevronLeft } from "lucide-react";
+import Link from "next/link";
 
-import BaseNavbar from "./layout/navbar/BaseNavbar";
+import BaseNavbar from "@/components/layout/navbar/BaseNavbar";
+import PageContainer from "@/components/layout/PageContainer";
+import { paths } from "@/lib/config/paths";
 
 type PageErrors = {
   [key: string]: {
@@ -51,8 +54,15 @@ export default function PageErrorView({ error }: { error?: string }) {
   const info = PAGE_ERRORS[code];
 
   return (
-    <div className="mx-auto flex size-full min-h-screen max-w-3xl flex-col">
-      <BaseNavbar />
+    <PageContainer>
+      <BaseNavbar>
+        <Link
+          href={paths.home()}
+          className="font-medium text-gray-600 hover:text-gray-400 focus:text-gray-400 focus:outline-hidden dark:text-neutral-400 dark:hover:text-neutral-500 dark:focus:text-neutral-500"
+        >
+          Home
+        </Link>
+      </BaseNavbar>
       <main id="content">
         <div className="px-4 py-10 text-center sm:px-6 lg:px-8">
           <h1 className="block text-7xl font-bold text-gray-800 sm:text-9xl dark:text-neutral-200">
@@ -84,6 +94,6 @@ export default function PageErrorView({ error }: { error?: string }) {
           </p>
         </div>
       </footer>
-    </div>
+    </PageContainer>
   );
 }
