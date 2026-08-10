@@ -28,20 +28,36 @@
     --normal-border-hover: var(--color-neutral-800) !important;
     --normal-text: var(--color-white) !important;
 
-    --success-bg: var(--color-teal-950) !important;
+    --success-bg: color-mix(
+      in oklab,
+      var(--color-teal-500) 20%,
+      transparent
+    ) !important;
     --success-border: var(--color-teal-900) !important;
-    --success-text: var(--color-teal-500) !important;
+    --success-text: var(--color-teal-400) !important;
 
-    --info-bg: var(--color-blue-950) !important;
+    --info-bg: color-mix(
+      in oklab,
+      var(--color-blue-500) 20%,
+      transparent
+    ) !important;
     --info-border: var(--color-blue-900) !important;
-    --info-text: var(--color-blue-500) !important;
+    --info-text: var(--color-blue-400) !important;
 
-    --warning-bg: var(--color-yellow-950) !important;
+    --warning-bg: color-mix(
+      in oklab,
+      var(--color-yellow-500) 20%,
+      transparent
+    ) !important;
     --warning-border: var(--color-yellow-900) !important;
-    --warning-text: var(--color-yellow-500) !important;
+    --warning-text: var(--color-yellow-400) !important;
 
-    --error-bg: var(--color-red-950) !important;
+    --error-bg: color-mix(
+      in oklab,
+      var(--color-red-500) 20%,
+      transparent
+    ) !important;
     --error-border: var(--color-red-900) !important;
-    --error-text: var(--color-red-500) !important;
+    --error-text: var(--color-red-400) !important;
   }
 }
