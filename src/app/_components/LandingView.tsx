@@ -2,6 +2,7 @@ import { LucideChevronRight } from "lucide-react";
 import Link from "next/link";
 
 import BaseNavbar from "@/components/layout/navbar/BaseNavbar";
+import PageContainer from "@/components/layout/PageContainer";
 import { paths } from "@/lib/config/paths";
 
 function Header() {
@@ -69,10 +70,10 @@ function Footer() {
 
 export default function LandingView() {
   return (
-    <div className="mx-auto flex h-full min-h-screen max-w-3xl flex-col">
+    <PageContainer>
       <Header />
       <Content />
       <Footer />
-    </div>
+    </PageContainer>
   );
 }

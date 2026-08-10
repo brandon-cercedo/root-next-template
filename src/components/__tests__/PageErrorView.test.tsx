@@ -5,7 +5,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import PageErrorView from "@/components/PageErrorView";
 
 vi.mock("@/components/layout/navbar/BaseNavbar", () => ({
-  default: () => <nav data-testid="base-navbar" />,
+  default: ({ children }: { children?: React.ReactNode }) => (
+    <nav data-testid="base-navbar">{children}</nav>
+  ),
 }));
 
 afterEach(() => {
@@ -17,6 +19,7 @@ describe("PageErrorView", () => {
     render(<PageErrorView />);
 
     expect(screen.getByTestId("base-navbar")).toBeDefined();
+    expect(screen.getByRole("link", { name: "Home" })).toBeDefined();
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("500");
     expect(
       screen.getByRole("heading", {

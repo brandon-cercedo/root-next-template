@@ -10,7 +10,12 @@ export default function PageContainer({
   className,
 }: PageContainerProps) {
   return (
-    <main className={mergeClsx("flex flex-1 gap-4 p-4 pb-16", className)}>
+    <main
+      className={mergeClsx(
+        "mx-auto flex size-full min-h-screen max-w-3xl flex-col",
+        className
+      )}
+    >
       {children}
     </main>
   );
