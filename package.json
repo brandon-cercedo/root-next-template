@@ -21,6 +21,7 @@
     "seed": "pnpm env:load -- prisma db seed",
     "prisma:studio": "pnpm env:load -- prisma studio",
     "prisma:generate": "pnpm env:load -- prisma generate",
+    "do": "pnpm env:load -- tsx",
     "skills:install": "pnpx skills experimental_install",
     "commitlint": "commitlint --edit",
     "precommit": "lint-staged",
