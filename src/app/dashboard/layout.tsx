@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 
 import { FullUser, getFullUser } from "@/actions/db/user";
 import Sidebar from "@/components/layout/sidebar/Sidebar";
-import Toasts from "@/components/ui/toasts/Toasts";
 import { UserProvider } from "@/hooks/use-user";
 import { paths } from "@/lib/config/paths";
 
@@ -41,7 +40,6 @@ export default async function DashboardLayout({
           </div>
         </div>
       </div>
-      <Toasts />
     </DashboardProviders>
   );
 }

@@ -100,7 +100,5 @@ describe("DashboardLayout", () => {
     expect(
       within(innerPanel as HTMLElement).getByText("Home child content")
     ).toBeDefined();
-
-    expect(screen.getByLabelText(/Notifications/i)).toBeDefined();
   });
 });
