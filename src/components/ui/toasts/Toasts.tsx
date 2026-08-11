@@ -16,7 +16,7 @@ export default function Toasts() {
     <Toaster
       theme={theme}
       richColors={true}
-      expand={true}
+      expand={false}
       visibleToasts={5}
       position="top-right"
       closeButton={true}
