@@ -1,9 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { ComponentProps } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import Home from "@/app/dashboard/page";
 import { fakeUserComplete } from "@/prisma/utils/fake-data";
+
+afterEach(() => {
+  cleanup();
+});
 
 const mockUser = {
   ...fakeUserComplete(),
@@ -45,5 +49,12 @@ describe("Home", () => {
     expect(screen.getByText(/Good morning/)).toBeDefined();
     expect(screen.getByText("John")).toBeDefined();
     expect(screen.getAllByText("Home").length).toBeGreaterThan(0);
+  });
+
+  it("should render toast demo section", () => {
+    render(<Home />);
+
+    expect(screen.getByText("Toast demos")).toBeDefined();
+    expect(screen.getByRole("button", { name: "Success" })).toBeDefined();
   });
 });

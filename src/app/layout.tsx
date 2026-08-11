@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 
 import { PrelineScriptDynamic } from "@/components/preline/PrelineScript";
+import Toasts from "@/components/ui/toasts/Toasts";
 import { ThemeProvider } from "@/hooks/use-theme";
 
 import type { Metadata } from "next";
@@ -42,6 +43,7 @@ export default function RootLayout({
       >
         <ThemeProvider>
           {children}
+          <Toasts />
           <PrelineScriptDynamic />
         </ThemeProvider>
       </body>
