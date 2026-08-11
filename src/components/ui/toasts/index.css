@@ -31,7 +31,7 @@
     --success-bg: color-mix(
       in oklab,
       var(--color-teal-500) 20%,
-      transparent
+      var(--color-neutral-900)
     ) !important;
     --success-border: var(--color-teal-900) !important;
     --success-text: var(--color-teal-400) !important;
@@ -39,7 +39,7 @@
     --info-bg: color-mix(
       in oklab,
       var(--color-blue-500) 20%,
-      transparent
+      var(--color-neutral-900)
     ) !important;
     --info-border: var(--color-blue-900) !important;
     --info-text: var(--color-blue-400) !important;
@@ -47,7 +47,7 @@
     --warning-bg: color-mix(
       in oklab,
       var(--color-yellow-500) 20%,
-      transparent
+      var(--color-neutral-900)
     ) !important;
     --warning-border: var(--color-yellow-900) !important;
     --warning-text: var(--color-yellow-400) !important;
@@ -55,7 +55,7 @@
     --error-bg: color-mix(
       in oklab,
       var(--color-red-500) 20%,
-      transparent
+      var(--color-neutral-900)
     ) !important;
     --error-border: var(--color-red-900) !important;
     --error-text: var(--color-red-400) !important;
