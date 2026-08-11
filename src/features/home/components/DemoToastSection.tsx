@@ -31,7 +31,7 @@ const DEMO_TOASTS = [
   },
 ] as const;
 
-export default function ToastDemoSection() {
+export default function DemoToastSection() {
   return (
     <section className="flex w-full flex-col gap-4">
       <div className="flex items-center gap-2">

@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import ToastDemoSection from "@/features/home/components/ToastDemoSection";
+import DemoToastSection from "@/features/home/components/DemoToastSection";
 
 vi.mock("sonner", () => ({
   toast: Object.assign(vi.fn(), {
@@ -19,9 +19,9 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe("ToastDemoSection", () => {
+describe("DemoToastSection", () => {
   it("should render toast demo controls", () => {
-    render(<ToastDemoSection />);
+    render(<DemoToastSection />);
 
     expect(screen.getByText("Toast demos")).toBeDefined();
     expect(screen.getByRole("button", { name: "Default" })).toBeDefined();
@@ -33,7 +33,7 @@ describe("ToastDemoSection", () => {
 
   it("should trigger toast variants when buttons are clicked", async () => {
     const user = userEvent.setup();
-    render(<ToastDemoSection />);
+    render(<DemoToastSection />);
 
     await user.click(screen.getByRole("button", { name: "Default" }));
     await user.click(screen.getByRole("button", { name: "Success" }));
