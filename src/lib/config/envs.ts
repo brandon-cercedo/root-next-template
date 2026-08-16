@@ -12,6 +12,7 @@ export const envs = createEnv({
   },
   client: {
     NEXT_PUBLIC_BASE_URL: z.url(),
+    NEXT_PUBLIC_APP_VERSION: z.string().min(1),
   },
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
@@ -21,6 +22,7 @@ export const envs = createEnv({
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION,
   },
   emptyStringAsUndefined: true,
   // prisma generate / postinstall may load prisma.config without .env.local

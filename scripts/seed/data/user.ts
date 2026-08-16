@@ -12,7 +12,7 @@ export const SEED_USERS: { users: SeedUser[] } = {
       name: "John Doe",
       email: "john.doe@example.com",
       emailVerified: new Date(),
-      rawPassword: "password123",
+      rawPassword: "root@123",
     },
     {
       name: "Brandon Cercedo",
@@ -20,7 +20,7 @@ export const SEED_USERS: { users: SeedUser[] } = {
       emailVerified: new Date(),
       image:
         "https://lh3.googleusercontent.com/a/ACg8ocJtKD3HYbmkBpYnH-ACNodCSQsbHeuODUIMnqdwGbtmN4Eoa1l3=s96-c",
-      rawPassword: "password123",
+      rawPassword: "root@123",
     },
   ],
 };

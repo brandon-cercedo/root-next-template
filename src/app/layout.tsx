@@ -1,5 +1,6 @@
 import { Inter } from "next/font/google";
 
+import ConsoleBrand from "@/components/brand/ConsoleBrand";
 import { PrelineScriptDynamic } from "@/components/preline/PrelineScript";
 import Toasts from "@/components/ui/toasts/Toasts";
 import { ThemeProvider } from "@/hooks/use-theme";
@@ -44,6 +45,7 @@ export default function RootLayout({
         <ThemeProvider>
           {children}
           <Toasts />
+          <ConsoleBrand />
           <PrelineScriptDynamic />
         </ThemeProvider>
       </body>
