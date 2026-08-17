@@ -18,6 +18,9 @@ async function populateDatabase() {
         emailVerified: user.emailVerified,
         image: user.image,
         password: hashedPassword,
+        setting: {
+          create: { preferences: {} },
+        },
       },
     });
   }

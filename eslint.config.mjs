@@ -20,6 +20,7 @@ const eslintConfig = defineConfig([
     "node_modules/**",
     ".agents/**",
     "prisma/utils/fake-data.ts",
+    "prisma/types/generated/**",
   ]),
   {
     plugins: {
