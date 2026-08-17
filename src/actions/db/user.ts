@@ -29,40 +29,37 @@ export type FullUser = User & {
 };
 
 export async function getFullUser(): Promise<FullUser | null> {
-  const session = await getServerSession(authOptions);
-  const id = session?.user?.id;
-  if (!id) {
-    console.error("[getFullUser] No user found");
-    return null;
-  }
-
-  const [user, setting] = await Promise.all([
-    prisma.user.findUnique({ where: { id } }),
-    prisma.userSetting.findUnique({ where: { userId: id } }),
-  ]);
-
+  const user = await getUser();
   if (!user) {
     console.error("[getFullUser] No user found");
     return null;
   }
 
-  return {
+  // Fetch extra data
+  const [setting] = await Promise.all([
+    prisma.userSetting.findUnique({ where: { userId: user.id } }),
+  ]);
+
+  // Prepare payload
+  const fullUser: FullUser = {
     ...user,
     password: null,
     setting,
   };
+
+  return fullUser;
 }
 
 export async function completeLoginConfetti() {
   const user = await getUser();
   if (!user) {
+    console.error("[completeLoginConfetti] User not authenticated");
     return;
   }
 
   const setting = await prisma.userSetting.findUnique({
     where: { userId: user.id },
   });
-
   if (!setting) {
     throw new Error("[completeLoginConfetti] Missing UserSetting");
   }
@@ -82,5 +79,5 @@ export async function completeLoginConfetti() {
     },
   });
 
-  revalidatePath(paths.dashboard.home(), "layout");
+  revalidatePath(paths.dashboard.home());
 }

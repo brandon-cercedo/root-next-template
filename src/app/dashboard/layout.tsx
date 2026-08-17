@@ -18,12 +18,7 @@ function DashboardProviders({
   user: FullUser;
   children: React.ReactNode;
 }) {
-  return (
-    <UserProvider user={user}>
-      <LoginConfetti />
-      {children}
-    </UserProvider>
-  );
+  return <UserProvider user={user}>{children}</UserProvider>;
 }
 
 export default async function DashboardLayout({
@@ -46,6 +41,7 @@ export default async function DashboardLayout({
           </div>
         </div>
       </div>
+      <LoginConfetti user={user} />
     </DashboardProviders>
   );
 }

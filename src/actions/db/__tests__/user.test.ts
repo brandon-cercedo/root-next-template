@@ -215,10 +215,7 @@ describe("completeLoginConfetti", () => {
           },
         },
       });
-      expect(mockRevalidatePath).toHaveBeenCalledWith(
-        paths.dashboard.home(),
-        "layout"
-      );
+      expect(mockRevalidatePath).toHaveBeenCalledWith(paths.dashboard.home());
     } finally {
       vi.useRealTimers();
     }
