@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { FullUser, getFullUser } from "@/actions/db/user";
 import Sidebar from "@/components/layout/sidebar/Sidebar";
+import FirstLoginConfetti from "@/features/home/components/FirstLoginConfetti";
 import { UserProvider } from "@/hooks/use-user";
 import { paths } from "@/lib/config/paths";
 
@@ -17,7 +18,12 @@ function DashboardProviders({
   user: FullUser;
   children: React.ReactNode;
 }) {
-  return <UserProvider user={user}>{children}</UserProvider>;
+  return (
+    <UserProvider user={user}>
+      <FirstLoginConfetti />
+      {children}
+    </UserProvider>
+  );
 }
 
 export default async function DashboardLayout({
