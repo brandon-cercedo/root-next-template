@@ -6,6 +6,10 @@ generator client {
   output   = "../prisma/types/generated"
 }
 
+generator json {
+  provider = "prisma-json-types-generator"
+}
+
 generator custom_generator {
   provider     = "prisma-generator-fake-data"
   output       = "./utils/fake-data.ts"
@@ -24,6 +28,8 @@ model User {
   image         String?
   password      String?
   accounts      Account[]
+  // Non-FK 1:1 side cannot be required in Prisma.
+  setting       UserSetting?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -49,4 +55,16 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+}
+
+model UserSetting {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// [UserPreferences]
+  preferences Json @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
