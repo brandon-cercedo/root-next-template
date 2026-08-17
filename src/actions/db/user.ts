@@ -1,18 +1,16 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
+import { paths } from "@/lib/config/paths";
 import prisma from "@/lib/prisma-client";
 import { User, UserSetting } from "@/prisma/types/client";
 
-async function getSessionUserId() {
-  const session = await getServerSession(authOptions);
-  return session?.user?.id ?? null;
-}
-
 export async function getUser() {
-  const userId = await getSessionUserId();
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
   if (!userId) {
     return null;
   }
@@ -31,49 +29,42 @@ export type FullUser = User & {
 };
 
 export async function getFullUser(): Promise<FullUser | null> {
-  const userId = await getSessionUserId();
-  if (!userId) {
+  const session = await getServerSession(authOptions);
+  const id = session?.user?.id;
+  if (!id) {
     console.error("[getFullUser] No user found");
     return null;
   }
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-    include: {
-      setting: true,
-    },
-  });
+  const [user, setting] = await Promise.all([
+    prisma.user.findUnique({ where: { id } }),
+    prisma.userSetting.findUnique({ where: { userId: id } }),
+  ]);
 
   if (!user) {
     console.error("[getFullUser] No user found");
     return null;
   }
 
-  if (!user.setting) {
-    console.error("[getFullUser] Missing UserSetting");
-  }
-
   return {
     ...user,
     password: null,
+    setting,
   };
 }
 
-export async function markLoginConfettiSeen() {
-  const userId = await getSessionUserId();
-  if (!userId) {
+export async function completeLoginConfetti() {
+  const user = await getUser();
+  if (!user) {
     return;
   }
 
   const setting = await prisma.userSetting.findUnique({
-    where: { userId },
+    where: { userId: user.id },
   });
 
   if (!setting) {
-    console.error("[markLoginConfettiSeen] Missing UserSetting");
-    return;
+    throw new Error("[completeLoginConfetti] Missing UserSetting");
   }
 
   const preferences = setting.preferences ?? {};
@@ -82,7 +73,7 @@ export async function markLoginConfettiSeen() {
   }
 
   await prisma.userSetting.update({
-    where: { userId },
+    where: { userId: user.id },
     data: {
       preferences: {
         ...preferences,
@@ -90,4 +81,6 @@ export async function markLoginConfettiSeen() {
       },
     },
   });
+
+  revalidatePath(paths.dashboard.home(), "layout");
 }

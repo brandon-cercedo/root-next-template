@@ -4,13 +4,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import Confetti from "@/components/ui/Confetti";
 
-const confetti = vi.hoisted(() => vi.fn());
+const confetti = vi.hoisted(() =>
+  vi.fn((): Promise<void> | undefined => Promise.resolve())
+);
 
 vi.mock("canvas-confetti", () => ({
   default: confetti,
 }));
 
-const PRELINE_BURST = {
+const DEFAULT_BURST = {
   particleCount: 100,
   spread: 70,
   origin: { y: 0.6 },
@@ -23,6 +25,7 @@ afterEach(() => {
 
 beforeEach(() => {
   confetti.mockReset();
+  confetti.mockImplementation(() => Promise.resolve());
 });
 
 describe("Confetti", () => {
@@ -48,17 +51,17 @@ describe("Confetti", () => {
 
     await waitFor(() => {
       expect(confetti).toHaveBeenCalledTimes(1);
-      expect(confetti).toHaveBeenCalledWith(PRELINE_BURST);
+      expect(confetti).toHaveBeenCalledWith(DEFAULT_BURST);
       expect(onFired).toHaveBeenCalledTimes(1);
     });
   });
 
-  it("should apply burst overrides", async () => {
+  it("should apply option overrides", async () => {
     render(<Confetti fire particleCount={20} spread={40} />);
 
     await waitFor(() => {
       expect(confetti).toHaveBeenCalledWith({
-        ...PRELINE_BURST,
+        ...DEFAULT_BURST,
         particleCount: 20,
         spread: 40,
       });
@@ -88,6 +91,41 @@ describe("Confetti", () => {
 
     await waitFor(() => {
       expect(confetti).toHaveBeenCalledTimes(1);
+      expect(onFired).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("should call onFired after the burst promise resolves", async () => {
+    let finishBurst: (() => void) | undefined;
+    confetti.mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          finishBurst = resolve;
+        })
+    );
+    const onFired = vi.fn();
+
+    render(<Confetti fire onFired={onFired} />);
+
+    await waitFor(() => {
+      expect(confetti).toHaveBeenCalledTimes(1);
+    });
+    expect(onFired).not.toHaveBeenCalled();
+
+    finishBurst?.();
+
+    await waitFor(() => {
+      expect(onFired).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("should call onFired when confetti returns undefined", async () => {
+    confetti.mockReturnValue(undefined);
+    const onFired = vi.fn();
+
+    render(<Confetti fire onFired={onFired} />);
+
+    await waitFor(() => {
       expect(onFired).toHaveBeenCalledTimes(1);
     });
   });

@@ -23,8 +23,8 @@ vi.mock("@/components/theme/ThemeSelector", () => ({
   ThemeSelectorDynamic: () => <div data-testid="theme-selector" />,
 }));
 
-vi.mock("@/features/home/components/FirstLoginConfetti", () => ({
-  default: () => <div data-testid="first-login-confetti" />,
+vi.mock("@/features/home/components/LoginConfetti", () => ({
+  default: () => <div data-testid="login-confetti" />,
 }));
 
 afterEach(() => {
@@ -104,6 +104,6 @@ describe("DashboardLayout", () => {
     expect(
       within(innerPanel as HTMLElement).getByText("Home child content")
     ).toBeDefined();
-    expect(screen.getByTestId("first-login-confetti")).toBeDefined();
+    expect(screen.getByTestId("login-confetti")).toBeDefined();
   });
 });

@@ -1,10 +1,10 @@
 "use client";
 
-import { markLoginConfettiSeen } from "@/actions/db/user";
+import { completeLoginConfetti } from "@/actions/db/user";
 import Confetti from "@/components/ui/Confetti";
 import { useUser } from "@/hooks/use-user";
 
-export default function FirstLoginConfetti() {
+export default function LoginConfetti() {
   const { user } = useUser();
   const seenAt = user.setting?.preferences.loginConfettiSeenAt;
 
@@ -12,7 +12,7 @@ export default function FirstLoginConfetti() {
     <Confetti
       fire={!seenAt}
       onFired={() => {
-        void markLoginConfettiSeen();
+        void completeLoginConfetti();
       }}
     />
   );

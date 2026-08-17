@@ -1,11 +1,13 @@
+import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  completeLoginConfetti,
   getFullUser,
   getUser,
-  markLoginConfettiSeen,
 } from "@/actions/db/user";
+import { paths } from "@/lib/config/paths";
 import prisma from "@/lib/prisma-client";
 import {
   fakeUserComplete,
@@ -14,6 +16,10 @@ import {
 
 vi.mock("next-auth", () => ({
   getServerSession: vi.fn(),
+}));
+
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
 }));
 
 vi.mock("@/lib/prisma-client", () => ({
@@ -33,6 +39,7 @@ vi.mock("@/lib/auth", () => ({
 }));
 
 const mockGetServerSession = vi.mocked(getServerSession);
+const mockRevalidatePath = vi.mocked(revalidatePath);
 const mockFindUnique = vi.mocked(prisma.user.findUnique);
 const mockFindSetting = vi.mocked(prisma.userSetting.findUnique);
 const mockUpdateSetting = vi.mocked(prisma.userSetting.update);
@@ -85,6 +92,7 @@ describe("getFullUser", () => {
 
     expect(fullUser).toBeNull();
     expect(mockFindUnique).not.toHaveBeenCalled();
+    expect(mockFindSetting).not.toHaveBeenCalled();
   });
 
   it("should return the user with setting and a cleared password", async () => {
@@ -95,10 +103,8 @@ describe("getFullUser", () => {
     };
 
     mockGetServerSession.mockResolvedValue(mockSessionFor(mockUser));
-    mockFindUnique.mockResolvedValue({
-      ...mockUser,
-      setting: mockSetting,
-    } as typeof mockUser);
+    mockFindUnique.mockResolvedValue(mockUser);
+    mockFindSetting.mockResolvedValue(mockSetting);
 
     const fullUser = await getFullUser();
 
@@ -109,7 +115,9 @@ describe("getFullUser", () => {
     });
     expect(mockFindUnique).toHaveBeenCalledWith({
       where: { id: mockUser.id },
-      include: { setting: true },
+    });
+    expect(mockFindSetting).toHaveBeenCalledWith({
+      where: { userId: mockUser.id },
     });
   });
 
@@ -118,10 +126,8 @@ describe("getFullUser", () => {
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     mockGetServerSession.mockResolvedValue(mockSessionFor(mockUser));
-    mockFindUnique.mockResolvedValue({
-      ...mockUser,
-      setting: null,
-    } as typeof mockUser);
+    mockFindUnique.mockResolvedValue(mockUser);
+    mockFindSetting.mockResolvedValue(null);
 
     const fullUser = await getFullUser();
 
@@ -130,12 +136,12 @@ describe("getFullUser", () => {
       password: null,
       setting: null,
     });
-    expect(errorSpy).toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
     errorSpy.mockRestore();
   });
 });
 
-describe("markLoginConfettiSeen", () => {
+describe("completeLoginConfetti", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -143,24 +149,26 @@ describe("markLoginConfettiSeen", () => {
   it("should no-op when there is no session", async () => {
     mockGetServerSession.mockResolvedValue(null);
 
-    await markLoginConfettiSeen();
+    await completeLoginConfetti();
 
+    expect(mockFindUnique).not.toHaveBeenCalled();
     expect(mockFindSetting).not.toHaveBeenCalled();
     expect(mockUpdateSetting).not.toHaveBeenCalled();
+    expect(mockRevalidatePath).not.toHaveBeenCalled();
   });
 
-  it("should no-op when UserSetting is missing", async () => {
+  it("should throw when UserSetting is missing", async () => {
     const mockUser = fakeUserComplete();
-    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     mockGetServerSession.mockResolvedValue(mockSessionFor(mockUser));
+    mockFindUnique.mockResolvedValue(mockUser);
     mockFindSetting.mockResolvedValue(null);
 
-    await markLoginConfettiSeen();
-
+    await expect(completeLoginConfetti()).rejects.toThrow(
+      "[completeLoginConfetti] Missing UserSetting"
+    );
     expect(mockUpdateSetting).not.toHaveBeenCalled();
-    expect(errorSpy).toHaveBeenCalled();
-    errorSpy.mockRestore();
+    expect(mockRevalidatePath).not.toHaveBeenCalled();
   });
 
   it("should not overwrite an existing loginConfettiSeenAt", async () => {
@@ -168,15 +176,17 @@ describe("markLoginConfettiSeen", () => {
     const seenAt = "2026-08-16T12:00:00.000Z";
 
     mockGetServerSession.mockResolvedValue(mockSessionFor(mockUser));
+    mockFindUnique.mockResolvedValue(mockUser);
     mockFindSetting.mockResolvedValue({
       ...fakeUserSettingComplete(),
       userId: mockUser.id,
       preferences: { loginConfettiSeenAt: seenAt },
     });
 
-    await markLoginConfettiSeen();
+    await completeLoginConfetti();
 
     expect(mockUpdateSetting).not.toHaveBeenCalled();
+    expect(mockRevalidatePath).not.toHaveBeenCalled();
   });
 
   it("should set loginConfettiSeenAt when it is unset", async () => {
@@ -188,13 +198,14 @@ describe("markLoginConfettiSeen", () => {
 
     try {
       mockGetServerSession.mockResolvedValue(mockSessionFor(mockUser));
+      mockFindUnique.mockResolvedValue(mockUser);
       mockFindSetting.mockResolvedValue({
         ...fakeUserSettingComplete(),
         userId: mockUser.id,
         preferences: {},
       });
 
-      await markLoginConfettiSeen();
+      await completeLoginConfetti();
 
       expect(mockUpdateSetting).toHaveBeenCalledWith({
         where: { userId: mockUser.id },
@@ -204,6 +215,10 @@ describe("markLoginConfettiSeen", () => {
           },
         },
       });
+      expect(mockRevalidatePath).toHaveBeenCalledWith(
+        paths.dashboard.home(),
+        "layout"
+      );
     } finally {
       vi.useRealTimers();
     }

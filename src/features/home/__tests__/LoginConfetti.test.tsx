@@ -2,20 +2,20 @@ import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { FullUser } from "@/actions/db/user";
-import FirstLoginConfetti from "@/features/home/components/FirstLoginConfetti";
+import LoginConfetti from "@/features/home/components/LoginConfetti";
 import { UserProvider } from "@/hooks/use-user";
 import {
   fakeUserComplete,
   fakeUserSettingComplete,
 } from "@/prisma/utils/fake-data";
 
-const { markLoginConfettiSeen, confettiProps } = vi.hoisted(() => ({
-  markLoginConfettiSeen: vi.fn(),
+const { completeLoginConfetti, confettiProps } = vi.hoisted(() => ({
+  completeLoginConfetti: vi.fn(),
   confettiProps: vi.fn(),
 }));
 
 vi.mock("@/actions/db/user", () => ({
-  markLoginConfettiSeen: () => markLoginConfettiSeen(),
+  completeLoginConfetti: () => completeLoginConfetti(),
 }));
 
 vi.mock("@/components/ui/Confetti", () => ({
@@ -50,23 +50,23 @@ function createFullUser({
   };
 }
 
-function renderFirstLogin(user: FullUser) {
+function renderLoginConfetti(user: FullUser) {
   return render(
     <UserProvider user={user}>
-      <FirstLoginConfetti />
+      <LoginConfetti />
     </UserProvider>
   );
 }
 
 afterEach(() => {
   cleanup();
-  markLoginConfettiSeen.mockReset();
+  completeLoginConfetti.mockReset();
   confettiProps.mockReset();
 });
 
-describe("FirstLoginConfetti", () => {
+describe("LoginConfetti", () => {
   it("should fire when loginConfettiSeenAt is unset", () => {
-    renderFirstLogin(createFullUser());
+    renderLoginConfetti(createFullUser());
 
     expect(confettiProps).toHaveBeenCalledWith(
       expect.objectContaining({ fire: true })
@@ -74,7 +74,7 @@ describe("FirstLoginConfetti", () => {
   });
 
   it("should not fire when loginConfettiSeenAt is set", () => {
-    renderFirstLogin(
+    renderLoginConfetti(
       createFullUser({
         seenAt: "2026-08-17T00:00:00.000Z",
       })
@@ -86,7 +86,7 @@ describe("FirstLoginConfetti", () => {
   });
 
   it("should fire when the setting relation is missing", () => {
-    renderFirstLogin(createFullUser({ setting: null }));
+    renderLoginConfetti(createFullUser({ setting: null }));
 
     expect(confettiProps).toHaveBeenCalledWith(
       expect.objectContaining({ fire: true })
@@ -94,13 +94,13 @@ describe("FirstLoginConfetti", () => {
   });
 
   it("should persist seen-at when the burst fires", () => {
-    renderFirstLogin(createFullUser());
+    renderLoginConfetti(createFullUser());
 
     const props = confettiProps.mock.calls[0][0] as {
       onFired?: () => void;
     };
     props.onFired?.();
 
-    expect(markLoginConfettiSeen).toHaveBeenCalledTimes(1);
+    expect(completeLoginConfetti).toHaveBeenCalledTimes(1);
   });
 });
