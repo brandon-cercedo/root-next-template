@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { FullUser, getFullUser } from "@/actions/db/user";
 import Sidebar from "@/components/layout/sidebar/Sidebar";
+import LoginConfetti from "@/features/home/components/LoginConfetti";
 import { UserProvider } from "@/hooks/use-user";
 import { paths } from "@/lib/config/paths";
 
@@ -40,6 +41,7 @@ export default async function DashboardLayout({
           </div>
         </div>
       </div>
+      <LoginConfetti user={user} />
     </DashboardProviders>
   );
 }
