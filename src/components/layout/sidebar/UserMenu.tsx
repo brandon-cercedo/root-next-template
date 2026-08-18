@@ -1,4 +1,8 @@
-import { LucideChevronsUpDown, LucideLogOut } from "lucide-react";
+import {
+  LucideChevronsUpDown,
+  LucideLogOut,
+  LucideMessageCircleQuestionMark,
+} from "lucide-react";
 import Link from "next/link";
 import { Fragment } from "react";
 
@@ -31,6 +35,15 @@ function Content({
           <span className="flex-1 cursor-default">Theme</span>
           <ThemeSelectorDynamic />
         </div>
+        <a
+          href="https://github.com/brandon-cercedo"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-x-3 rounded-lg px-2 py-1.5 text-[13px] leading-5 text-gray-800 hover:bg-gray-100 focus:bg-gray-100 focus:outline-hidden dark:text-neutral-200 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"
+        >
+          <LucideMessageCircleQuestionMark className="size-4 flex-none" />
+          <span>Help</span>
+        </a>
       </div>
       <div className="space-y-0.5 p-1">
         <Link
@@ -51,7 +64,8 @@ export default function UserMenu({ user }: { user: FullUser }) {
     <Dropdown
       content={<Content displayName={displayName} email={user.email} />}
       autoClose="inside"
-      containerClassName="w-full"
+      placement="top"
+      containerClassName="w-full rounded-lg border border-gray-200 bg-white dark:border-neutral-700 dark:bg-neutral-900"
       className="z-60 w-56"
     >
       <button

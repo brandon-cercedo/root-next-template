@@ -74,7 +74,9 @@ describe("DashboardLayout", () => {
       name: /Root/i,
     });
     expect(brandLink.getAttribute("href")).toBe(paths.dashboard.home());
-    expect(within(sidebar).getByText("john@example.com")).toBeDefined();
+
+    const footer = within(sidebar).getByRole("contentinfo");
+    expect(within(footer).getByText("john@example.com")).toBeDefined();
   });
 
   it("should render children inside the framed main panel", async () => {
