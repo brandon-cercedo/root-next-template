@@ -9,12 +9,6 @@ import { mergeClsx } from "@/lib/utils/styles";
 
 import ModalTrigger from "../ModalTrigger";
 
-export type OverlayOptions = {
-  isClosePrev?: boolean;
-  backdropClasses?: string;
-  backdropExtraClasses?: string;
-};
-
 function fixOverlayOptions(options?: OverlayOptions) {
   return {
     backdropClasses:
@@ -22,6 +16,12 @@ function fixOverlayOptions(options?: OverlayOptions) {
     ...options,
   };
 }
+
+export type OverlayOptions = {
+  isClosePrev?: boolean;
+  backdropClasses?: string;
+  backdropExtraClasses?: string;
+};
 
 interface ModalContentProps {
   id: string;
@@ -34,6 +34,7 @@ interface ModalContentProps {
   scrollScope?: ScrollScope;
   isVerticallyCentered?: boolean;
   isKeyActionsEnabled?: boolean;
+  overlayClassName?: string;
 }
 
 function ModalContent({
@@ -47,6 +48,7 @@ function ModalContent({
   scrollScope = "body",
   isVerticallyCentered = false,
   isKeyActionsEnabled = true,
+  overlayClassName,
 }: ModalContentProps) {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -73,7 +75,8 @@ function ModalContent({
         "hs-overlay pointer-events-none fixed inset-s-0 top-0 z-80 hidden size-full overflow-x-hidden overflow-y-auto",
         {
           "[--overlay-backdrop:static]": overlayBackdrop === "static",
-        }
+        },
+        overlayClassName
       )}
       role="dialog"
       tabIndex={-1}
@@ -130,6 +133,7 @@ type ModalProps = {
   scrollScope?: ScrollScope;
   isVerticallyCentered?: boolean;
   isKeyActionsEnabled?: boolean;
+  overlayClassName?: string;
 };
 
 export default function Modal({
@@ -144,6 +148,7 @@ export default function Modal({
   scrollScope = "body",
   isVerticallyCentered = false,
   isKeyActionsEnabled = true,
+  overlayClassName,
 }: ModalProps) {
   return (
     <Fragment>
@@ -158,6 +163,7 @@ export default function Modal({
         scrollScope={scrollScope}
         isVerticallyCentered={isVerticallyCentered}
         isKeyActionsEnabled={isKeyActionsEnabled}
+        overlayClassName={overlayClassName}
       >
         {children}
       </ModalContent>
