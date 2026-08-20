@@ -1,6 +1,6 @@
 "use client";
 
-import { HSOverlay, ICollectionItem } from "preline";
+import { HSOverlay, type ICollectionItem } from "preline/non-auto";
 import { useCallback } from "react";
 
 import { fixHTMLSelector } from "@/lib/utils/html";
@@ -24,16 +24,16 @@ async function getOverlayInstance(id: string) {
     const isLastAttempt = attempt === OVERLAY_MAX_ATTEMPTS - 1;
 
     try {
-      if (!window.HSOverlay) {
-        throw new Error("HSOverlay is not initialized");
-      }
-
-      const item = window.HSOverlay.getInstance(
+      const item = HSOverlay.getInstance(
         selector,
         true
       ) as ICollectionItem<HSOverlay> | null;
       if (item?.element) {
         return item.element;
+      }
+
+      if (isLastAttempt) {
+        throw new Error("Overlay instance was not found");
       }
     } catch (error) {
       if (isLastAttempt) {
@@ -41,7 +41,9 @@ async function getOverlayInstance(id: string) {
       }
     } finally {
       if (!isLastAttempt) {
-        await new Promise((resolve) => setTimeout(resolve, OVERLAY_DELAY));
+        await new Promise((resolve) => {
+          setTimeout(resolve, OVERLAY_DELAY);
+        });
       }
     }
   }

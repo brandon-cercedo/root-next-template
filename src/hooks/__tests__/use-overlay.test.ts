@@ -5,12 +5,18 @@ import { useOverlay } from "@/hooks/use-overlay";
 
 const mockOpen = vi.fn();
 const mockClose = vi.fn();
-const mockGetInstance = vi.fn();
+const mockGetInstance = vi.hoisted(() => vi.fn());
 
 const overlayElement = {
   open: mockOpen,
   close: mockClose,
 };
+
+vi.mock("preline/non-auto", () => ({
+  HSOverlay: {
+    getInstance: mockGetInstance,
+  },
+}));
 
 describe("useOverlay", () => {
   beforeEach(() => {
@@ -19,9 +25,6 @@ describe("useOverlay", () => {
     mockClose.mockReset();
     mockGetInstance.mockReset();
     mockGetInstance.mockReturnValue({ element: overlayElement });
-    window.HSOverlay = {
-      getInstance: mockGetInstance,
-    } as unknown as typeof window.HSOverlay;
     vi.spyOn(console, "error").mockImplementation(() => undefined);
   });
 
@@ -89,8 +92,8 @@ describe("useOverlay", () => {
     expect(instance).toBe(overlayElement);
   });
 
-  it("should log an error when HSOverlay never initializes", async () => {
-    window.HSOverlay = undefined as unknown as typeof window.HSOverlay;
+  it("should log an error when the overlay instance never appears", async () => {
+    mockGetInstance.mockReturnValue(null);
 
     const { result } = renderHook(() => useOverlay());
     const promise = result.current.getInstance("modal");
