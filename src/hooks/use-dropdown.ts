@@ -31,21 +31,21 @@ async function getDropdownInstance(id: string) {
       if (item?.element) {
         return item.element;
       }
-
-      if (isLastAttempt) {
-        throw new Error("Dropdown instance was not found");
-      }
     } catch (error) {
       if (isLastAttempt) {
         console.error("Failed to get dropdown instance", error);
-      }
-    } finally {
-      if (!isLastAttempt) {
-        await new Promise((resolve) => {
-          setTimeout(resolve, DROPDOWN_DELAY);
-        });
+        return;
       }
     }
+
+    if (isLastAttempt) {
+      console.error("Dropdown instance was not found");
+      return;
+    }
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, DROPDOWN_DELAY);
+    });
   }
 }
 

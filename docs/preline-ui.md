@@ -23,24 +23,23 @@ and when new plugin roots are added after first mount.
 | Client-only dynamic import     | Preline needs `window`; SSR would break or hydrate poorly          |
 | Root-layout `PrelineScript`    | One init path for the whole app; pages stay free of boilerplate    |
 | `usePreline` + pathname effect | App Router does not remount the layout; route changes need re-init |
-| MutationObserver               | Registers `hs-*` nodes added after first mount (portals, flags)    |
+| MutationObserver               | Registers nested `hs-*` nodes after first mount (tooltips, flags)  |
 | Delayed `autoInit` (~100ms)    | Give the new route DOM time to paint before scanning               |
 
 ## Flow
 
 The root layout mounts the `PrelineScriptDynamic` component, which calls the
-`usePreline` hook. It loads `preline/non-auto` once, then calls
-`HSStaticMethods.autoInit()` after import, on each pathname change, and when
-new plugin roots appear in the DOM.
+`usePreline` hook. It loads `preline/non-auto` once on the first pathname
+effect, then calls `HSStaticMethods.autoInit()` after that import, on later
+pathname changes, and when new plugin roots appear in the DOM.
 
 ```mermaid
 flowchart TD
   Layout["src/app/layout.tsx"] --> Script["PrelineScriptDynamic"]
   Script -->|ssr: false| PrelineScript["PrelineScript"]
   PrelineScript --> Hook["usePreline"]
-  Hook -->|first visit| Import["import('preline/non-auto')"]
-  Import --> FirstInit["autoInit after delay"]
-  Hook -->|pathname change| PathInit["autoInit after delay"]
+  Hook -->|first visit / route change| Import["import('preline/non-auto')"]
+  Import --> PathInit["autoInit after delay"]
   Hook -->|added hs-* node| Observer["autoInit after delay"]
   CSS["globals.css"] --> Variants["preline/variants.css"]
   CSS --> Source["@source preline/dist/*.js"]
@@ -58,8 +57,12 @@ Some relevant details:
 ## Considerations
 
 - **Initializing:**
-  - First paint is covered by `autoInit` after the import. The observer does
-    not see nodes that already exist.
+  - First paint is covered by `autoInit` after the import in the pathname
+    effect. The observer does not see nodes that already exist.
+  - Nested `hs-*` roots (tooltips inside truncated text, portals) are picked
+    up by the observer subtree scan.
+  - Backdrop nodes (`.hs-overlay-backdrop` and
+    `[data-hs-overlay-backdrop-template]`) do not trigger a rescan.
   - Call `init()` (or `init(["dropdown", "overlay"])`) after client-only
     DOM inserts if you need an immediate scan.
   - Same-tick `open(id)` still needs the overlay retry; `autoInit` cannot

@@ -3,9 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef } from "react";
 
-type StaticMethods = {
-  autoInit: (collection?: string | string[]) => void;
-};
+type PrelineModule = typeof import("preline/non-auto");
 
 const PRELINE_CLASS_PREFIX = "hs-";
 const PRELINE_INTERNAL_SELECTORS = [
@@ -13,35 +11,34 @@ const PRELINE_INTERNAL_SELECTORS = [
   "[data-hs-overlay-backdrop-template]",
 ];
 
-function isPluginRoot(element: Element) {
+function hasPrelineSelector(element: Element) {
+  const isInternal = PRELINE_INTERNAL_SELECTORS.some((selector) => {
+    return element.matches(selector);
+  });
+  if (isInternal) {
+    return false;
+  }
+
   return Array.from(element.classList).some((token) => {
     return token.startsWith(PRELINE_CLASS_PREFIX);
   });
 }
 
-function isPrelineInternal(element: Element) {
-  return PRELINE_INTERNAL_SELECTORS.some((selector) => {
-    return element.closest(selector) !== null;
-  });
-}
-
-function hasPluginRoot(node: Node) {
+function hasPrelineElement(node: Node) {
   if (node.nodeType !== Node.ELEMENT_NODE) {
     return false;
   }
 
+  // Check self
   const element = node as Element;
-  if (isPrelineInternal(element)) {
-    return false;
-  }
-
-  if (isPluginRoot(element)) {
+  if (hasPrelineSelector(element)) {
     return true;
   }
 
-  return Array.from(element.querySelectorAll("[class]")).some((child) => {
-    return isPluginRoot(child) && !isPrelineInternal(child);
-  });
+  // Check children
+  return Array.from(element.querySelectorAll("[class]")).some(
+    hasPrelineSelector
+  );
 }
 
 function shouldInit(mutations: MutationRecord[]) {
@@ -49,8 +46,7 @@ function shouldInit(mutations: MutationRecord[]) {
     if (mutation.type !== "childList") {
       return false;
     }
-
-    return Array.from(mutation.addedNodes).some(hasPluginRoot);
+    return Array.from(mutation.addedNodes).some(hasPrelineElement);
   });
 }
 
@@ -59,25 +55,17 @@ function shouldInit(mutations: MutationRecord[]) {
  *
  * @note Loads Preline once, then re-initializes on pathname changes
  * and when new plugin roots are added to the DOM.
- * @see {@link https://preline.co/docs/guides/nextjs.html}
+ * @see {@link https://preline.co/docs/guides/nextjs.html | Using Preline UI with Next.js}
  */
 export function usePreline() {
   const path = usePathname();
-  const previousPath = useRef(path);
-  const isLoaded = useRef(false);
-  const staticMethods = useRef<StaticMethods | null>(null);
-  const debounceId = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const preline = useRef<PrelineModule>(undefined);
 
   const init = useCallback(
     (collections?: string | string[], delay: number = 100) => {
       return setTimeout(() => {
-        const autoInit = staticMethods.current?.autoInit;
-        if (typeof autoInit !== "function") {
-          return;
-        }
-
         try {
-          autoInit(collections);
+          preline.current?.HSStaticMethods.autoInit(collections);
         } catch (error) {
           console.error(error);
         }
@@ -86,69 +74,53 @@ export function usePreline() {
     []
   );
 
-  const scheduleInit = useCallback(() => {
-    if (debounceId.current) {
-      clearTimeout(debounceId.current);
-    }
-    debounceId.current = init();
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    const handleInit = () => {
+      clearTimeout(timeoutId);
+      timeoutId = init();
+    };
+
+    const observer = new MutationObserver((mutations) => {
+      if (shouldInit(mutations)) {
+        handleInit();
+      }
+    });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(timeoutId);
+    };
   }, [init]);
 
   useEffect(() => {
     let isCancelled = false;
-    let observer: MutationObserver | null = null;
-    let firstInitId: ReturnType<typeof setTimeout> | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
     const load = async () => {
-      if (!isLoaded.current) {
-        const preline = await import("preline/non-auto");
-        if (isCancelled) {
-          return;
-        }
-
-        staticMethods.current = preline.HSStaticMethods;
-        isLoaded.current = true;
+      if (!preline.current) {
+        preline.current = await import("preline/non-auto");
       }
 
       if (isCancelled) {
         return;
       }
 
-      observer = new MutationObserver((mutations) => {
-        if (shouldInit(mutations)) {
-          scheduleInit();
-        }
-      });
-      observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-      });
-
-      firstInitId = init();
+      timeoutId = init();
     };
-
     void load();
 
     return () => {
       isCancelled = true;
-      observer?.disconnect();
-      if (debounceId.current) {
-        clearTimeout(debounceId.current);
-      }
-      if (firstInitId) {
-        clearTimeout(firstInitId);
-      }
+      clearTimeout(timeoutId);
     };
-  }, [init, scheduleInit]);
-
-  useEffect(() => {
-    if (previousPath.current === path) {
-      return;
-    }
-
-    previousPath.current = path;
-    const timeoutId = init();
-    return () => clearTimeout(timeoutId);
-  }, [path, init]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [path]);
 
   return { init };
 }

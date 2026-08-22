@@ -31,21 +31,21 @@ async function getOverlayInstance(id: string) {
       if (item?.element) {
         return item.element;
       }
-
-      if (isLastAttempt) {
-        throw new Error("Overlay instance was not found");
-      }
     } catch (error) {
       if (isLastAttempt) {
         console.error("Failed to get overlay instance", error);
-      }
-    } finally {
-      if (!isLastAttempt) {
-        await new Promise((resolve) => {
-          setTimeout(resolve, OVERLAY_DELAY);
-        });
+        return;
       }
     }
+
+    if (isLastAttempt) {
+      console.error("Overlay instance was not found");
+      return;
+    }
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, OVERLAY_DELAY);
+    });
   }
 }
 

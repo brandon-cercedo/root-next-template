@@ -130,8 +130,7 @@ describe("useDropdown", () => {
     await promise;
 
     expect(console.error).toHaveBeenCalledWith(
-      "Failed to get dropdown instance",
-      expect.any(Error)
+      "Dropdown instance was not found"
     );
   });
 });

@@ -101,8 +101,7 @@ describe("useOverlay", () => {
     await promise;
 
     expect(console.error).toHaveBeenCalledWith(
-      "Failed to get overlay instance",
-      expect.any(Error)
+      "Overlay instance was not found"
     );
   });
 });
