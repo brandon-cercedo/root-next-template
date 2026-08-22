@@ -6,13 +6,19 @@ import { useDropdown } from "@/hooks/use-dropdown";
 const mockOpen = vi.fn();
 const mockClose = vi.fn();
 const mockIsOpened = vi.fn();
-const mockGetInstance = vi.fn();
+const mockGetInstance = vi.hoisted(() => vi.fn());
 
 const dropdownElement = {
   open: mockOpen,
   close: mockClose,
   isOpened: mockIsOpened,
 };
+
+vi.mock("preline/non-auto", () => ({
+  HSDropdown: {
+    getInstance: mockGetInstance,
+  },
+}));
 
 describe("useDropdown", () => {
   beforeEach(() => {
@@ -22,9 +28,6 @@ describe("useDropdown", () => {
     mockIsOpened.mockReset();
     mockGetInstance.mockReset();
     mockGetInstance.mockReturnValue({ element: dropdownElement });
-    window.HSDropdown = {
-      getInstance: mockGetInstance,
-    } as unknown as typeof window.HSDropdown;
     vi.spyOn(console, "error").mockImplementation(() => undefined);
   });
 
@@ -93,6 +96,20 @@ describe("useDropdown", () => {
     expect(mockClose).not.toHaveBeenCalled();
   });
 
+  it("should retry until the dropdown instance is available", async () => {
+    mockGetInstance
+      .mockReturnValueOnce(null)
+      .mockReturnValueOnce({ element: dropdownElement });
+
+    const { result } = renderHook(() => useDropdown());
+    const promise = result.current.getInstance("menu");
+    await flushDelay(200);
+    const instance = await promise;
+
+    expect(mockGetInstance).toHaveBeenCalledTimes(2);
+    expect(instance).toBe(dropdownElement);
+  });
+
   it("should skip open and close when the selector is invalid", async () => {
     const { result } = renderHook(() => useDropdown());
     await result.current.open("");
@@ -104,8 +121,8 @@ describe("useDropdown", () => {
     expect(console.error).toHaveBeenCalled();
   });
 
-  it("should log an error when HSDropdown never initializes", async () => {
-    window.HSDropdown = undefined as unknown as typeof window.HSDropdown;
+  it("should log an error when the dropdown instance never appears", async () => {
+    mockGetInstance.mockReturnValue(null);
 
     const { result } = renderHook(() => useDropdown());
     const promise = result.current.getInstance("menu");
@@ -113,8 +130,7 @@ describe("useDropdown", () => {
     await promise;
 
     expect(console.error).toHaveBeenCalledWith(
-      "Failed to get dropdown instance",
-      expect.any(Error)
+      "Dropdown instance was not found"
     );
   });
 });

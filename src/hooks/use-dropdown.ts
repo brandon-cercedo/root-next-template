@@ -1,6 +1,6 @@
 "use client";
 
-import { HSDropdown, ICollectionItem } from "preline";
+import { HSDropdown, type ICollectionItem } from "preline/non-auto";
 import { useCallback } from "react";
 
 import { fixHTMLSelector } from "@/lib/utils/html";
@@ -24,11 +24,7 @@ async function getDropdownInstance(id: string) {
     const isLastAttempt = attempt === DROPDOWN_MAX_ATTEMPTS - 1;
 
     try {
-      if (!window.HSDropdown) {
-        throw new Error("HSDropdown is not initialized");
-      }
-
-      const item = window.HSDropdown.getInstance(
+      const item = HSDropdown.getInstance(
         selector,
         true
       ) as ICollectionItem<HSDropdown> | null;
@@ -38,12 +34,18 @@ async function getDropdownInstance(id: string) {
     } catch (error) {
       if (isLastAttempt) {
         console.error("Failed to get dropdown instance", error);
-      }
-    } finally {
-      if (!isLastAttempt) {
-        await new Promise((resolve) => setTimeout(resolve, DROPDOWN_DELAY));
+        return;
       }
     }
+
+    if (isLastAttempt) {
+      console.error("Dropdown instance was not found");
+      return;
+    }
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, DROPDOWN_DELAY);
+    });
   }
 }
 
