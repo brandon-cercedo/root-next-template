@@ -67,6 +67,43 @@ Enforced by ESLint / Prettier / Commitlint — follow these over conflicting pro
   - Parent folder: prefer placing tests under `__tests__` folders.
   - Public and exported APIs: should be covered by tests.
 
+### Folder Structure
+
+<details>
+<summary>Check out the below folder structure to understand how the project must be organized:</summary>
+
+```sh
+src/
++-- app/               # Next.js app router (pages, layouts)
++-- assets/            # Static files (images, fonts, icons)
++-- components/        # Shared UI components
+    +-- ui/            # Reusable UI primitives and framework-agnostic (Button, Input, Modal)
+    +-- layout/        # Layout components (Header, Sidebar, Footer)
++-- hooks/             # Shared custom hooks (useAuth, useLocalStorage)
++-- features/          # Feature-based modules
+    +-- auth/
+        +-- actions/     # Server actions only (login.ts, register.ts)
+        +-- utils/       # Feature utils (generate-password.ts)
+        +-- components/  # Feature components (LoginForm, SignupModal)
+        +-- hooks/       # Feature hooks (useAuth, useSession)
+        +-- types/       # Feature types (User, AuthState)
+        +-- stores/      # Feature state (authStore.ts)
+        +-- api/         # External API calls (oauth.ts, resetPassword.ts)
+        +-- schema/      # Feature schemas (auth.ts)
++-- lib/               # Shared utilities and configurations
+    +-- config/        # App config (env.ts, database.ts, auth.ts)
+    +-- utils/         # Pure utilities (format.ts, validation.ts)
++-- actions/           # Shared server actions
+    +-- db/            # DB utilities (user.ts, profile.ts)
++-- types/             # Global TypeScript types (api.ts, common.ts)
++-- stores/            # Global state stores (userStore.ts, appStore.ts)
++-- tests/             # Test utilities, mocks, and setup files
+```
+
+Also, use `__tests__` folders to colocate tests alongside the code they verify.
+
+</details>
+
 ## Programming Principles
 
 Ensure these programming principles are followed when writing code:
@@ -80,6 +117,7 @@ Ensure these programming principles are followed when writing code:
 Also, consider the following code guidelines:
 
 - Max 2 function arguments; use an object if more.
+- Put shared functions in shared folders; otherwise, keep them local.
 - Avoid negative variable names.
 - Only comment things that have business logic complexity.
 - Prefer early returns over nesting. For example, prefer this:
@@ -101,6 +139,8 @@ if (isValid) {
   doSomething();
 }
 ```
+
+- Only use `mergeClsx` or `clsx` for conditional or dynamic class names. DO NOT use it to split long static class strings across lines.
 
 ## Summary
 
