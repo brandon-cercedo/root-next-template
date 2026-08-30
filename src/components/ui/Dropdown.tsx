@@ -106,7 +106,7 @@ export default function Dropdown({
       </div>
       <div
         className={mergeClsx(
-          "hs-dropdown-menu duration mt-2 hidden max-w-60 divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white opacity-0 shadow-md transition-[opacity,margin] before:absolute before:start-0 before:-top-4 before:h-4 before:w-full after:absolute after:start-0 after:-bottom-4 after:h-4 after:w-full dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 hs-dropdown-open:opacity-100",
+          "hs-dropdown-menu duration mt-2 hidden max-w-60 divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white opacity-0 shadow-md transition-[opacity,margin] before:absolute before:inset-s-0 before:-top-4 before:h-4 before:w-full after:absolute after:inset-s-0 after:-bottom-4 after:h-4 after:w-full dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 hs-dropdown-open:opacity-100",
           className
         )}
         role="menu"

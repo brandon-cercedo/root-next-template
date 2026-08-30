@@ -18,6 +18,7 @@ export default defineConfig({
       NEXTAUTH_SECRET: "test-secret",
       GOOGLE_CLIENT_ID: "test-google-client-id",
       GOOGLE_CLIENT_SECRET: "test-google-client-secret",
+      FLAGS_SECRET: "test-flags-secret",
       NEXT_PUBLIC_BASE_URL: "http://localhost:3000",
       NEXT_PUBLIC_APP_VERSION: "0.1.0",
     },
