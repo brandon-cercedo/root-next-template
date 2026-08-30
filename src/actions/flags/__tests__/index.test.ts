@@ -2,10 +2,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import {
-  deleteFlagOverrides,
-  updateFlagOverrides,
-} from "@/actions/flags";
+import { deleteFlagOverrides, updateFlagOverrides } from "@/actions/flags";
 import {
   FLAG_OVERRIDE_COOKIE_NAME,
   FLAG_OVERRIDE_COOKIE_PATH,
