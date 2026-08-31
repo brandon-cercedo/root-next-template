@@ -1,4 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
+import { HSOverlay } from "preline/non-auto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useOverlay } from "@/hooks/use-overlay";
@@ -6,10 +7,16 @@ import { useOverlay } from "@/hooks/use-overlay";
 const mockOpen = vi.fn();
 const mockClose = vi.fn();
 const mockGetInstance = vi.hoisted(() => vi.fn());
+const mockClassListContains = vi.hoisted(() => vi.fn());
 
 const overlayElement = {
   open: mockOpen,
   close: mockClose,
+  el: {
+    classList: {
+      contains: mockClassListContains,
+    },
+  },
 };
 
 vi.mock("preline/non-auto", () => ({
@@ -23,8 +30,10 @@ describe("useOverlay", () => {
     vi.useFakeTimers();
     mockOpen.mockReset();
     mockClose.mockReset();
+    mockClassListContains.mockReset();
     mockGetInstance.mockReset();
     mockGetInstance.mockReturnValue({ element: overlayElement });
+    mockClassListContains.mockReturnValue(false);
     vi.spyOn(console, "error").mockImplementation(() => undefined);
   });
 
@@ -65,6 +74,70 @@ describe("useOverlay", () => {
     await promise;
 
     expect(mockClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("should toggle open overlay to close", async () => {
+    mockClassListContains.mockImplementation(
+      (token: string) => token === "open"
+    );
+
+    const { result } = renderHook(() => useOverlay());
+    const promise = result.current.toggle("modal");
+    await flushDelay();
+    await promise;
+
+    expect(mockClose).toHaveBeenCalledTimes(1);
+    expect(mockOpen).not.toHaveBeenCalled();
+  });
+
+  it("should toggle closed overlay to open", async () => {
+    mockClassListContains.mockReturnValue(false);
+
+    const { result } = renderHook(() => useOverlay());
+    const promise = result.current.toggle("modal");
+    await flushDelay();
+    await promise;
+
+    expect(mockOpen).toHaveBeenCalledTimes(1);
+    expect(mockClose).not.toHaveBeenCalled();
+  });
+
+  it("should return open state from isOpen", async () => {
+    mockClassListContains.mockImplementation(
+      (token: string) => token === "open"
+    );
+
+    const { result } = renderHook(() => useOverlay());
+    const promise = result.current.isOpen("modal");
+    await flushDelay();
+    const opened = await promise;
+
+    expect(opened).toBe(true);
+  });
+
+  it("should return open state from isOpen when passed an instance", async () => {
+    mockClassListContains.mockImplementation(
+      (token: string) => token === "open"
+    );
+
+    const { result } = renderHook(() => useOverlay());
+    const opened = await result.current.isOpen(
+      overlayElement as unknown as HSOverlay
+    );
+
+    expect(mockGetInstance).not.toHaveBeenCalled();
+    expect(opened).toBe(true);
+  });
+
+  it("should return false from isOpen when instance is missing", async () => {
+    mockGetInstance.mockReturnValue(null);
+
+    const { result } = renderHook(() => useOverlay());
+    const promise = result.current.isOpen("modal");
+    await flushDelay(2000);
+    const opened = await promise;
+
+    expect(opened).toBe(false);
   });
 
   it("should skip open and close when the selector is invalid", async () => {
