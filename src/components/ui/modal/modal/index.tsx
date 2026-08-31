@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { Fragment, KeyboardEvent, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { ModalProvider } from "@/hooks/use-modal";
 import { mergeClsx } from "@/lib/utils/styles";
 
 import ModalTrigger from "../ModalTrigger";
@@ -47,11 +48,11 @@ function ModalContent({
   isVerticallyCentered = false,
   isKeyActionsEnabled = true,
 }: ModalContentProps) {
-  const [mounted, setMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true);
+    setIsMounted(true);
   }, []);
 
   const handleKeyDownCapture = (event: KeyboardEvent<HTMLElement>) => {
@@ -61,7 +62,7 @@ function ModalContent({
     event.stopPropagation();
   };
 
-  if (!mounted) {
+  if (!isMounted) {
     return null;
   }
 
@@ -103,7 +104,9 @@ function ModalContent({
             className
           )}
         >
-          {children}
+          <ModalProvider id={id} isMounted={isMounted}>
+            {children}
+          </ModalProvider>
         </div>
       </div>
     </div>,

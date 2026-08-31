@@ -55,6 +55,19 @@ export function useOverlay() {
     []
   );
 
+  const isOpen = useCallback(
+    async (id: string | HSOverlay) => {
+      const instance = typeof id === "string" ? await getInstance(id) : id;
+      if (!instance) {
+        return false;
+      }
+
+      const classList = instance.el.classList;
+      return classList.contains("open") && !classList.contains("hidden");
+    },
+    [getInstance]
+  );
+
   const open = useCallback(
     async (id: string) => {
       const instance = await getInstance(id);
@@ -79,5 +92,23 @@ export function useOverlay() {
     [getInstance]
   );
 
-  return { getInstance, open, close };
+  const toggle = useCallback(
+    async (id: string) => {
+      const instance = await getInstance(id);
+      if (!instance) {
+        return;
+      }
+
+      const isInstanceOpen = await isOpen(instance);
+      if (isInstanceOpen) {
+        instance.close();
+        return;
+      }
+
+      instance.open();
+    },
+    [getInstance, isOpen]
+  );
+
+  return { getInstance, isOpen, open, close, toggle };
 }
