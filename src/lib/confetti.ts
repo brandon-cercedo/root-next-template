@@ -1,6 +1,6 @@
 import confetti from "canvas-confetti";
 
-export function burstConfetti() {
+export function confettiSchoolPride() {
   void confetti({
     particleCount: 250,
     spread: 80,

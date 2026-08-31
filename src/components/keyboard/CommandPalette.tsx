@@ -1,88 +1,144 @@
 "use client";
 
 import { Command } from "cmdk";
-import { Check, LucideSearch } from "lucide-react";
+import {
+  Check,
+  Home,
+  LogOut,
+  LucideIcon,
+  LucideSearchX,
+  Monitor,
+  Moon,
+  PanelLeft,
+  PartyPopper,
+  Sun,
+  ToggleLeft,
+} from "lucide-react";
 import { useEffect, useRef } from "react";
 
 import { OVERLAY_IDS } from "@/components/constants";
-import Modal from "@/components/ui/modal/Modal";
+import { useModal } from "@/hooks/use-modal";
+import { useOverlay } from "@/hooks/use-overlay";
 import { Theme } from "@/hooks/use-theme";
 import {
   COMMAND_GROUPS,
+  CommandGroup,
   CommandId,
-  KEYBOARD_COMMANDS,
+  getShortcutKeys,
+  KeyboardCommand,
 } from "@/lib/keyboard/commands";
 import { mergeClsx } from "@/lib/utils/styles";
 
-import Kbd from "./Kbd";
-import "./command-palette.css";
+import MessageWithImage from "../ui/MessageWithImage";
+import Modal from "../ui/modal/modal";
 
-type CommandPaletteProps = {
-  isOpen: boolean;
-  theme: Theme | undefined;
-  onSelect: (id: CommandId) => void;
+import KbdList from "./Kbd";
+
+const COMMAND_ICONS: Partial<Record<CommandId, LucideIcon>> = {
+  "theme-light": Sun,
+  "theme-dark": Moon,
+  "theme-system": Monitor,
+  "toggle-sidebar": PanelLeft,
+  "go-home": Home,
+  "log-out": LogOut,
+  confetti: PartyPopper,
+  "open-flag-toolbar": ToggleLeft,
 };
 
-function getCommandsByGroup(group: (typeof COMMAND_GROUPS)[number]) {
-  return KEYBOARD_COMMANDS.filter((command) => command.group === group);
+function getCommandsByGroup(commands: KeyboardCommand[], group: CommandGroup) {
+  return commands.filter((command) => {
+    if (command.inPalette === false) {
+      return false;
+    }
+    return command.group === group;
+  });
 }
 
-export default function CommandPalette({
-  isOpen,
+function Content({
   theme,
-  onSelect,
-}: CommandPaletteProps) {
+  commands,
+}: {
+  theme: Theme | undefined;
+  commands: KeyboardCommand[];
+}) {
+  const { close } = useOverlay();
+  const { isMounted } = useModal();
   const inputRef = useRef<HTMLInputElement>(null);
+  const paletteToggle = commands.find((command) => {
+    return command.id === "toggle-palette";
+  });
 
   useEffect(() => {
-    if (!isOpen) {
+    if (!isMounted) {
       return;
     }
 
-    const frameId = requestAnimationFrame(() => {
-      inputRef.current?.focus();
-    });
+    const input = inputRef.current;
+    if (!input) {
+      return;
+    }
 
-    return () => cancelAnimationFrame(frameId);
-  }, [isOpen]);
+    // Preline HSOverlay.focusElement() uses querySelector('[autofocus]').
+    input.setAttribute("autofocus", "");
+  }, [isMounted]);
 
   return (
-    <Modal
-      id={OVERLAY_IDS.COMMAND_PALETTE}
-      trigger={null}
-      size="md"
-      overlayOptions={{ isClosePrev: false }}
-      overlayClassName="[--has-autofocus:false]"
-      className="command-palette overflow-hidden border-gray-200 bg-white dark:border-neutral-700 dark:bg-neutral-800"
+    <Command
+      label="Command menu"
+      className="flex flex-col gap-2 overflow-hidden p-1"
+      onKeyDown={(event) => {
+        if (event.key !== "Enter") {
+          return;
+        }
+        // Preline HSOverlay onEnter reopens the modal when Enter
+        event.stopPropagation();
+      }}
     >
-      <Command
-        label="Command palette"
-        className="flex flex-col text-[13px] leading-5"
-      >
-        <div className="flex items-center gap-2 border-b border-gray-200 px-3 py-2.5 dark:border-neutral-700">
-          <LucideSearch
-            className="size-4 flex-none text-gray-400 dark:text-neutral-500"
-            aria-hidden="true"
-          />
+      <div className="space-y-0.5 px-2 py-1">
+        <div className="flex items-center gap-2">
           <Command.Input
             ref={inputRef}
-            placeholder="Search actions..."
-            className={mergeClsx(
-              "text-[13px] leading-5 text-gray-800",
-              "placeholder:text-gray-500 dark:text-neutral-200",
-              "dark:placeholder:text-neutral-500"
-            )}
+            autoFocus={false}
+            placeholder="Type a command or search…"
+            className="block w-full rounded-lg border-0 bg-transparent px-0 py-1.5 text-[13px] leading-5 shadow-none ring-0 outline-none focus:border-0 focus:ring-0 focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-neutral-400 dark:placeholder-neutral-500"
           />
-          <Kbd mac="⌘K" windows="Ctrl+K" />
+          {paletteToggle?.shortcut ? (
+            <KbdList keys={getShortcutKeys(paletteToggle.shortcut)} />
+          ) : null}
         </div>
-        <Command.List className="px-1 py-1">
-          <Command.Empty>No results found.</Command.Empty>
-          {COMMAND_GROUPS.map((group) => (
-            <Command.Group key={group} heading={group}>
-              {getCommandsByGroup(group).map((command) => {
+      </div>
+      <Command.List className="max-h-96 scrollbar-thin overflow-y-auto overscroll-contain">
+        <Command.Empty className="px-3 py-6 text-center text-[13px] text-gray-500 dark:text-neutral-400">
+          <MessageWithImage
+            title="No matching commands"
+            image={
+              <LucideSearchX
+                className="size-10 flex-none text-gray-500 dark:text-neutral-400"
+                strokeWidth={1}
+              />
+            }
+            className="gap-2 px-2 py-3"
+            titleClassName="text-[13px] leading-5 font-medium text-gray-500 dark:text-gray-400"
+          />
+        </Command.Empty>
+
+        {COMMAND_GROUPS.map((group) => {
+          const groupCommands = getCommandsByGroup(commands, group);
+          if (groupCommands.length === 0) {
+            return null;
+          }
+
+          return (
+            <Command.Group
+              key={group}
+              heading={group}
+              className="flex flex-col **:[[cmdk-group-heading]]:p-2 **:[[cmdk-group-heading]]:text-[10px] **:[[cmdk-group-heading]]:leading-5 **:[[cmdk-group-heading]]:font-medium **:[[cmdk-group-heading]]:text-gray-500 **:[[cmdk-group-heading]]:uppercase dark:**:[[cmdk-group-heading]]:text-neutral-500 **:[[cmdk-group-items]]:space-y-0.5"
+            >
+              {groupCommands.map((command) => {
                 const isThemeCommand = command.id.startsWith("theme-");
                 const themeValue = command.id.replace("theme-", "") as Theme;
                 const isActiveTheme = isThemeCommand && theme === themeValue;
+                const Icon = COMMAND_ICONS[command.id];
 
                 return (
                   <Command.Item
@@ -90,36 +146,63 @@ export default function CommandPalette({
                     value={[command.label, ...(command.keywords ?? [])].join(
                       " "
                     )}
-                    aria-checked={isActiveTheme ? true : undefined}
-                    onSelect={() => onSelect(command.id)}
-                    className={mergeClsx(
-                      "flex items-center justify-between gap-3",
-                      "rounded-lg px-2 py-1.5 text-gray-800",
-                      "dark:text-neutral-200"
-                    )}
+                    onSelect={() => {
+                      command.run();
+                      void close(OVERLAY_IDS.COMMAND_PALETTE);
+                    }}
+                    className="flex cursor-pointer items-center gap-x-3 rounded-lg px-2 py-1.5 text-[13px] leading-5 text-gray-800 select-none hover:bg-gray-100 focus:bg-gray-100 focus:outline-hidden data-[selected=true]:bg-gray-100 dark:text-neutral-200 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:data-[selected=true]:bg-neutral-700 dark:data-[selected=true]:text-neutral-300"
                   >
-                    <span className="truncate">{command.label}</span>
-                    <span className="flex items-center gap-2">
-                      {isActiveTheme ? (
-                        <Check
-                          className="size-3.5 flex-none text-gray-500 dark:text-neutral-400"
-                          aria-hidden="true"
-                        />
-                      ) : null}
-                      {command.kbdMac && command.kbdWindows ? (
-                        <Kbd
-                          mac={command.kbdMac}
-                          windows={command.kbdWindows}
-                        />
-                      ) : null}
-                    </span>
+                    {Icon ? (
+                      <Icon
+                        className={mergeClsx(
+                          "size-4 flex-none",
+                          group === "Admin"
+                            ? "text-indigo-600 dark:text-indigo-500"
+                            : "text-gray-500 dark:text-neutral-400"
+                        )}
+                        aria-hidden="true"
+                      />
+                    ) : null}
+                    <span className="w-full truncate">{command.label}</span>
+                    {isActiveTheme ? (
+                      <Check className="size-3.5 flex-none text-gray-500 dark:text-neutral-400" />
+                    ) : null}
+                    {command.shortcut ? (
+                      <KbdList keys={getShortcutKeys(command.shortcut)} />
+                    ) : null}
                   </Command.Item>
                 );
               })}
             </Command.Group>
-          ))}
-        </Command.List>
-      </Command>
+          );
+        })}
+      </Command.List>
+    </Command>
+  );
+}
+
+type CommandPaletteProps = {
+  theme: Theme | undefined;
+  commands: KeyboardCommand[];
+};
+
+export default function CommandPalette({
+  theme,
+  commands,
+}: CommandPaletteProps) {
+  return (
+    <Modal
+      id={OVERLAY_IDS.COMMAND_PALETTE}
+      className="shadow-xl"
+      rootClassName="top-32"
+      size="md"
+      overlayOptions={{
+        isClosePrev: false,
+        backdropExtraClasses: "bg-transparent dark:bg-transparent",
+      }}
+      transition="scale"
+    >
+      <Content theme={theme} commands={commands} />
     </Modal>
   );
 }

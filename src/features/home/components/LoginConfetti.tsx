@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 
 import { completeLoginConfetti, FullUser } from "@/actions/db/user";
-import { burstConfetti } from "@/lib/confetti";
+import { confettiSchoolPride } from "@/lib/confetti";
 
 export default function LoginConfetti({ user }: { user: FullUser }) {
   const hasSeen = !!user.setting?.preferences.loginConfettiSeenAt;
@@ -14,7 +14,7 @@ export default function LoginConfetti({ user }: { user: FullUser }) {
     }
 
     const run = () => {
-      burstConfetti();
+      confettiSchoolPride();
       void completeLoginConfetti();
     };
 

@@ -1,25 +1,87 @@
-export type CommandGroup = "Theme" | "Navigation" | "Actions";
+import { isMac } from "@/lib/utils/html";
+
+export const COMMAND_GROUPS = [
+  "Theme",
+  "Navigation",
+  "Actions",
+  "Admin",
+] as const;
+
+export type CommandGroup = (typeof COMMAND_GROUPS)[number];
 
 export type CommandId =
+  | "toggle-palette"
+  | "open-palette"
+  | "toggle-theme"
   | "theme-light"
   | "theme-dark"
   | "theme-system"
   | "toggle-sidebar"
   | "go-home"
   | "log-out"
-  | "confetti";
+  | "confetti"
+  | "open-flag-toolbar";
 
-export type KeyboardCommand = {
+type Shortcut = {
+  chord: string; // e.g. "$mod+k"
+  labels: {
+    mac: string[]; // e.g. ["⌘", "K"]
+    windows: string[]; // e.g. ["Ctrl", "K"]
+  };
+};
+
+export type BaseKeyboardCommand = {
   id: CommandId;
   label: string;
   group: CommandGroup;
   keywords?: string[];
-  chord?: string;
-  kbdMac?: string;
-  kbdWindows?: string;
+  shortcut?: Shortcut;
+  inPalette?: boolean;
 };
 
-export const KEYBOARD_COMMANDS: KeyboardCommand[] = [
+export type KeyboardCommand = BaseKeyboardCommand & {
+  run: () => void;
+};
+
+export function getShortcutKeys({ labels }: Shortcut) {
+  return isMac() ? labels.mac : labels.windows;
+}
+
+const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
+  {
+    id: "toggle-palette",
+    label: "Toggle command palette",
+    group: "Navigation",
+    shortcut: {
+      chord: "$mod+k",
+      labels: { mac: ["⌘", "K"], windows: ["Ctrl", "K"] },
+    },
+    inPalette: false,
+  },
+  {
+    id: "open-palette",
+    label: "Open command palette",
+    group: "Navigation",
+    shortcut: {
+      chord: "/",
+      labels: { mac: ["/"], windows: ["/"] },
+    },
+    inPalette: false,
+  },
+  {
+    id: "toggle-theme",
+    label: "Toggle theme",
+    group: "Theme",
+    keywords: ["appearance", "mode"],
+    shortcut: {
+      chord: "$mod+Shift+l",
+      labels: {
+        mac: ["⌘", "⇧", "L"],
+        windows: ["Ctrl", "Shift", "L"],
+      },
+    },
+    inPalette: false,
+  },
   {
     id: "theme-light",
     label: "Theme: Light",
@@ -43,9 +105,10 @@ export const KEYBOARD_COMMANDS: KeyboardCommand[] = [
     label: "Toggle sidebar",
     group: "Navigation",
     keywords: ["panel", "menu"],
-    chord: "$mod+b",
-    kbdMac: "⌘B",
-    kbdWindows: "Ctrl+B",
+    shortcut: {
+      chord: "$mod+b",
+      labels: { mac: ["⌘", "B"], windows: ["Ctrl", "B"] },
+    },
   },
   {
     id: "go-home",
@@ -64,22 +127,54 @@ export const KEYBOARD_COMMANDS: KeyboardCommand[] = [
     label: "Confetti",
     group: "Actions",
     keywords: ["celebrate", "party"],
-    chord: "$mod+Shift+.",
-    kbdMac: "⌘⇧.",
-    kbdWindows: "Ctrl+Shift+.",
+    shortcut: {
+      chord: "$mod+Shift+.",
+      labels: {
+        mac: ["⌘", "⇧", "."],
+        windows: ["Ctrl", "Shift", "."],
+      },
+    },
+  },
+  {
+    id: "open-flag-toolbar",
+    label: "Open flag toolbar",
+    group: "Admin",
+    keywords: ["flags", "feature", "debug"],
+    shortcut: {
+      chord: "$mod+Shift+f",
+      labels: {
+        mac: ["⌘", "⇧", "F"],
+        windows: ["Ctrl", "Shift", "F"],
+      },
+    },
   },
 ];
 
-export const KEYBOARD_CHORDS = {
-  TOGGLE_PALETTE: "$mod+k",
-  OPEN_PALETTE: "/",
-  TOGGLE_THEME: "$mod+Shift+l",
-  TOGGLE_SIDEBAR: "$mod+b",
-  CONFETTI: "$mod+Shift+.",
-} as const;
+export type CommandActions = Partial<Record<CommandId, () => void>>;
 
-export const COMMAND_GROUPS: CommandGroup[] = [
-  "Theme",
-  "Navigation",
-  "Actions",
-];
+export function getKeyboardCommands(actions: CommandActions) {
+  return BASE_KEYBOARD_COMMANDS.reduce<KeyboardCommand[]>((acc, item) => {
+    const run = actions[item.id];
+    if (!run) {
+      return acc;
+    }
+
+    const command: KeyboardCommand = {
+      ...item,
+      run,
+    };
+    acc.push(command);
+
+    return acc;
+  }, []);
+}
+
+type ShortcutCommand = KeyboardCommand & {
+  shortcut: Shortcut;
+};
+
+export function getShortcutCommands(commands: KeyboardCommand[]) {
+  return commands.filter((command): command is ShortcutCommand =>
+    Boolean(command.shortcut)
+  );
+}
