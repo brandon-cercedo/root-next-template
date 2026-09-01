@@ -3,6 +3,8 @@
 import { LucideBell } from "lucide-react";
 import { toast } from "sonner";
 
+import { useFlag } from "@/hooks/use-flag";
+
 const DEMO_TOASTS = [
   {
     id: "default",
@@ -32,6 +34,12 @@ const DEMO_TOASTS = [
 ] as const;
 
 export default function DemoToastSection() {
+  const { values } = useFlag();
+
+  if (!values?.["client-debug"]) {
+    return null;
+  }
+
   return (
     <section className="flex w-full flex-col gap-4">
       <div className="flex items-center gap-2">
