@@ -1,4 +1,17 @@
+import {
+  Home,
+  LogOut,
+  Monitor,
+  Moon,
+  PanelLeft,
+  PartyPopper,
+  Sun,
+  ToggleLeft,
+} from "lucide-react";
+
 import { isMac } from "@/lib/utils/html";
+
+import type { ReactNode } from "react";
 
 export const COMMAND_GROUPS = [
   "Theme",
@@ -37,6 +50,7 @@ export type BaseKeyboardCommand = {
   keywords?: string[];
   shortcut?: Shortcut;
   inPalette?: boolean;
+  icon?: ReactNode;
 };
 
 export type KeyboardCommand = BaseKeyboardCommand & {
@@ -74,10 +88,10 @@ const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
     group: "Theme",
     keywords: ["appearance", "mode"],
     shortcut: {
-      chord: "$mod+Shift+l",
+      chord: "$mod+Shift+,",
       labels: {
-        mac: ["⌘", "⇧", "L"],
-        windows: ["Ctrl", "Shift", "L"],
+        mac: ["⌘", "⇧", ","],
+        windows: ["Ctrl", "Shift", ","],
       },
     },
     inPalette: false,
@@ -87,18 +101,27 @@ const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
     label: "Theme: Light",
     group: "Theme",
     keywords: ["appearance", "mode"],
+    icon: (
+      <Sun className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
   },
   {
     id: "theme-dark",
     label: "Theme: Dark",
     group: "Theme",
     keywords: ["appearance", "mode"],
+    icon: (
+      <Moon className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
   },
   {
     id: "theme-system",
     label: "Theme: System",
     group: "Theme",
     keywords: ["appearance", "mode", "auto"],
+    icon: (
+      <Monitor className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
   },
   {
     id: "toggle-sidebar",
@@ -109,18 +132,27 @@ const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
       chord: "$mod+b",
       labels: { mac: ["⌘", "B"], windows: ["Ctrl", "B"] },
     },
+    icon: (
+      <PanelLeft className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
   },
   {
     id: "go-home",
     label: "Go to Home",
     group: "Navigation",
     keywords: ["dashboard"],
+    icon: (
+      <Home className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
   },
   {
     id: "log-out",
     label: "Log out",
     group: "Actions",
     keywords: ["sign out", "exit"],
+    icon: (
+      <LogOut className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
   },
   {
     id: "confetti",
@@ -134,6 +166,9 @@ const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
         windows: ["Ctrl", "Shift", "."],
       },
     },
+    icon: (
+      <PartyPopper className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
   },
   {
     id: "open-flag-toolbar",
@@ -141,12 +176,15 @@ const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
     group: "Admin",
     keywords: ["flags", "feature", "debug"],
     shortcut: {
-      chord: "$mod+Shift+f",
+      chord: "$mod+Shift+/",
       labels: {
-        mac: ["⌘", "⇧", "F"],
-        windows: ["Ctrl", "Shift", "F"],
+        mac: ["⌘", "⇧", "/"],
+        windows: ["Ctrl", "Shift", "/"],
       },
     },
+    icon: (
+      <ToggleLeft className="size-4 flex-none text-indigo-600 dark:text-indigo-500" />
+    ),
   },
 ];
 
@@ -169,7 +207,7 @@ export function getKeyboardCommands(actions: CommandActions) {
   }, []);
 }
 
-type ShortcutCommand = KeyboardCommand & {
+export type ShortcutCommand = KeyboardCommand & {
   shortcut: Shortcut;
 };
 

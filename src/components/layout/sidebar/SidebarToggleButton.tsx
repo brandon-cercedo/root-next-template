@@ -10,9 +10,7 @@ export default function SidebarToggleButton() {
       aria-haspopup="dialog"
       aria-expanded={false}
       aria-controls={OVERLAY_IDS.SIDEBAR}
-      aria-keyshortcuts="Meta+B Control+B"
       data-hs-overlay={`#${OVERLAY_IDS.SIDEBAR}`}
-      title="Toggle sidebar (⌘B / Ctrl+B)"
     >
       <LucideSidebarClose className="hidden size-3.5 flex-none hs-overlay-layout-open:block" />
       <LucideSidebarOpen className="block size-3.5 flex-none hs-overlay-layout-open:hidden" />

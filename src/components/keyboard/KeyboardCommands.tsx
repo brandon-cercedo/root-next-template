@@ -2,25 +2,45 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { KeybindingsMap, tinykeys } from "tinykeys";
+import {
+  defaultKeybindingsHandlerIgnore,
+  KeybindingsMap,
+  matchKeybindingPress,
+  parseKeybinding,
+  tinykeys,
+} from "tinykeys";
 
 import { DROPDOWN_IDS, OVERLAY_IDS } from "@/components/constants";
+import {
+  CommandActions,
+  getKeyboardCommands,
+  getShortcutCommands,
+  ShortcutCommand,
+} from "@/components/keyboard/config";
 import { useDropdown } from "@/hooks/use-dropdown";
 import { useOverlay } from "@/hooks/use-overlay";
 import { useTheme } from "@/hooks/use-theme";
 import { useUser } from "@/hooks/use-user";
 import { confettiSchoolPride } from "@/lib/confetti";
 import { paths } from "@/lib/config/paths";
-import {
-  CommandActions,
-  getKeyboardCommands,
-  getShortcutCommands,
-} from "@/lib/keyboard/commands";
 import { isAdmin } from "@/lib/utils/db/user";
 import { isEditableTarget } from "@/lib/utils/html";
 
 import CommandPalette from "./CommandPalette";
 
+function isTogglePaletteEvent(
+  event: KeyboardEvent,
+  shortcut: ShortcutCommand
+) {
+  const chord = shortcut.shortcut.chord;
+  const press = parseKeybinding(chord)[0];
+  return press && matchKeybindingPress(event, press);
+}
+
+/**
+ * @note By default, tinykeys ignores keyboard events from [contenteditable],
+ * input, textarea, and select unless they are the event.currentTarget.
+ */
 export default function KeyboardCommands() {
   const { open, toggle, isOpen } = useOverlay();
   const { open: openDropdown } = useDropdown();
@@ -68,6 +88,9 @@ export default function KeyboardCommands() {
   };
   const commands = getKeyboardCommands(actions);
   const shortcuts = getShortcutCommands(commands);
+  const togglePaletteShortcut = shortcuts.find((command) => {
+    return command.id === "toggle-palette";
+  });
 
   useEffect(() => {
     const keybindings = shortcuts.reduce<KeybindingsMap>((acc, command) => {
@@ -105,12 +128,24 @@ export default function KeyboardCommands() {
     if (Object.keys(keybindings).length === 0) {
       return;
     }
-    const unsubscribe = tinykeys(window, keybindings);
+
+    const unsubscribe = tinykeys(window, keybindings, {
+      ignore: (event) => {
+        if (
+          togglePaletteShortcut &&
+          isTogglePaletteEvent(event, togglePaletteShortcut)
+        ) {
+          return false;
+        }
+        return defaultKeybindingsHandlerIgnore(event);
+      },
+    });
 
     return () => {
       unsubscribe();
     };
-  }, [shortcuts, isOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shortcuts]);
 
   return <CommandPalette theme={theme} commands={commands} />;
 }

@@ -18,12 +18,6 @@ const KBD_CHIP_SIZES = {
 
 type KbdSize = keyof typeof KBD_WRAPPER_SIZES;
 
-type KbdListProps = {
-  keys: string[];
-  size?: KbdSize;
-  className?: string;
-};
-
 type KbdProps = {
   label: string;
   size?: KbdSize;
@@ -44,6 +38,12 @@ export function Kbd({ label, size = "md", className }: KbdProps) {
     </kbd>
   );
 }
+
+type KbdListProps = {
+  keys: string[];
+  size?: KbdSize;
+  className?: string;
+};
 
 export default function KbdList({
   keys,
