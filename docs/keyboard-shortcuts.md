@@ -8,7 +8,8 @@ Dashboard-only shortcuts powered by `tinykeys`, plus a action search built
 with `cmdk` inside the existing Preline `Modal` overlay:
 
 - Global chords bind on `window` via `KeyboardCommands`.
-- `⌘K` / `Ctrl+K` toggles the command palette (always active).
+- `⌘K` / `Ctrl+K` toggles the command palette (always active, including
+  inside inputs).
 - `/` opens the palette when focus is not in an editable field.
 
 ## Design choices
@@ -29,7 +30,7 @@ with `cmdk` inside the existing Preline `Modal` overlay:
 | `⌘⇧.` / `Ctrl+Shift+.` | Confetti                                 |
 | `⌘⇧/` / `Ctrl+Shift+/` | Open flag toolbar (admin)                |
 
-Modifier chords still run while focused in inputs; `/` does not.
+Only `⌘K` / `Ctrl+K` runs inside editable targets; other chords and `/` do not.
 Esc closes the palette via Preline (not `tinykeys`).
 Shortcut labels show Mac or Windows, not both, via `getIsMac`.
 
@@ -56,8 +57,6 @@ Some relevant details:
   optional chords, keywords, and optional palette `icon` nodes. Chord-only
   commands skip the palette via `inPalette: false`. `getKeyboardCommands`
   attaches `run` in `KeyboardCommands`.
-- **Editable guard:** `isEditableTarget` in `src/lib/utils/html.ts` blocks `/`
-  inside inputs, textareas, selects, and common ARIA text roles.
 
 ## Considerations
 
