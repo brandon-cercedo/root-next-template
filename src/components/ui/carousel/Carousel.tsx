@@ -48,7 +48,7 @@ interface CarouselProps {
 }
 
 /**
- * @notes Pagination is not working as expected when using `isSnap` and `hasSnapSpacers` together. It is a Preline bug.
+ * @note Pagination is not working as expected when using `isSnap` and `hasSnapSpacers` together. It is a Preline bug.
  */
 export default function Carousel({
   id,
