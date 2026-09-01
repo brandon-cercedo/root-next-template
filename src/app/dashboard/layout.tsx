@@ -5,6 +5,7 @@ import { FullUser, getFullUser } from "@/actions/db/user";
 import { getFlagOverrides, getFlagValues } from "@/actions/flags/utils";
 import DebugModeBadge from "@/components/flags/DebugModeBadge";
 import FlagToolbar from "@/components/flags/FlagToolbar";
+import KeyboardCommands from "@/components/keyboard/KeyboardCommands";
 import Sidebar from "@/components/layout/sidebar/Sidebar";
 import LoginConfetti from "@/features/home/components/LoginConfetti";
 import { FlagProvider } from "@/hooks/use-flag";
@@ -31,6 +32,7 @@ async function DashboardProviders({
     <UserProvider user={user}>
       <FlagProvider values={values} overrides={overrides}>
         {children}
+        <KeyboardCommands />
       </FlagProvider>
     </UserProvider>
   );

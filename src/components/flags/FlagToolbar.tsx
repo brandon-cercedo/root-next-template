@@ -2,6 +2,7 @@
 
 import { LucideToggleLeft } from "lucide-react";
 
+import { DROPDOWN_IDS } from "@/components/constants";
 import FlagToolbarContent from "@/components/flags/FlagToolbarContent";
 import Dropdown from "@/components/ui/Dropdown";
 import { useFlag } from "@/hooks/use-flag";
@@ -18,6 +19,7 @@ export default function FlagToolbar({ user }: { user: User }) {
   return (
     <div className="absolute right-3 bottom-1/2" data-testid="flag-toolbar">
       <Dropdown
+        id={DROPDOWN_IDS.FLAG_TOOLBAR}
         content={<FlagToolbarContent values={values} overrides={overrides} />}
         containerClassName="w-full"
         className="z-1000000000 w-sm max-w-sm"

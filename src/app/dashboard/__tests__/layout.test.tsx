@@ -18,6 +18,7 @@ vi.mock("@/actions/db/user", () => ({
 
 vi.mock("next/navigation", () => ({
   redirect: (url: string) => redirect(url),
+  useRouter: () => ({ push: vi.fn() }),
 }));
 
 vi.mock("@/components/theme/ThemeSelector", () => ({

@@ -1,6 +1,5 @@
 "use client";
 
-import clsx from "clsx";
 import { Fragment, KeyboardEvent, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -8,12 +7,6 @@ import { ModalProvider } from "@/hooks/use-modal";
 import { mergeClsx } from "@/lib/utils/styles";
 
 import ModalTrigger from "../ModalTrigger";
-
-export type OverlayOptions = {
-  isClosePrev?: boolean;
-  backdropClasses?: string;
-  backdropExtraClasses?: string;
-};
 
 function fixOverlayOptions(options?: OverlayOptions) {
   return {
@@ -23,15 +16,26 @@ function fixOverlayOptions(options?: OverlayOptions) {
   };
 }
 
+export type OverlayOptions = {
+  isClosePrev?: boolean;
+  backdropClasses?: string;
+  backdropExtraClasses?: string;
+};
+
+type ModalTransition = "fade" | "scale" | "slide-down" | "slide-up" | "none";
+
 interface ModalContentProps {
   id: string;
   children: React.ReactNode;
   className?: string;
   containerClassName?: string;
+  rootClassName?: string;
   size?: ModalSize;
   overlayBackdrop?: OverlayBackdrop;
   overlayOptions?: OverlayOptions;
+  autoFocus?: boolean;
   scrollScope?: ScrollScope;
+  transition?: ModalTransition;
   isVerticallyCentered?: boolean;
   isKeyActionsEnabled?: boolean;
 }
@@ -41,10 +45,13 @@ function ModalContent({
   children,
   className,
   containerClassName,
+  rootClassName,
   size = "sm",
   overlayBackdrop,
   overlayOptions,
+  autoFocus = true,
   scrollScope = "body",
+  transition = "slide-down",
   isVerticallyCentered = false,
   isKeyActionsEnabled = true,
 }: ModalContentProps) {
@@ -69,11 +76,15 @@ function ModalContent({
   return createPortal(
     <div
       id={id}
-      className={clsx(
+      className={mergeClsx(
         "hs-overlay pointer-events-none fixed inset-s-0 top-0 z-80 hidden size-full overflow-x-hidden overflow-y-auto",
         {
+          "opacity-0 transition-all hs-overlay-open:opacity-100 hs-overlay-open:duration-500":
+            transition === "fade",
           "[--overlay-backdrop:static]": overlayBackdrop === "static",
-        }
+          "[--has-autofocus:false]": autoFocus === false,
+        },
+        rootClassName
       )}
       role="dialog"
       tabIndex={-1}
@@ -84,13 +95,19 @@ function ModalContent({
     >
       <div
         className={mergeClsx(
-          "m-3 mt-0 opacity-0 transition-all ease-out hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500",
+          "m-3",
           {
             "sm:mx-auto sm:w-full sm:max-w-lg": size === "sm",
             "md:mx-auto md:w-full md:max-w-2xl": size === "md",
             "lg:mx-auto lg:w-full lg:max-w-4xl": size === "lg",
             "flex min-h-[calc(100%-56px)] items-center": isVerticallyCentered,
             "h-[calc(100%-56px)]": scrollScope === "parent",
+            "hs-overlay-animation-target scale-95 opacity-0 transition-all duration-200 ease-in-out hs-overlay-open:scale-100 hs-overlay-open:opacity-100":
+              transition === "scale",
+            "hs-overlay-animation-target mt-0 opacity-0 transition-all ease-out hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500":
+              transition === "slide-down",
+            "mt-14 opacity-0 transition-all ease-out hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500":
+              transition === "slide-up",
           },
           containerClassName
         )}
@@ -124,10 +141,13 @@ type ModalProps = {
   children: React.ReactNode;
   className?: string;
   containerClassName?: string;
+  rootClassName?: string;
   size?: ModalSize;
   overlayBackdrop?: OverlayBackdrop;
   overlayOptions?: OverlayOptions;
+  autoFocus?: boolean;
   scrollScope?: ScrollScope;
+  transition?: ModalTransition;
   isVerticallyCentered?: boolean;
   isKeyActionsEnabled?: boolean;
 };
@@ -138,10 +158,13 @@ export default function Modal({
   children,
   className,
   containerClassName,
+  rootClassName,
   size = "sm",
   overlayBackdrop,
   overlayOptions,
+  autoFocus = true,
   scrollScope = "body",
+  transition = "slide-down",
   isVerticallyCentered = false,
   isKeyActionsEnabled = true,
 }: ModalProps) {
@@ -152,10 +175,13 @@ export default function Modal({
         id={id}
         className={className}
         containerClassName={containerClassName}
+        rootClassName={rootClassName}
         size={size}
         overlayBackdrop={overlayBackdrop}
         overlayOptions={overlayOptions}
+        autoFocus={autoFocus}
         scrollScope={scrollScope}
+        transition={transition}
         isVerticallyCentered={isVerticallyCentered}
         isKeyActionsEnabled={isKeyActionsEnabled}
       >
