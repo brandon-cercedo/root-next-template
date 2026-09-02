@@ -9,6 +9,8 @@ import { Fragment } from "react";
 
 import { FullUser } from "@/actions/db/user";
 import AppLogoIcon from "@/components/brand/AppLogoIcon";
+import { getShortcutKeys } from "@/components/keyboard/config";
+import KbdList from "@/components/keyboard/Kbd";
 import { ThemeSelectorDynamic } from "@/components/theme/ThemeSelector";
 import Dropdown from "@/components/ui/Dropdown";
 import ImageWithFallback from "@/components/ui/ImageWithFallback";
@@ -24,7 +26,8 @@ function Content({
   displayName: string;
   email: string;
 }) {
-  const { openHelp } = useKeyboard();
+  const { openHelp, shortcutsById } = useKeyboard();
+  const helpCommand = shortcutsById.get("open-keyboard-help");
 
   return (
     <Fragment>
@@ -41,11 +44,16 @@ function Content({
         </div>
         <button
           type="button"
-          className="flex w-full items-center gap-x-3 rounded-lg px-2 py-1.5 text-[13px] leading-5 text-gray-800 hover:bg-gray-100 focus:bg-gray-100 focus:outline-hidden dark:text-neutral-200 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"
+          className="flex w-full items-center justify-between gap-x-3 rounded-lg px-2 py-1.5 text-[13px] leading-5 text-gray-800 hover:bg-gray-100 focus:bg-gray-100 focus:outline-hidden dark:text-neutral-200 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"
           onClick={openHelp}
         >
-          <LucideKeyboard className="size-4 flex-none" />
-          <span>Keyboard shortcuts</span>
+          <span className="flex items-center gap-x-3">
+            <LucideKeyboard className="size-4 flex-none" />
+            <span>Keyboard shortcuts</span>
+          </span>
+          {helpCommand && (
+            <KbdList keys={getShortcutKeys(helpCommand.shortcut)} size="xs" />
+          )}
         </button>
         <a
           href="https://github.com/brandon-cercedo"
@@ -78,7 +86,7 @@ export default function UserMenu({ user }: { user: FullUser }) {
       autoClose="inside"
       placement="top"
       containerClassName="w-full rounded-lg border border-gray-200 bg-white dark:border-neutral-700 dark:bg-neutral-900"
-      className="z-60 w-56"
+      className="z-60 max-w-sm min-w-56"
     >
       <button
         type="button"

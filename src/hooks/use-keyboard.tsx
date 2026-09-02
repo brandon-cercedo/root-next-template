@@ -13,6 +13,7 @@ import {
 import { DROPDOWN_IDS, OVERLAY_IDS } from "@/components/constants";
 import {
   CommandActions,
+  CommandId,
   getKeyboardCommands,
   getShortcutCommands,
   KeyboardCommand,
@@ -30,6 +31,7 @@ import { isEditableTarget } from "@/lib/utils/html";
 type KeyboardContextType = {
   commands: KeyboardCommand[];
   shortcuts: ShortcutCommand[];
+  shortcutsById: Map<CommandId, ShortcutCommand>;
   openHelp: () => void;
 };
 
@@ -102,9 +104,10 @@ export function KeyboardProvider({ children }: { children: ReactNode }) {
   };
   const commands = getKeyboardCommands(actions);
   const shortcuts = getShortcutCommands(commands);
-  const togglePaletteShortcut = shortcuts.find((command) => {
-    return command.id === "toggle-palette";
-  });
+  const shortcutsById = new Map(
+    shortcuts.map((command) => [command.id, command])
+  );
+  const togglePaletteShortcut = shortcutsById.get("toggle-palette");
 
   useEffect(() => {
     const keybindings = shortcuts.reduce<KeybindingsMap>((acc, command) => {
@@ -162,7 +165,9 @@ export function KeyboardProvider({ children }: { children: ReactNode }) {
   }, [shortcuts]);
 
   return (
-    <KeyboardContext.Provider value={{ commands, shortcuts, openHelp }}>
+    <KeyboardContext.Provider
+      value={{ commands, shortcuts, shortcutsById, openHelp }}
+    >
       {children}
     </KeyboardContext.Provider>
   );
