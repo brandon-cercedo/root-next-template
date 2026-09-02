@@ -11,9 +11,10 @@ import {
   getShortcutKeys,
   KeyboardCommand,
 } from "@/components/keyboard/config";
+import { useKeyboard } from "@/hooks/use-keyboard";
 import { useModal } from "@/hooks/use-modal";
 import { useOverlay } from "@/hooks/use-overlay";
-import { Theme } from "@/hooks/use-theme";
+import { Theme, useTheme } from "@/hooks/use-theme";
 
 import MessageWithImage from "../ui/MessageWithImage";
 import Modal from "../ui/modal/modal";
@@ -66,7 +67,7 @@ function CommandItem({ command, theme }: CommandItemProps) {
     <Command.Item
       key={command.id}
       value={command.label}
-      keywords={command.keywords}
+      keywords={[...(command.keywords ?? []), command.group]}
       onSelect={() => {
         command.run();
         void close(OVERLAY_IDS.COMMAND_PALETTE);
@@ -173,15 +174,10 @@ function Content({ theme, commands }: ContentProps) {
   );
 }
 
-type CommandPaletteProps = {
-  theme: Theme | undefined;
-  commands: KeyboardCommand[];
-};
+export default function CommandPalette() {
+  const { commands } = useKeyboard();
+  const { theme } = useTheme();
 
-export default function CommandPalette({
-  theme,
-  commands,
-}: CommandPaletteProps) {
   if (commands.length === 0) {
     return null;
   }

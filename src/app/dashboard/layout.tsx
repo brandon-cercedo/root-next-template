@@ -5,10 +5,12 @@ import { FullUser, getFullUser } from "@/actions/db/user";
 import { getFlagOverrides, getFlagValues } from "@/actions/flags/utils";
 import DebugModeBadge from "@/components/flags/DebugModeBadge";
 import FlagToolbar from "@/components/flags/FlagToolbar";
-import KeyboardCommands from "@/components/keyboard/KeyboardCommands";
+import CommandPalette from "@/components/keyboard/CommandPalette";
+import KeyboardHelpOffcanvas from "@/components/keyboard/KeyboardHelpOffcanvas";
 import Sidebar from "@/components/layout/sidebar/Sidebar";
 import LoginConfetti from "@/features/home/components/LoginConfetti";
 import { FlagProvider } from "@/hooks/use-flag";
+import { KeyboardProvider } from "@/hooks/use-keyboard";
 import { UserProvider } from "@/hooks/use-user";
 import { paths } from "@/lib/config/paths";
 import { isAdmin } from "@/lib/utils/db/user";
@@ -31,8 +33,11 @@ async function DashboardProviders({
   return (
     <UserProvider user={user}>
       <FlagProvider values={values} overrides={overrides}>
-        {children}
-        <KeyboardCommands />
+        <KeyboardProvider>
+          {children}
+          <CommandPalette />
+          <KeyboardHelpOffcanvas />
+        </KeyboardProvider>
       </FlagProvider>
     </UserProvider>
   );
