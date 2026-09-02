@@ -1,4 +1,4 @@
-minimumReleaseAge: 43200 # 30 days in minutes
+minimumReleaseAge: 20160 # 14 days in minutes
 
 ignoredBuiltDependencies:
   - sharp
