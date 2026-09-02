@@ -29,7 +29,21 @@ Guidelines for AI agents and humans working on this codebase.
 | Format    | `pnpm format` / `pnpm format:check`                                      |
 | Typecheck | `pnpm type:check`                                                        |
 
-## Code Style
+## Goals
+
+Use these as a decision filter for every change:
+
+- Build fast, ship things people love (small nice touches, polish where it
+  matters).
+- Always fix the root issue — never just patch the symptoms.
+- Prefer small, surgical changes. Complexity hurts understanding, debugging,
+  and review.
+- Almost everything can be fixed or built with a simple change. Choose the
+  simple correct approach over a clever specialized system.
+
+## Conventions
+
+### Structure & Workflow
 
 Enforced by ESLint / Prettier / Commitlint — follow these over conflicting prose elsewhere.
 
@@ -47,7 +61,7 @@ Enforced by ESLint / Prettier / Commitlint — follow these over conflicting pro
   - Import direction: app → features → shared.
     - App (`src/app`):
       - only import from features and shared.
-      - `*View.tsx` lives in `_components` and are used to compose the page.
+      - `*View.tsx` lives in `_components` and is used to compose the page.
     - Features (`src/features`):
       - only import from shared.
       - each feature is self-contained.
@@ -97,24 +111,16 @@ src/
     +-- db/            # DB utilities (user.ts, profile.ts)
 +-- types/             # Global TypeScript types (api.ts, common.ts)
 +-- stores/            # Global state stores (userStore.ts, appStore.ts)
-+-- tests/             # Test utilities, mocks, and setup files
++-- testing/           # Test utilities, mocks, and setup files
 ```
 
-Also, use `__tests__` folders to colocate tests alongside the code they verify.
+Use `__tests__` folders to colocate tests alongside the code they verify.
 
 </details>
 
-## Programming Principles
+### Code Guidelines
 
-Ensure these programming principles are followed when writing code:
-
-- KISS (Keep It Simple): Avoid unnecessary complexity and choose the simplest solution.
-- DRY (Don't Repeat Yourself): Extract repeated logic into reusable functions.
-- YAGNI (You Aren't Gonna Need It): Don't implement until necessary.
-- SOLID (Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion): Follow the SOLID principles.
-- FIRST (Fast, Isolated, Repeatable, Self-validating, Timely): Follow the FIRST principles for testing.
-
-Also, consider the following code guidelines:
+Consider the following day-to-day coding practices:
 
 - Max 2 function arguments; use an object if more.
 - Put shared functions in shared folders; otherwise, keep them local.
@@ -141,6 +147,16 @@ if (isValid) {
 ```
 
 - Only use `mergeClsx` or `clsx` for conditional or dynamic class names. DO NOT use it to split long static class strings across lines.
+
+## Programming Principles
+
+Ensure these programming principles are followed when writing code:
+
+- KISS (Keep It Simple): Avoid unnecessary complexity and choose the simplest solution.
+- DRY (Don't Repeat Yourself): Extract repeated logic into reusable functions.
+- YAGNI (You Aren't Gonna Need It): Don't implement until necessary.
+- SOLID (Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion): Follow the SOLID principles.
+- FIRST (Fast, Isolated, Repeatable, Self-validating, Timely): Follow the FIRST principles for testing.
 
 ## Summary
 
