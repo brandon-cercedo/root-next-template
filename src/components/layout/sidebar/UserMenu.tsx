@@ -1,5 +1,6 @@
 import {
   LucideChevronsUpDown,
+  LucideKeyboard,
   LucideLogOut,
   LucideMessageCircleQuestionMark,
 } from "lucide-react";
@@ -12,6 +13,7 @@ import { ThemeSelectorDynamic } from "@/components/theme/ThemeSelector";
 import Dropdown from "@/components/ui/Dropdown";
 import ImageWithFallback from "@/components/ui/ImageWithFallback";
 import TruncatedText from "@/components/ui/TruncatedText";
+import { useKeyboard } from "@/hooks/use-keyboard";
 import { paths } from "@/lib/config/paths";
 import { composeUserDisplayName } from "@/lib/utils/db/user";
 
@@ -22,6 +24,8 @@ function Content({
   displayName: string;
   email: string;
 }) {
+  const { openHelp } = useKeyboard();
+
   return (
     <Fragment>
       <div className="space-y-0.5 px-3 py-2 break-all dark:border-gray-700">
@@ -35,6 +39,14 @@ function Content({
           <span className="flex-1 cursor-default">Theme</span>
           <ThemeSelectorDynamic />
         </div>
+        <button
+          type="button"
+          className="flex w-full items-center gap-x-3 rounded-lg px-2 py-1.5 text-[13px] leading-5 text-gray-800 hover:bg-gray-100 focus:bg-gray-100 focus:outline-hidden dark:text-neutral-200 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"
+          onClick={openHelp}
+        >
+          <LucideKeyboard className="size-4 flex-none" />
+          <span>Keyboard shortcuts</span>
+        </button>
         <a
           href="https://github.com/brandon-cercedo"
           target="_blank"

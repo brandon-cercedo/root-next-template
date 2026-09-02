@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { createContext, ReactNode, useContext, useEffect } from "react";
 import {
   defaultKeybindingsHandlerIgnore,
   KeybindingsMap,
@@ -15,6 +15,7 @@ import {
   CommandActions,
   getKeyboardCommands,
   getShortcutCommands,
+  KeyboardCommand,
   ShortcutCommand,
 } from "@/components/keyboard/config";
 import { useDropdown } from "@/hooks/use-dropdown";
@@ -26,7 +27,15 @@ import { paths } from "@/lib/config/paths";
 import { isAdmin } from "@/lib/utils/db/user";
 import { isEditableTarget } from "@/lib/utils/html";
 
-import CommandPalette from "./CommandPalette";
+type KeyboardContextType = {
+  commands: KeyboardCommand[];
+  shortcuts: ShortcutCommand[];
+  openHelp: () => void;
+};
+
+const KeyboardContext = createContext<KeyboardContextType | undefined>(
+  undefined
+);
 
 function isTogglePaletteEvent(
   event: KeyboardEvent,
@@ -41,10 +50,10 @@ function isTogglePaletteEvent(
  * @note By default, tinykeys ignores keyboard events from [contenteditable],
  * input, textarea, and select unless they are the event.currentTarget.
  */
-export default function KeyboardCommands() {
+export function KeyboardProvider({ children }: { children: ReactNode }) {
   const { open, toggle, isOpen } = useOverlay();
   const { open: openDropdown } = useDropdown();
-  const { theme, setTheme, color } = useTheme();
+  const { setTheme, color } = useTheme();
   const { user } = useUser();
   const router = useRouter();
 
@@ -58,6 +67,10 @@ export default function KeyboardCommands() {
 
   const toggleSidebar = () => {
     void toggle(OVERLAY_IDS.SIDEBAR);
+  };
+
+  const openHelp = () => {
+    void open(OVERLAY_IDS.KEYBOARD_HELP);
   };
 
   const toggleTheme = () => {
@@ -75,6 +88,7 @@ export default function KeyboardCommands() {
     "theme-dark": () => setTheme("dark"),
     "theme-system": () => setTheme("system"),
     "toggle-sidebar": toggleSidebar,
+    "open-keyboard-help": openHelp,
     "go-home": () => router.push(paths.dashboard.home()),
     "log-out": () => router.push(paths.auth.signOut()),
     confetti: confettiSchoolPride,
@@ -147,5 +161,17 @@ export default function KeyboardCommands() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shortcuts]);
 
-  return <CommandPalette theme={theme} commands={commands} />;
+  return (
+    <KeyboardContext.Provider value={{ commands, shortcuts, openHelp }}>
+      {children}
+    </KeyboardContext.Provider>
+  );
+}
+
+export function useKeyboard() {
+  const context = useContext(KeyboardContext);
+  if (!context) {
+    throw new Error("useKeyboard must be used within a KeyboardProvider");
+  }
+  return context;
 }

@@ -1,5 +1,6 @@
 import {
   Home,
+  Keyboard,
   LogOut,
   Monitor,
   Moon,
@@ -33,7 +34,8 @@ export type CommandId =
   | "go-home"
   | "log-out"
   | "confetti"
-  | "open-flag-toolbar";
+  | "open-flag-toolbar"
+  | "open-keyboard-help";
 
 type Shortcut = {
   chord: string; // e.g. "$mod+k"
@@ -134,6 +136,20 @@ const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
     },
     icon: (
       <PanelLeft className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
+  },
+  {
+    id: "open-keyboard-help",
+    label: "Keyboard shortcuts",
+    group: "Navigation",
+    keywords: ["help", "shortcuts", "keys", "bindings"],
+    shortcut: {
+      chord: "$mod+/",
+      labels: { mac: ["⌘", "/"], windows: ["Ctrl", "/"] },
+    },
+    inPalette: true,
+    icon: (
+      <Keyboard className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
     ),
   },
   {
