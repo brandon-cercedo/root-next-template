@@ -69,6 +69,8 @@ Enforced by ESLint / Prettier / Commitlint — follow these over conflicting pro
       `src/testing`):
       - only import from other shared folders.
 - Git and GitHub conventions:
+  - Branches:
+    - Always work on a feature branch; never commit on `main`/`master`/`release`.
   - Commits:
     - Use Conventional Commits.
     - Pattern: `<type>(<optional_scope>): <subject>`.
