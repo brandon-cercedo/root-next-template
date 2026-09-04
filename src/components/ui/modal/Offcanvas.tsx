@@ -2,7 +2,7 @@
 
 import { mergeClsx } from "@/lib/utils/styles";
 
-import Modal, { OverlayBackdrop } from ".";
+import Modal, { OverlayBackdrop } from "./Modal";
 
 type OffcanvasProps = {
   id: string;
