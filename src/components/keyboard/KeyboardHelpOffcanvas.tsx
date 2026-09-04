@@ -12,7 +12,7 @@ import {
   ShortcutCommand,
 } from "@/components/keyboard/config";
 import MessageWithImage from "@/components/ui/MessageWithImage";
-import Offcanvas from "@/components/ui/modal/modal/Offcanvas";
+import Offcanvas from "@/components/ui/modal/Offcanvas";
 import { useKeyboard } from "@/hooks/use-keyboard";
 import { useModal } from "@/hooks/use-modal";
 

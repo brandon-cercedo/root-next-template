@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { ModalProvider } from "@/hooks/use-modal";
 import { mergeClsx } from "@/lib/utils/styles";
 
-import ModalTrigger from "../ModalTrigger";
+import ModalTrigger from "./ModalTrigger";
 
 function fixOverlayOptions(options?: OverlayOptions) {
   return {

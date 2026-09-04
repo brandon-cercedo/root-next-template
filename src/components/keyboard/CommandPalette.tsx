@@ -17,7 +17,7 @@ import { useOverlay } from "@/hooks/use-overlay";
 import { Theme, useTheme } from "@/hooks/use-theme";
 
 import MessageWithImage from "../ui/MessageWithImage";
-import Modal from "../ui/modal/modal";
+import Modal from "../ui/modal/Modal";
 
 import KbdList from "./Kbd";
 
