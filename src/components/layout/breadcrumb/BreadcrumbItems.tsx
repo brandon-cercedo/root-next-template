@@ -28,11 +28,13 @@ function BreadcrumbItem({
         item.children
       ) : (
         <NullableLink
-          href={item.href}
+          href={isActive ? undefined : item.href}
           className={clsx(
-            "flex items-center gap-2 rounded-lg px-2 py-1 text-[13px] leading-4 text-gray-800 hover:bg-gray-200 focus:bg-gray-200 focus:outline-hidden dark:text-neutral-200 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800",
+            "flex items-center gap-2 rounded-lg px-2 py-1 text-[13px] leading-4 text-gray-800 focus:outline-hidden dark:text-neutral-200",
             {
               "font-medium": isActive,
+              "hover:bg-gray-200 focus:bg-gray-200 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800":
+                !isActive,
             }
           )}
         >
