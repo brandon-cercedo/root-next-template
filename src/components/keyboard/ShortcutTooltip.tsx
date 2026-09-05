@@ -26,7 +26,6 @@ export default function ShortcutTooltip({
   return (
     <Tooltip
       placement={placement}
-      className="border border-gray-200 bg-white text-gray-900 dark:border-neutral-700 dark:bg-neutral-200 dark:text-neutral-900"
       content={
         <span className="inline-flex items-center gap-2">
           {command.label}
