@@ -1,4 +1,4 @@
-# in-short
+# briefly
 
 Answer briefly. Be direct. Use simple words.
 
@@ -19,7 +19,7 @@ Answer briefly. Be direct. Use simple words.
 ## Example
 
 **Input:**
-/in-short can I change the dev indicator size in next.config.ts?
+/briefly can I change the dev indicator size in next.config.ts?
 
 **Output:**
 **No — you can't change the size from `next.config.ts` in Next.js 16.** The `devIndicators` option only supports:
