@@ -63,7 +63,7 @@ export default function Tooltip({
     >
       <div
         className={mergeClsx(
-          "hs-tooltip-content invisible absolute z-9999 inline-block max-w-3xs rounded-md bg-gray-900 px-2 py-1 text-xs text-white opacity-0 shadow-2xs transition-opacity dark:bg-neutral-700 hs-tooltip-shown:visible hs-tooltip-shown:opacity-100",
+          "hs-tooltip-content invisible absolute z-9999 inline-block max-w-3xs rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-900 opacity-0 shadow-2xs transition-opacity dark:border-neutral-700 dark:bg-neutral-200 dark:text-neutral-900 hs-tooltip-shown:visible hs-tooltip-shown:opacity-100",
           className
         )}
         role="tooltip"
