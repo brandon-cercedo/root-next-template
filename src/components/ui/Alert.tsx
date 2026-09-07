@@ -19,7 +19,7 @@ export type AlertType =
   | "warning"
   | "light";
 
-export type AlertColor = "solid" | "soft";
+export type AlertVariant = "solid" | "soft";
 
 type AlertStyle = {
   container: string;
@@ -27,7 +27,7 @@ type AlertStyle = {
   dismiss: string;
 };
 
-const ALERT_STYLES: Record<AlertColor, Record<AlertType, AlertStyle>> = {
+const ALERT_STYLES: Record<AlertVariant, Record<AlertType, AlertStyle>> = {
   solid: {
     dark: {
       container: "bg-gray-900 text-white dark:bg-white dark:text-neutral-800",
@@ -146,7 +146,7 @@ function AlertIcon({ type, icon }: AlertIconProps) {
 
 type AlertProps = {
   type?: AlertType;
-  color?: AlertColor;
+  variant?: AlertVariant;
   icon?: ReactNode | null;
   title?: string;
   className?: string;
@@ -156,7 +156,7 @@ type AlertProps = {
 
 export default function Alert({
   type = "dark",
-  color = "solid",
+  variant = "solid",
   icon,
   title,
   className,
@@ -165,7 +165,7 @@ export default function Alert({
 }: AlertProps) {
   const reactId = useId();
   const alertId = `alert-${reactId.replaceAll(":", "")}`;
-  const styles = ALERT_STYLES[color][type];
+  const styles = ALERT_STYLES[variant][type];
 
   return (
     <div

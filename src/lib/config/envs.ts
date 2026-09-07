@@ -10,6 +10,7 @@ export const envs = createEnv({
     GOOGLE_CLIENT_ID: z.string().min(1),
     GOOGLE_CLIENT_SECRET: z.string().min(1),
     FLAGS_SECRET: z.string().min(1),
+    OPENAI_API_KEY: z.string().min(1).optional(),
   },
   client: {
     NEXT_PUBLIC_BASE_URL: z.url(),
@@ -23,6 +24,7 @@ export const envs = createEnv({
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     FLAGS_SECRET: process.env.FLAGS_SECRET,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION,
   },
