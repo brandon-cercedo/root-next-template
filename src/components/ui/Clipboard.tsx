@@ -12,7 +12,7 @@ const CLIPBOARD_SIZES: Record<
   ClipboardSize,
   { button: string; icon: string }
 > = {
-  xs: { button: "size-5", icon: "size-3" },
+  xs: { button: "size-5", icon: "size-2.5" },
   sm: { button: "size-6", icon: "size-3.5" },
   md: { button: "size-7", icon: "size-4" },
   lg: { button: "size-8", icon: "size-5" },
@@ -72,7 +72,7 @@ export default function Clipboard({
       disabled={isCopied}
       onClick={handleCopy}
       className={mergeClsx(
-        "inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:bg-gray-50 focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700",
+        "inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-100 focus:bg-gray-100 focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700",
         sizing.button,
         className
       )}

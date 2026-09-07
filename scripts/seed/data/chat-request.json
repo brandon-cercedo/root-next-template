@@ -1,0 +1,365 @@
+{
+  "input": {
+    "messages": [
+      {
+        "id": "59IfnqrdJLLkk0LV",
+        "role": "user",
+        "parts": [
+          {
+            "type": "text",
+            "text": "What is the latest stable version of Next.js?"
+          }
+        ]
+      },
+      {
+        "id": "o4YqsnV7Ozy4SsVo",
+        "role": "assistant",
+        "parts": [
+          { "type": "step-start" },
+          {
+            "type": "text",
+            "text": "As of June 2024, the latest stable version of Next.js is 14.0.0.",
+            "providerMetadata": {
+              "openai": {
+                "itemId": "msg_073727ec229bf88f006a9b80f37ba887d1af7669016a5525fc"
+              }
+            },
+            "state": "done"
+          }
+        ]
+      },
+      {
+        "id": "a9sVrVO3qoaeus0q",
+        "role": "user",
+        "parts": [{ "type": "text", "text": "How could I install it?" }]
+      }
+    ]
+  },
+  "output": {
+    "callId": "call-kdoNhne8OCkouDJ2XmpBx5bk",
+    "toolsContext": {},
+    "stepNumber": 0,
+    "model": { "provider": "openai.responses", "modelId": "gpt-4.1-mini" },
+    "runtimeContext": {},
+    "finishReason": "stop",
+    "usage": {
+      "inputTokens": 89,
+      "inputTokenDetails": {
+        "noCacheTokens": 89,
+        "cacheReadTokens": 0,
+        "cacheWriteTokens": 0
+      },
+      "outputTokens": 75,
+      "outputTokenDetails": { "textTokens": 75, "reasoningTokens": 0 },
+      "totalTokens": 164
+    },
+    "totalUsage": {
+      "inputTokens": 89,
+      "inputTokenDetails": {
+        "noCacheTokens": 89,
+        "cacheReadTokens": 0,
+        "cacheWriteTokens": 0
+      },
+      "outputTokens": 75,
+      "outputTokenDetails": { "textTokens": 75, "reasoningTokens": 0 },
+      "totalTokens": 164
+    },
+    "content": [
+      {
+        "type": "text",
+        "text": "To install the latest stable Next.js (v14.0.0), run:\n\n```bash\nnpx create-next-app@latest\n```\n\nOr, to add Next.js to an existing project with npm:\n\n```bash\nnpm install next@latest react react-dom\n```\n\nWith yarn:\n\n```bash\nyarn add next@latest react react-dom\n```",
+        "providerMetadata": {
+          "openai": {
+            "itemId": "msg_073727ec229bf88f006a9b8112fd5c87d1851515b90adea3fe"
+          }
+        }
+      }
+    ],
+    "text": "To install the latest stable Next.js (v14.0.0), run:\n\n```bash\nnpx create-next-app@latest\n```\n\nOr, to add Next.js to an existing project with npm:\n\n```bash\nnpm install next@latest react react-dom\n```\n\nWith yarn:\n\n```bash\nyarn add next@latest react react-dom\n```",
+    "reasoning": [],
+    "files": [],
+    "sources": [],
+    "toolCalls": [],
+    "staticToolCalls": [],
+    "dynamicToolCalls": [],
+    "toolResults": [],
+    "staticToolResults": [],
+    "dynamicToolResults": [],
+    "responseMessages": [
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "To install the latest stable Next.js (v14.0.0), run:\n\n```bash\nnpx create-next-app@latest\n```\n\nOr, to add Next.js to an existing project with npm:\n\n```bash\nnpm install next@latest react react-dom\n```\n\nWith yarn:\n\n```bash\nyarn add next@latest react react-dom\n```",
+            "providerOptions": {
+              "openai": {
+                "itemId": "msg_073727ec229bf88f006a9b8112fd5c87d1851515b90adea3fe"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "warnings": [],
+    "request": {},
+    "response": {
+      "id": "resp_073727ec229bf88f006a9b8111ca2c87d1b9901783a9cb5f0f",
+      "timestamp": "2026-09-05T02:40:17.000Z",
+      "modelId": "gpt-4.1-mini-2025-04-14",
+      "headers": {
+        "access-control-expose-headers": "X-Request-ID, CF-Ray, CF-Ray",
+        "alt-svc": "h3=\":443\"; ma=86400",
+        "cf-cache-status": "DYNAMIC",
+        "cf-ray": "a361de4d6d2a798c-SCL",
+        "connection": "keep-alive",
+        "content-type": "text/event-stream; charset=utf-8",
+        "date": "Sat, 05 Sep 2026 02:40:18 GMT",
+        "openai-organization": "user-ip2pioiu38y9cgkhhwhikcmh",
+        "openai-processing-ms": "169",
+        "openai-project": "proj_3gDZKfYKxKF1u6vMILjQ5csm",
+        "openai-version": "2020-10-01",
+        "server": "cloudflare",
+        "set-cookie": "__cf_bm=WfKXj2O7VMT8LoW1Z5GCpPxjWMMzZRuqz8tn2YUyGwQ-1788576017.5051568-1.0.1.1-daHmNdphtZPVSD8nxYa_Mhg1SlaAUVBhaIlN7QsslkRIahBdYx0JfisXHUMZhjf6Yk59_D6SaSRLIPrHFzFtq72qosknz7q44FupWYzfge2WzK5lFHhSPYYfiFw20iLs; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Sat, 05 Sep 2026 03:10:18 GMT",
+        "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+        "transfer-encoding": "chunked",
+        "x-content-type-options": "nosniff",
+        "x-request-id": "req_819e7c09a28e4201a1ba195a0dccd9d1"
+      },
+      "messages": [
+        {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "To install the latest stable Next.js (v14.0.0), run:\n\n```bash\nnpx create-next-app@latest\n```\n\nOr, to add Next.js to an existing project with npm:\n\n```bash\nnpm install next@latest react react-dom\n```\n\nWith yarn:\n\n```bash\nyarn add next@latest react react-dom\n```",
+              "providerOptions": {
+                "openai": {
+                  "itemId": "msg_073727ec229bf88f006a9b8112fd5c87d1851515b90adea3fe"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "providerMetadata": {
+      "openai": {
+        "responseId": "resp_073727ec229bf88f006a9b8111ca2c87d1b9901783a9cb5f0f",
+        "serviceTier": "default"
+      }
+    },
+    "steps": [
+      {
+        "callId": "call-kdoNhne8OCkouDJ2XmpBx5bk",
+        "stepNumber": 0,
+        "model": { "provider": "openai.responses", "modelId": "gpt-4.1-mini" },
+        "runtimeContext": {},
+        "toolsContext": {},
+        "content": [
+          {
+            "type": "text",
+            "text": "To install the latest stable Next.js (v14.0.0), run:\n\n```bash\nnpx create-next-app@latest\n```\n\nOr, to add Next.js to an existing project with npm:\n\n```bash\nnpm install next@latest react react-dom\n```\n\nWith yarn:\n\n```bash\nyarn add next@latest react react-dom\n```",
+            "providerMetadata": {
+              "openai": {
+                "itemId": "msg_073727ec229bf88f006a9b8112fd5c87d1851515b90adea3fe"
+              }
+            }
+          }
+        ],
+        "finishReason": "stop",
+        "usage": {
+          "inputTokens": 89,
+          "inputTokenDetails": {
+            "noCacheTokens": 89,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0
+          },
+          "outputTokens": 75,
+          "outputTokenDetails": { "textTokens": 75, "reasoningTokens": 0 },
+          "totalTokens": 164,
+          "raw": {
+            "input_tokens": 89,
+            "input_tokens_details": {
+              "cached_tokens": 0,
+              "cache_write_tokens": 0
+            },
+            "output_tokens": 75,
+            "output_tokens_details": { "reasoning_tokens": 0 }
+          }
+        },
+        "performance": {
+          "stepTimeMs": 3018.5249160006642,
+          "toolExecutionMs": {},
+          "responseTimeMs": 3014.416124999523,
+          "effectiveOutputTokensPerSecond": 24.88044015489463,
+          "outputTokensPerSecond": 63.76865529045845,
+          "inputTokensPerSecond": 48.414566846761474,
+          "effectiveTotalTokensPerSecond": 54.40522913870292,
+          "timeToFirstOutputMs": 1838.2897089980543,
+          "timeBetweenOutputChunksMs": {
+            "min": 0.36445800215005875,
+            "p10": 0.9687920026481152,
+            "median": 3.8167500011622906,
+            "avg": 13.417953767137577,
+            "p90": 31.71179100126028,
+            "max": 75.86524999886751
+          }
+        },
+        "warnings": [],
+        "request": {},
+        "response": {
+          "id": "resp_073727ec229bf88f006a9b8111ca2c87d1b9901783a9cb5f0f",
+          "timestamp": "2026-09-05T02:40:17.000Z",
+          "modelId": "gpt-4.1-mini-2025-04-14",
+          "headers": {
+            "access-control-expose-headers": "X-Request-ID, CF-Ray, CF-Ray",
+            "alt-svc": "h3=\":443\"; ma=86400",
+            "cf-cache-status": "DYNAMIC",
+            "cf-ray": "a361de4d6d2a798c-SCL",
+            "connection": "keep-alive",
+            "content-type": "text/event-stream; charset=utf-8",
+            "date": "Sat, 05 Sep 2026 02:40:18 GMT",
+            "openai-organization": "user-ip2pioiu38y9cgkhhwhikcmh",
+            "openai-processing-ms": "169",
+            "openai-project": "proj_3gDZKfYKxKF1u6vMILjQ5csm",
+            "openai-version": "2020-10-01",
+            "server": "cloudflare",
+            "set-cookie": "__cf_bm=WfKXj2O7VMT8LoW1Z5GCpPxjWMMzZRuqz8tn2YUyGwQ-1788576017.5051568-1.0.1.1-daHmNdphtZPVSD8nxYa_Mhg1SlaAUVBhaIlN7QsslkRIahBdYx0JfisXHUMZhjf6Yk59_D6SaSRLIPrHFzFtq72qosknz7q44FupWYzfge2WzK5lFHhSPYYfiFw20iLs; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Sat, 05 Sep 2026 03:10:18 GMT",
+            "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+            "transfer-encoding": "chunked",
+            "x-content-type-options": "nosniff",
+            "x-request-id": "req_819e7c09a28e4201a1ba195a0dccd9d1"
+          },
+          "messages": [
+            {
+              "role": "assistant",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "To install the latest stable Next.js (v14.0.0), run:\n\n```bash\nnpx create-next-app@latest\n```\n\nOr, to add Next.js to an existing project with npm:\n\n```bash\nnpm install next@latest react react-dom\n```\n\nWith yarn:\n\n```bash\nyarn add next@latest react react-dom\n```",
+                  "providerOptions": {
+                    "openai": {
+                      "itemId": "msg_073727ec229bf88f006a9b8112fd5c87d1851515b90adea3fe"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "providerMetadata": {
+          "openai": {
+            "responseId": "resp_073727ec229bf88f006a9b8111ca2c87d1b9901783a9cb5f0f",
+            "serviceTier": "default"
+          }
+        }
+      }
+    ],
+    "finalStep": {
+      "callId": "call-kdoNhne8OCkouDJ2XmpBx5bk",
+      "stepNumber": 0,
+      "model": { "provider": "openai.responses", "modelId": "gpt-4.1-mini" },
+      "runtimeContext": {},
+      "toolsContext": {},
+      "content": [
+        {
+          "type": "text",
+          "text": "To install the latest stable Next.js (v14.0.0), run:\n\n```bash\nnpx create-next-app@latest\n```\n\nOr, to add Next.js to an existing project with npm:\n\n```bash\nnpm install next@latest react react-dom\n```\n\nWith yarn:\n\n```bash\nyarn add next@latest react react-dom\n```",
+          "providerMetadata": {
+            "openai": {
+              "itemId": "msg_073727ec229bf88f006a9b8112fd5c87d1851515b90adea3fe"
+            }
+          }
+        }
+      ],
+      "finishReason": "stop",
+      "usage": {
+        "inputTokens": 89,
+        "inputTokenDetails": {
+          "noCacheTokens": 89,
+          "cacheReadTokens": 0,
+          "cacheWriteTokens": 0
+        },
+        "outputTokens": 75,
+        "outputTokenDetails": { "textTokens": 75, "reasoningTokens": 0 },
+        "totalTokens": 164,
+        "raw": {
+          "input_tokens": 89,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 75,
+          "output_tokens_details": { "reasoning_tokens": 0 }
+        }
+      },
+      "performance": {
+        "stepTimeMs": 3018.5249160006642,
+        "toolExecutionMs": {},
+        "responseTimeMs": 3014.416124999523,
+        "effectiveOutputTokensPerSecond": 24.88044015489463,
+        "outputTokensPerSecond": 63.76865529045845,
+        "inputTokensPerSecond": 48.414566846761474,
+        "effectiveTotalTokensPerSecond": 54.40522913870292,
+        "timeToFirstOutputMs": 1838.2897089980543,
+        "timeBetweenOutputChunksMs": {
+          "min": 0.36445800215005875,
+          "p10": 0.9687920026481152,
+          "median": 3.8167500011622906,
+          "avg": 13.417953767137577,
+          "p90": 31.71179100126028,
+          "max": 75.86524999886751
+        }
+      },
+      "warnings": [],
+      "request": {},
+      "response": {
+        "id": "resp_073727ec229bf88f006a9b8111ca2c87d1b9901783a9cb5f0f",
+        "timestamp": "2026-09-05T02:40:17.000Z",
+        "modelId": "gpt-4.1-mini-2025-04-14",
+        "headers": {
+          "access-control-expose-headers": "X-Request-ID, CF-Ray, CF-Ray",
+          "alt-svc": "h3=\":443\"; ma=86400",
+          "cf-cache-status": "DYNAMIC",
+          "cf-ray": "a361de4d6d2a798c-SCL",
+          "connection": "keep-alive",
+          "content-type": "text/event-stream; charset=utf-8",
+          "date": "Sat, 05 Sep 2026 02:40:18 GMT",
+          "openai-organization": "user-ip2pioiu38y9cgkhhwhikcmh",
+          "openai-processing-ms": "169",
+          "openai-project": "proj_3gDZKfYKxKF1u6vMILjQ5csm",
+          "openai-version": "2020-10-01",
+          "server": "cloudflare",
+          "set-cookie": "__cf_bm=WfKXj2O7VMT8LoW1Z5GCpPxjWMMzZRuqz8tn2YUyGwQ-1788576017.5051568-1.0.1.1-daHmNdphtZPVSD8nxYa_Mhg1SlaAUVBhaIlN7QsslkRIahBdYx0JfisXHUMZhjf6Yk59_D6SaSRLIPrHFzFtq72qosknz7q44FupWYzfge2WzK5lFHhSPYYfiFw20iLs; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Sat, 05 Sep 2026 03:10:18 GMT",
+          "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+          "transfer-encoding": "chunked",
+          "x-content-type-options": "nosniff",
+          "x-request-id": "req_819e7c09a28e4201a1ba195a0dccd9d1"
+        },
+        "messages": [
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "To install the latest stable Next.js (v14.0.0), run:\n\n```bash\nnpx create-next-app@latest\n```\n\nOr, to add Next.js to an existing project with npm:\n\n```bash\nnpm install next@latest react react-dom\n```\n\nWith yarn:\n\n```bash\nyarn add next@latest react react-dom\n```",
+                "providerOptions": {
+                  "openai": {
+                    "itemId": "msg_073727ec229bf88f006a9b8112fd5c87d1851515b90adea3fe"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "providerMetadata": {
+        "openai": {
+          "responseId": "resp_073727ec229bf88f006a9b8111ca2c87d1b9901783a9cb5f0f",
+          "serviceTier": "default"
+        }
+      }
+    }
+  }
+}

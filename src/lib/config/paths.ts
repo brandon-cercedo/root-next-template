@@ -21,4 +21,7 @@ export const paths = {
   dashboard: {
     home: () => "/dashboard",
   },
+  api: {
+    chat: () => "/api/chat",
+  },
 } satisfies PathsType;
