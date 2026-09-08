@@ -1,10 +1,12 @@
 "use client";
 
+import { type ChatStatus } from "ai";
 import clsx from "clsx";
 
 import { getMessageText } from "@/features/chat/utils";
 import { useFlag } from "@/hooks/use-flag";
 
+import MessageMarkdown from "./markdown/MessageMarkdown";
 import MessageActions from "./MessageActions";
 
 import type { ChatUIMessage } from "@/hooks/use-chatbot";
@@ -30,9 +32,10 @@ function MessageSteps({ message }: { message: ChatUIMessage }) {
 type ChatMessageProps = {
   message: ChatUIMessage;
   isDebug: boolean;
+  isAnimating: boolean;
 };
 
-function ChatMessage({ message, isDebug }: ChatMessageProps) {
+function ChatMessage({ message, isDebug, isAnimating }: ChatMessageProps) {
   const text = getMessageText(message);
   const isUser = message.role === "user";
   const metadata = message.metadata;
@@ -41,18 +44,18 @@ function ChatMessage({ message, isDebug }: ChatMessageProps) {
     <div
       key={message.id}
       className={clsx("group flex w-full flex-col gap-1", {
-        "max-w-lg items-end self-end": isUser,
+        "max-w-4/5 items-end self-end": isUser,
       })}
     >
       {isUser && (
-        <div className="space-y-3 rounded-2xl border border-gray-200 bg-white p-4 text-sm whitespace-pre-wrap text-gray-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
-          {text}
+        <div className="max-h-[70vh] w-full scrollbar-thin space-y-3 overflow-y-auto overscroll-contain rounded-2xl border border-gray-200 bg-white p-4 text-sm text-gray-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
+          <MessageMarkdown isAnimating={false}>{text}</MessageMarkdown>
         </div>
       )}
 
       {!isUser && (
-        <div className="space-y-3 text-sm whitespace-pre-wrap text-gray-800 dark:text-neutral-200">
-          {text}
+        <div className="w-full space-y-3 text-sm text-gray-800 dark:text-neutral-200">
+          <MessageMarkdown isAnimating={isAnimating}>{text}</MessageMarkdown>
         </div>
       )}
 
@@ -67,9 +70,10 @@ function ChatMessage({ message, isDebug }: ChatMessageProps) {
 
 type ChatMessagesProps = {
   messages: ChatUIMessage[];
+  status: ChatStatus;
 };
 
-export default function ChatMessages({ messages }: ChatMessagesProps) {
+export default function ChatMessages({ messages, status }: ChatMessagesProps) {
   const { values } = useFlag();
   const isDebug = Boolean(values?.["client-debug"]);
 
@@ -79,9 +83,21 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
 
   return (
     <div className="flex flex-col gap-5">
-      {messages.map((message) => (
-        <ChatMessage key={message.id} message={message} isDebug={isDebug} />
-      ))}
+      {messages.map((message, index) => {
+        const isAnimating =
+          index === messages.length - 1 &&
+          status === "streaming" &&
+          message.role === "assistant";
+
+        return (
+          <ChatMessage
+            key={message.id}
+            message={message}
+            isDebug={isDebug}
+            isAnimating={isAnimating}
+          />
+        );
+      })}
     </div>
   );
 }
