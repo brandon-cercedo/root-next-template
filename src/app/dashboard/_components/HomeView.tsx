@@ -26,9 +26,9 @@ export default function HomeView() {
           },
         ]}
       />
-      <DashboardPageContainer className="pb-40">
-        <div className="flex w-full min-w-0 flex-col items-center">
-          <div className="flex h-full w-full flex-col items-center justify-center gap-5 sm:max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl">
+      <DashboardPageContainer className="pb-10 sm:pb-20 lg:pb-30 xl:pb-40">
+        <div className="flex w-full min-w-0 flex-col items-center justify-center">
+          <div className="flex size-full flex-col items-center justify-center gap-5 sm:max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl">
             <GreetingMessage user={user} />
             <ChatSection />
             <DemoToastSection />

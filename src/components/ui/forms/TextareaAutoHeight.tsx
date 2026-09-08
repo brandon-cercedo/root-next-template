@@ -21,8 +21,7 @@ const TextareaAutoHeight = forwardRef<
     if (typeof textareaRef === "object" && textareaRef?.current) {
       updateTextareaHeight(textareaRef.current);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [props.value, textareaRef]);
 
   const handleInput = (e: React.InputEvent<HTMLTextAreaElement>) => {
     updateTextareaHeight(e.currentTarget);
