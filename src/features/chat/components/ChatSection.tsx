@@ -28,7 +28,7 @@ export default function ChatSection() {
 
   return (
     <section className="relative flex w-full flex-col gap-4">
-      <ChatMessages messages={messages} />
+      <ChatMessages messages={messages} status={status} />
 
       {error && <Alert type="danger" variant="soft" message={error.message} />}
 

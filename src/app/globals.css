@@ -2,6 +2,11 @@
 
 @import "../../node_modules/preline/variants.css";
 @source "../../node_modules/preline/dist/*.js";
+@source "../../node_modules/streamdown/dist/*.js";
+@source "../../node_modules/@streamdown/code/dist/*.js";
+@source "../../node_modules/@streamdown/mermaid/dist/*.js";
+@source "../../node_modules/@streamdown/math/dist/*.js";
+@source "../../node_modules/@streamdown/cjk/dist/*.js";
 @plugin "@tailwindcss/forms";
 
 /**
@@ -15,7 +20,53 @@
   }
 }
 
-/* Default hover styles on all devices */
+/**
+ * Streamdown markdown styles
+ */
+
+@theme inline {
+  --color-border: transparent;
+  --color-sidebar: transparent;
+}
+
+[data-streamdown="code-block"],
+[data-streamdown="mermaid-block"],
+[data-streamdown="table-wrapper"] > div:last-child,
+[data-streamdown="table-row"] {
+  @apply border-gray-200 dark:border-neutral-700;
+}
+
+[data-streamdown="table"] {
+  @apply divide-gray-200 dark:divide-neutral-700;
+}
+
+[data-streamdown="table-header"] {
+  @apply bg-gray-50 dark:bg-neutral-800;
+}
+
+[data-streamdown="table-wrapper"] {
+  @apply p-0;
+}
+
+[data-streamdown="table-wrapper"] > div {
+  @apply rounded-xl;
+}
+
+[data-streamdown="code-block-body"] {
+  @apply p-2;
+}
+
+[data-streamdown="list-item"] > input[type="checkbox"] {
+  @apply rounded-sm;
+}
+
+[data-streamdown="inline-code"] {
+  @apply rounded-md bg-gray-100 text-red-600 dark:bg-neutral-800 dark:text-red-500;
+}
+
+/* 
+ * Default hover styles on all devices
+ */
 @custom-variant hover (&:hover);
 
 @custom-variant dark (&:where(.dark, .dark *));
