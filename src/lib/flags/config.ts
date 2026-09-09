@@ -1,6 +1,9 @@
 import type { FlagDeclaration } from "flags";
 
-export type FlagKey = "client-debug" | "server-debug";
+export type FlagKey =
+  | "client-debug"
+  | "server-debug"
+  | "user-message-markdown";
 
 export type FlagOverrides = Record<FlagKey, boolean>;
 
@@ -36,6 +39,17 @@ export const FLAG_DECLARATIONS: InternalFlagDeclaration[] = [
     key: "server-debug",
     description:
       "Debug mode will be activated and dev actions will be available.",
+    options: [
+      { value: false, label: "Off" },
+      { value: true, label: "On" },
+    ],
+    decide() {
+      return false;
+    },
+  },
+  {
+    key: "user-message-markdown",
+    description: "Render user chat messages as markdown when enabled.",
     options: [
       { value: false, label: "Off" },
       { value: true, label: "On" },

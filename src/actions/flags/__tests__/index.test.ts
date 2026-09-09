@@ -94,11 +94,13 @@ describe("updateFlagOverrides", () => {
     await updateFlagOverrides({
       "client-debug": true,
       "server-debug": false,
+      "user-message-markdown": true,
     });
 
     expect(mockEncryptOverrides).toHaveBeenCalledWith({
       "client-debug": true,
       "server-debug": false,
+      "user-message-markdown": true,
     });
     expect(mockCookieSet).toHaveBeenCalledWith(
       FLAG_OVERRIDE_COOKIE_NAME,

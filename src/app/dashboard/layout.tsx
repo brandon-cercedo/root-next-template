@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { FullUser, getFullUser } from "@/actions/db/user";
 import { getFlagOverrides, getFlagValues } from "@/actions/flags/utils";
-import DebugModeBadge from "@/components/flags/DebugModeBadge";
+import FlagsBadge from "@/components/flags/FlagsBadge";
 import FlagToolbar from "@/components/flags/FlagToolbar";
 import CommandPalette from "@/components/keyboard/CommandPalette";
 import KeyboardHelpOffcanvas from "@/components/keyboard/KeyboardHelpOffcanvas";
@@ -61,7 +61,7 @@ export default async function DashboardLayout({
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             {children}
           </div>
-          <DebugModeBadge />
+          <FlagsBadge />
           <FlagToolbar user={user} />
         </div>
       </div>

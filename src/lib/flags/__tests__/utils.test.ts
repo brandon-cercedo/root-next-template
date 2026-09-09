@@ -10,11 +10,13 @@ describe("sanitizeFlagOverrides", () => {
       sanitizeFlagOverrides({
         "client-debug": true,
         "server-debug": false,
+        "user-message-markdown": true,
         unknown: true,
       } as PartialFlagOverrides)
     ).toEqual({
       "client-debug": true,
       "server-debug": false,
+      "user-message-markdown": true,
     });
   });
 

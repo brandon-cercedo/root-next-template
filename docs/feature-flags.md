@@ -16,18 +16,20 @@ values without redeploying via an encrypted cookie.
 - `FlagToolbar` mounts on dashboard routes when `isAdmin` allows the
   signed-in user (always in development; allowlisted emails in
   preview/production).
-- `DebugModeBadge` renders a compact indigo **Debug** capsule at the
-  bottom-left of the main content panel when `client-debug` and/or
-  `server-debug` resolve to `true`.
+- `FlagsBadge` renders a compact indigo capsule at the bottom-left of the
+  main content panel when any flag resolves to `true`. It shows
+  `Flag` / `Flags`, the first active flag key, and a `+N more` chip with
+  a tooltip listing the remaining keys.
 
 ## Available flags
 
-| Key            | Export            | Default | Purpose                      |
-| -------------- | ----------------- | ------- | ---------------------------- |
-| `client-debug` | `clientDebugFlag` | `false` | Enables debug UI             |
-| `server-debug` | `serverDebugFlag` | `false` | Enables debug server actions |
+| Key                     | Export                    | Default | Purpose                         |
+| ----------------------- | ------------------------- | ------- | ------------------------------- |
+| `client-debug`          | `clientDebugFlag`         | `false` | Enables debug UI                |
+| `server-debug`          | `serverDebugFlag`         | `false` | Enables debug server actions    |
+| `user-message-markdown` | `userMessageMarkdownFlag` | `false` | User chat messages as markdown  |
 
-Both flags are boolean with Off / On options. Production behavior comes from
+All flags are boolean with Off / On options. Production behavior comes from
 each flag's `decide()` until overridden via cookie.
 
 ## Flow
@@ -38,7 +40,7 @@ flowchart TD
   Fetch --> Provider["FlagProvider"]
   Provider --> Hook["useFlag"]
   Hook --> FlagToolbar["FlagToolbar"]
-  Hook --> UI["DebugModeBadge"]
+  Hook --> UI["FlagsBadge"]
   Toolbar["FlagToolbarContent"] --> Actions["updateFlagOverrides / deleteFlagOverrides"]
   Gate["isAdmin"] --> Layout
   Gate --> Actions
