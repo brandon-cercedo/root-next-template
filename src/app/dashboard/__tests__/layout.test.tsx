@@ -46,6 +46,7 @@ vi.mock("@/components/flags/FlagToolbar", async () => {
 const defaultFlagValues = {
   "client-debug": false,
   "server-debug": false,
+  "user-message-markdown": false,
 };
 
 const getFlagValues = vi.fn().mockResolvedValue(defaultFlagValues);
@@ -216,27 +217,29 @@ describe("DashboardLayout", () => {
     expect(getFlagValues).not.toHaveBeenCalled();
     expect(getFlagOverrides).not.toHaveBeenCalled();
     expect(screen.queryByTestId("flag-toolbar")).toBeNull();
-    expect(screen.queryByTestId("debug-mode-badge")).toBeNull();
+    expect(screen.queryByTestId("flag-badge")).toBeNull();
   });
 
-  it("should hide the debug badge when both debug flags are off", async () => {
+  it("should hide the flag badge when all flags are off", async () => {
     getFullUser.mockResolvedValue(mockUser);
     getFlagValues.mockResolvedValue({
       "client-debug": false,
       "server-debug": false,
+      "user-message-markdown": false,
     });
 
     await renderLayout(<p>Home child content</p>);
 
-    expect(screen.queryByTestId("debug-mode-badge")).toBeNull();
+    expect(screen.queryByTestId("flag-badge")).toBeNull();
     expect(screen.getByTestId("flag-toolbar")).toBeDefined();
   });
 
-  it("should show Client chip when client-debug is on", async () => {
+  it("should show the first flag key when one flag is on", async () => {
     getFullUser.mockResolvedValue(mockUser);
     getFlagValues.mockResolvedValue({
       "client-debug": true,
       "server-debug": false,
+      "user-message-markdown": false,
     });
 
     const { container } = await renderLayout(<p>Home child content</p>);
@@ -246,25 +249,29 @@ describe("DashboardLayout", () => {
     );
     expect(innerPanel).not.toBeNull();
     expect(
-      within(innerPanel as HTMLElement).getByTestId("debug-mode-badge")
+      within(innerPanel as HTMLElement).getByTestId("flag-badge")
     ).toBeDefined();
-    expect(screen.getByText("Debug")).toBeDefined();
-    expect(screen.getByText("Client")).toBeDefined();
-    expect(screen.queryByText("Server")).toBeNull();
+    expect(screen.getByText("Flag")).toBeDefined();
+    expect(screen.getByText("client-debug")).toBeDefined();
+    expect(screen.queryByText(/\+\d+ more/)).toBeNull();
   });
 
-  it("should show Server chip when server-debug is on", async () => {
+  it("should show +N more when multiple flags are on", async () => {
     getFullUser.mockResolvedValue(mockUser);
     getFlagValues.mockResolvedValue({
-      "client-debug": false,
+      "client-debug": true,
       "server-debug": true,
+      "user-message-markdown": true,
     });
 
     await renderLayout(<p>Home child content</p>);
 
-    expect(screen.getByTestId("debug-mode-badge")).toBeDefined();
-    expect(screen.getByText("Server")).toBeDefined();
-    expect(screen.queryByText("Client")).toBeNull();
+    expect(screen.getByTestId("flag-badge")).toBeDefined();
+    expect(screen.getByText("Flags")).toBeDefined();
+    expect(screen.getByText("client-debug")).toBeDefined();
+    expect(screen.getByText("+2 more")).toBeDefined();
+    expect(screen.getByText("server-debug")).toBeDefined();
+    expect(screen.getByText("user-message-markdown")).toBeDefined();
   });
 
   it("should hide FlagToolbar when isAdmin is false", async () => {

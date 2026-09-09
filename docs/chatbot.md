@@ -57,6 +57,9 @@ Some relevant details:
   non-text **Steps** under assistant bubbles.
 - **`server-debug`:** Logs chat input and `streamText` `onEnd` output in
   the API route.
+- **`user-message-markdown`:** When on, user bubbles render via
+  `MessageMarkdown`; when off, user text is plain
+  `whitespace-pre-wrap`.
 - **Env:** `OPENAI_API_KEY` in `envs.ts` / `.env.example`;
   required at runtime to chat (SDK reads it by default).
 

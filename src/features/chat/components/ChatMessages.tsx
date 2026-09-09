@@ -32,11 +32,17 @@ function MessageSteps({ message }: { message: ChatUIMessage }) {
 
 type ChatMessageProps = {
   message: ChatUIMessage;
-  isDebug: boolean;
   isAnimating: boolean;
+  isDebug: boolean;
+  isUserMarkdown: boolean;
 };
 
-function ChatMessage({ message, isDebug, isAnimating }: ChatMessageProps) {
+function ChatMessage({
+  message,
+  isAnimating,
+  isDebug,
+  isUserMarkdown,
+}: ChatMessageProps) {
   const text = getMessageText(message);
   const isUser = message.role === "user";
   const metadata = message.metadata;
@@ -50,7 +56,11 @@ function ChatMessage({ message, isDebug, isAnimating }: ChatMessageProps) {
     >
       {isUser && (
         <div className="max-h-[70vh] w-full scrollbar-thin space-y-3 overflow-y-auto overscroll-contain rounded-2xl border border-gray-200 bg-white p-4 text-sm text-gray-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
-          <MessageMarkdown isAnimating={false}>{text}</MessageMarkdown>
+          {isUserMarkdown ? (
+            <MessageMarkdown isAnimating={false}>{text}</MessageMarkdown>
+          ) : (
+            <div className="whitespace-pre-wrap">{text}</div>
+          )}
         </div>
       )}
 
@@ -77,6 +87,7 @@ type ChatMessagesProps = {
 export default function ChatMessages({ messages, status }: ChatMessagesProps) {
   const { values } = useFlag();
   const isDebug = Boolean(values?.["client-debug"]);
+  const isUserMarkdown = Boolean(values?.["user-message-markdown"]);
 
   if (messages.length === 0) {
     return null;
@@ -94,8 +105,9 @@ export default function ChatMessages({ messages, status }: ChatMessagesProps) {
           <ChatMessage
             key={message.id}
             message={message}
-            isDebug={isDebug}
             isAnimating={isAnimating}
+            isDebug={isDebug}
+            isUserMarkdown={isUserMarkdown}
           />
         );
       })}

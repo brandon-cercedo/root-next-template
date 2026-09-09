@@ -2,7 +2,11 @@ import { decryptOverrides } from "flags";
 import { evaluate } from "flags/next";
 import { cookies } from "next/headers";
 
-import { clientDebugFlag, serverDebugFlag } from "@/lib/flags";
+import {
+  clientDebugFlag,
+  serverDebugFlag,
+  userMessageMarkdownFlag,
+} from "@/lib/flags";
 import {
   FLAG_OVERRIDE_COOKIE_NAME,
   type FlagOverrides,
@@ -11,14 +15,14 @@ import {
 import { sanitizeFlagOverrides } from "@/lib/flags/utils";
 
 export async function getFlagValues() {
-  const [isClientDebug, isServerDebug] = await evaluate([
-    clientDebugFlag,
-    serverDebugFlag,
-  ]);
+  const [isClientDebug, isServerDebug, isUserMessageMarkdown] = await evaluate(
+    [clientDebugFlag, serverDebugFlag, userMessageMarkdownFlag]
+  );
 
   const values: FlagOverrides = {
     "client-debug": isClientDebug,
     "server-debug": isServerDebug,
+    "user-message-markdown": isUserMessageMarkdown,
   };
 
   return values;

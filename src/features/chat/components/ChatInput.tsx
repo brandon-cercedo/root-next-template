@@ -31,7 +31,7 @@ export default function ChatInput({ status, onSend, onStop }: ChatInputProps) {
         event.preventDefault();
         handleSend();
       }}
-      className="sticky bottom-0 z-10 flex w-full flex-col gap-2 rounded-2xl border border-gray-300 bg-white p-2 shadow-xl dark:border-neutral-700 dark:bg-neutral-900 dark:shadow-none"
+      className="sticky bottom-4 z-10 flex w-full flex-col gap-2 rounded-2xl border border-gray-300 bg-white p-2 shadow-xl dark:border-neutral-700 dark:bg-neutral-900 dark:shadow-none"
     >
       <TextareaAutoHeight
         value={input}

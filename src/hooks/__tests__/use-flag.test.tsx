@@ -34,6 +34,7 @@ describe("useFlag", () => {
     const values: FlagOverrides = {
       "client-debug": true,
       "server-debug": false,
+      "user-message-markdown": false,
     };
     const overrides: PartialFlagOverrides = { "client-debug": true };
 
