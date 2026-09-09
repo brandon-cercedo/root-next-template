@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { getMessageText } from "@/features/chat/utils";
 import { useFlag } from "@/hooks/use-flag";
 
+import LoadingMessage from "./LoadingMessage";
 import MessageMarkdown from "./markdown/MessageMarkdown";
 import MessageActions from "./MessageActions";
 
@@ -98,6 +99,7 @@ export default function ChatMessages({ messages, status }: ChatMessagesProps) {
           />
         );
       })}
+      <LoadingMessage status={status} />
     </div>
   );
 }
