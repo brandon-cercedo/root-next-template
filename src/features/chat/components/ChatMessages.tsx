@@ -3,6 +3,7 @@
 import { type ChatStatus } from "ai";
 import clsx from "clsx";
 
+import ClampedContainer from "@/components/ui/ClampedContainer";
 import { getMessageText } from "@/features/chat/utils";
 import { useFlag } from "@/hooks/use-flag";
 
@@ -55,12 +56,14 @@ function ChatMessage({
       })}
     >
       {isUser && (
-        <div className="max-h-[70vh] w-full scrollbar-thin space-y-3 overflow-y-auto overscroll-contain rounded-2xl border border-gray-200 bg-white p-4 text-sm text-gray-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
-          {isUserMarkdown ? (
-            <MessageMarkdown isAnimating={false}>{text}</MessageMarkdown>
-          ) : (
-            <div className="whitespace-pre-wrap">{text}</div>
-          )}
+        <div className="w-full space-y-3 rounded-2xl border border-gray-200 bg-white p-4 text-sm text-gray-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
+          <ClampedContainer className="max-h-24.5">
+            {isUserMarkdown ? (
+              <MessageMarkdown isAnimating={false}>{text}</MessageMarkdown>
+            ) : (
+              <div className="whitespace-pre-wrap">{text}</div>
+            )}
+          </ClampedContainer>
         </div>
       )}
 
