@@ -52,7 +52,7 @@ const defaultFlagValues = {
 const getFlagValues = vi.fn().mockResolvedValue(defaultFlagValues);
 const getFlagOverrides = vi.fn().mockResolvedValue({});
 
-vi.mock("@/actions/flags/utils", () => ({
+vi.mock("@/services/flags", () => ({
   getFlagValues: () => getFlagValues(),
   getFlagOverrides: () => getFlagOverrides(),
 }));

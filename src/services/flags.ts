@@ -1,3 +1,5 @@
+import "server-only";
+
 import { decryptOverrides } from "flags";
 import { evaluate } from "flags/next";
 import { cookies } from "next/headers";
