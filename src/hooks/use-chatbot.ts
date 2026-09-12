@@ -2,6 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
+import { useEffect } from "react";
 
 import { paths } from "@/lib/config/paths";
 
@@ -77,6 +78,12 @@ export function useChatbot({ initialMessages }: UseChatbotOptions = {}) {
       );
     },
   });
+
+  useEffect(() => {
+    const newMessages = initialMessages ?? [];
+    chat.setMessages(newMessages);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialMessages]);
 
   const sendMessage: typeof chat.sendMessage = (message, options) => {
     const newMessage = composeUserMessage(message);
