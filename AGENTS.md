@@ -65,8 +65,8 @@ Enforced by ESLint / Prettier / Commitlint — follow these over conflicting pro
     - Features (`src/features`):
       - only import from shared.
       - each feature is self-contained.
-    - Shared (`src/components`, `src/hooks`, `src/lib`, `src/actions`, `src/assets`,
-      `src/testing`):
+    - Shared (`src/components`, `src/hooks`, `src/lib`, `src/actions`,
+      `src/services`, `src/assets`, `src/testing`):
       - only import from other shared folders.
 - Git and GitHub conventions:
   - Branches:
@@ -99,6 +99,7 @@ src/
 +-- features/          # Feature-based modules
     +-- auth/
         +-- actions/     # Server actions only (login.ts, register.ts)
+        +-- services/    # Server-only business logic; enforce with `import "server-only"`
         +-- utils/       # Feature utils (generate-password.ts)
         +-- components/  # Feature components (LoginForm, SignupModal)
         +-- hooks/       # Feature hooks (useAuth, useSession)
@@ -111,6 +112,7 @@ src/
     +-- utils/         # Pure utilities (format.ts, validation.ts)
 +-- actions/           # Shared server actions
     +-- db/            # DB utilities (user.ts, profile.ts)
++-- services/          # Server-only business logic; enforce with `import "server-only"`
 +-- types/             # Global TypeScript types (api.ts, common.ts)
 +-- stores/            # Global state stores (userStore.ts, appStore.ts)
 +-- testing/           # Test utilities, mocks, and setup files

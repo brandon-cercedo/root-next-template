@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { FullUser, getFullUser } from "@/actions/db/user";
-import { getFlagOverrides, getFlagValues } from "@/actions/flags/utils";
 import FlagsBadge from "@/components/flags/FlagsBadge";
 import FlagToolbar from "@/components/flags/FlagToolbar";
 import CommandPalette from "@/components/keyboard/CommandPalette";
@@ -14,6 +13,7 @@ import { KeyboardProvider } from "@/hooks/use-keyboard";
 import { UserProvider } from "@/hooks/use-user";
 import { paths } from "@/lib/config/paths";
 import { isAdmin } from "@/lib/utils/db/user";
+import { getFlagOverrides, getFlagValues } from "@/services/flags";
 
 export const metadata: Metadata = {
   title: "Dashboard",

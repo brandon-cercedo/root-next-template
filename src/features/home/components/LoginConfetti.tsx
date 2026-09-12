@@ -2,7 +2,8 @@
 
 import { useEffect } from "react";
 
-import { completeLoginConfetti, FullUser } from "@/actions/db/user";
+import { FullUser } from "@/actions/db/user";
+import { completeLoginConfetti } from "@/actions/db/user-setting";
 import { confettiSchoolPride } from "@/lib/confetti";
 
 export default function LoginConfetti({ user }: { user: FullUser }) {

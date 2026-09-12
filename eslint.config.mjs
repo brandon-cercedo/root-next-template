@@ -94,10 +94,16 @@ const eslintConfig = defineConfig([
                 "./src/hooks",
                 "./src/lib",
                 "./src/actions",
+                "./src/services",
                 "./src/assets",
                 "./src/testing",
               ],
               from: ["./src/features", "./src/app"],
+            },
+            // Only app, actions, features, and services may import services
+            {
+              target: "./src/!(app|actions|features|services)/**/*",
+              from: "./src/services",
             },
           ],
         },
