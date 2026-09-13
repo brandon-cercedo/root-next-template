@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 
 import chatSession from "@/../scripts/seed/data/chat-session.js";
 import Alert from "@/components/ui/Alert";
+import ScrollableContainer from "@/components/ui/ScrollableContainer";
 import GreetingMessage from "@/features/home/components/GreetingMessage";
 import { useChatbot, type ChatUIMessage } from "@/hooks/use-chatbot";
 import { useFlag } from "@/hooks/use-flag";
@@ -38,7 +39,11 @@ export default function ChatSection({ user, className }: ChatSectionProps) {
   }
 
   return (
-    <section className="flex flex-1 flex-col items-center overflow-y-auto [&::-webkit-scrollbar]:w-0">
+    <ScrollableContainer.section
+      containerClassName="[&::-webkit-scrollbar]:w-0"
+      className="items-center"
+      buttonClassName="bottom-32.5"
+    >
       <div
         className={mergeClsx(
           "relative flex w-full flex-1 flex-col gap-4",
@@ -78,6 +83,6 @@ export default function ChatSection({ user, className }: ChatSectionProps) {
           />
         </motion.div>
       </div>
-    </section>
+    </ScrollableContainer.section>
   );
 }
