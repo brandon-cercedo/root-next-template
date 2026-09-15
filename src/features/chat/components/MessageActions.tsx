@@ -51,7 +51,7 @@ export default function MessageActions({
   metadata,
 }: MessageActionsProps) {
   return (
-    <div className="flex items-center gap-1 text-xs text-gray-500 opacity-0 transition-opacity group-hover:opacity-100 dark:text-neutral-400">
+    <div className="flex items-center gap-1 text-xs text-gray-500 opacity-0 transition-opacity group-hover/message:opacity-100 dark:text-neutral-400">
       <Clipboard
         text={text}
         size="sm"

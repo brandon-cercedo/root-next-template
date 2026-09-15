@@ -72,7 +72,7 @@ function ScrollableContainerRoot({
   return (
     <Root
       className={mergeClsx(
-        "group relative flex min-h-0 flex-1",
+        "group/scroll relative flex min-h-0 flex-1",
         rootClassName
       )}
     >
@@ -96,7 +96,7 @@ function ScrollableContainerRoot({
           aria-label="Scroll to bottom"
           onClick={scrollToBottom}
           className={mergeClsx(
-            "absolute bottom-4 left-1/2 z-10 inline-flex size-8 -translate-x-1/2 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-800 opacity-0 shadow-md transition-opacity duration-200 group-hover:opacity-100 hover:bg-gray-100 focus:outline-hidden dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800",
+            "absolute bottom-4 left-1/2 z-10 inline-flex size-8 -translate-x-1/2 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-800 opacity-0 shadow-md transition-opacity duration-200 group-hover/scroll:opacity-100 hover:bg-gray-100 focus:outline-hidden dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800",
             buttonClassName
           )}
         >
