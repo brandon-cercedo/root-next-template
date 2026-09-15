@@ -35,6 +35,7 @@ describe("useFlag", () => {
       "client-debug": true,
       "server-debug": false,
       "user-message-markdown": false,
+      "chat-initial-message": false,
     };
     const overrides: PartialFlagOverrides = { "client-debug": true };
 

@@ -36,7 +36,7 @@ export default function ChatInput({ status, onSend, onStop }: ChatInputProps) {
       <TextareaAutoHeight
         value={input}
         rows={1}
-        placeholder="Ask root…"
+        placeholder="Ask about code, your profile, or a UI action…"
         onChange={(event) => {
           setInput(event.target.value);
         }}

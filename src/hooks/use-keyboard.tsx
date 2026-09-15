@@ -30,6 +30,7 @@ import { isEditableTarget } from "@/lib/utils/html";
 
 type KeyboardContextType = {
   commands: KeyboardCommand[];
+  commandsById: Map<CommandId, KeyboardCommand>;
   shortcuts: ShortcutCommand[];
   shortcutsById: Map<CommandId, ShortcutCommand>;
   openHelp: () => void;
@@ -103,6 +104,9 @@ export function KeyboardProvider({ children }: { children: ReactNode }) {
       : {}),
   };
   const commands = getKeyboardCommands(actions);
+  const commandsById = new Map(
+    commands.map((command) => [command.id, command])
+  );
   const shortcuts = getShortcutCommands(commands);
   const shortcutsById = new Map(
     shortcuts.map((command) => [command.id, command])
@@ -166,7 +170,13 @@ export function KeyboardProvider({ children }: { children: ReactNode }) {
 
   return (
     <KeyboardContext.Provider
-      value={{ commands, shortcuts, shortcutsById, openHelp }}
+      value={{
+        commands,
+        commandsById,
+        shortcuts,
+        shortcutsById,
+        openHelp,
+      }}
     >
       {children}
     </KeyboardContext.Provider>

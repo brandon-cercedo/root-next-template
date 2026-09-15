@@ -2,11 +2,12 @@
 
 import { motion } from "motion/react";
 
-import chatSession from "@/../scripts/seed/data/chat-session.js";
+import chatSession from "@/../scripts/seed/data/chat-session-tools";
 import Alert from "@/components/ui/Alert";
 import ScrollableContainer from "@/components/ui/ScrollableContainer";
+import { useAgent } from "@/features/chat/hooks/use-agent";
 import GreetingMessage from "@/features/home/components/GreetingMessage";
-import { useChatbot, type ChatUIMessage } from "@/hooks/use-chatbot";
+import { type ChatUIMessage } from "@/hooks/use-chatbot";
 import { useFlag } from "@/hooks/use-flag";
 import { mergeClsx } from "@/lib/utils/styles";
 import { User } from "@/prisma/types/generated/browser";
@@ -22,9 +23,10 @@ type ChatSectionProps = {
 export default function ChatSection({ user, className }: ChatSectionProps) {
   const { values } = useFlag();
   const isClientDebug = Boolean(values?.["client-debug"]);
+  const isChatInitialMessage = Boolean(values?.["chat-initial-message"]);
 
-  const { messages, sendMessage, status, stop, error } = useChatbot({
-    initialMessages: isClientDebug
+  const { messages, sendMessage, status, stop, error } = useAgent({
+    initialMessages: isChatInitialMessage
       ? (chatSession.messages as ChatUIMessage[])
       : undefined,
   });

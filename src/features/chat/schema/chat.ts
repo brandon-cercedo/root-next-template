@@ -14,6 +14,8 @@ export const ChatRequestSchema = z.object({
       parts: z.array(UIMessagePartSchema),
     })
   ),
+  /** Client registry keys that currently have `run` (allowlisted on server). */
+  keyboardCommandIds: z.array(z.string()),
 });
 
 export type ChatRequest = z.infer<typeof ChatRequestSchema>;
