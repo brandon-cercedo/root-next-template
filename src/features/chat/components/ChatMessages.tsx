@@ -51,7 +51,7 @@ function ChatMessage({
   return (
     <div
       key={message.id}
-      className={clsx("group flex w-full flex-col gap-1", {
+      className={clsx("group/message flex w-full flex-col gap-1", {
         "max-w-4/5 items-end self-end": isUser,
       })}
     >
