@@ -3,7 +3,8 @@ import type { FlagDeclaration } from "flags";
 export type FlagKey =
   | "client-debug"
   | "server-debug"
-  | "user-message-markdown";
+  | "user-message-markdown"
+  | "chat-initial-message";
 
 export type FlagOverrides = Record<FlagKey, boolean>;
 
@@ -50,6 +51,17 @@ export const FLAG_DECLARATIONS: InternalFlagDeclaration[] = [
   {
     key: "user-message-markdown",
     description: "Render user chat messages as markdown when enabled.",
+    options: [
+      { value: false, label: "Off" },
+      { value: true, label: "On" },
+    ],
+    decide() {
+      return false;
+    },
+  },
+  {
+    key: "chat-initial-message",
+    description: "Seed chat with initial messages from the session seed data.",
     options: [
       { value: false, label: "Off" },
       { value: true, label: "On" },

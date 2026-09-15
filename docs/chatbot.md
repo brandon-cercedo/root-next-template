@@ -75,9 +75,10 @@ Some relevant details:
 - **Agent loop:** `stopWhen: stepCountIs(5)`, `maxRetries: 2`,
   `temperature: 0.2`, `repairToolCall` (re-ask; no `Output.object`).
 - **Input:** Enter sends; Shift+Enter inserts a newline.
-- **`client-debug`:** Seeds `initialMessages` from
-  `scripts/seed/data/chat-session.js`, logs section state, and shows
-  non-text **Steps** under assistant bubbles.
+- **`client-debug`:** Logs section state and shows non-text **Steps**
+  under assistant bubbles.
+- **`chat-initial-message`:** When on, seeds `initialMessages` from
+  `scripts/seed/data/chat-session.js`; when off, no seeding.
 - **`server-debug`:** Logs chat input and `streamText` `onEnd` output in
   the API route.
 - **`user-message-markdown`:** When on, user bubbles render via

@@ -23,9 +23,10 @@ type ChatSectionProps = {
 export default function ChatSection({ user, className }: ChatSectionProps) {
   const { values } = useFlag();
   const isClientDebug = Boolean(values?.["client-debug"]);
+  const isChatInitialMessage = Boolean(values?.["chat-initial-message"]);
 
   const { messages, sendMessage, status, stop, error } = useAgent({
-    initialMessages: isClientDebug
+    initialMessages: isChatInitialMessage
       ? (chatSession.messages as ChatUIMessage[])
       : undefined,
   });
