@@ -86,7 +86,7 @@ describe("createChatTools", () => {
       await import("@/features/chat/services/tools/create-chat-tools");
     const tools = createChatTools({
       userId: "session-user-1",
-      keyboardCommandIds: ["not-a-real-command"],
+      keyboardCommandIds: ["not-a-real-command" as never],
     });
 
     expect(tools).not.toHaveProperty("runKeyboardCommand");
@@ -97,7 +97,12 @@ describe("createChatTools", () => {
       await import("@/features/chat/services/tools/create-chat-tools");
     const tools = createChatTools({
       userId: "session-user-1",
-      keyboardCommandIds: ["theme-dark", "spoofed", "theme-dark", "go-home"],
+      keyboardCommandIds: [
+        "theme-dark",
+        "spoofed" as never,
+        "theme-dark",
+        "go-home",
+      ],
     });
 
     expect(tools.runKeyboardCommand).toBeDefined();
