@@ -77,7 +77,9 @@ function ChatMessage({
         <MessageSteps message={message} />
       )}
 
-      <MessageActions role={message.role} text={text} metadata={metadata} />
+      {!isAnimating && (
+        <MessageActions role={message.role} text={text} metadata={metadata} />
+      )}
     </div>
   );
 }
