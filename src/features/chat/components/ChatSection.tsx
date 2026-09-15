@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 
-import chatSession from "@/../scripts/seed/data/chat-session.js";
+import chatSession from "@/../scripts/seed/data/chat-session-tools";
 import Alert from "@/components/ui/Alert";
 import ScrollableContainer from "@/components/ui/ScrollableContainer";
 import { useAgent } from "@/features/chat/hooks/use-agent";

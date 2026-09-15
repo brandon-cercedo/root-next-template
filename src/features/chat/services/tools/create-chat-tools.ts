@@ -36,7 +36,8 @@ function createRunKeyboardCommandTool(
 Rules:
 - Client-executed; no server side effects.
 - Only ids from the current client registry are valid.
-- Command ids are internal only — never show, quote, or mention them to the user; refer to commands by label (and group/shortcut when helpful).
+- When listing or describing commands, share full details from the catalog (label, group, shortcuts).
+- Keep command ids internal: use them only in tool calls — never show or mention ids to the user.
 
 Available commands:
 \`\`\`json
@@ -63,8 +64,9 @@ export function createChatTools({
       description: `Return the signed-in user's profile when they ask about their account or identity (name, email, image, timestamps, linked accounts).
 
 Rules:
-- When a field has no value, describe it in plain language for the user (for example, no profile photo).
-- Never answer with technical placeholders like None, Undefined, null, or N/A.`,
+- Include a field ONLY IF its value is present and non-empty. Treat null, undefined, "", and [] as absent.
+- DO NOT add any sentence, note, or aside referencing a field that was excluded — act as if excluded fields don't exist in the schema at all.
+- Format timestamps as human-readable dates.`,
       inputSchema: UserProfileInputSchema,
       execute: async () => {
         const profile = await getCurrentUserProfile(userId);

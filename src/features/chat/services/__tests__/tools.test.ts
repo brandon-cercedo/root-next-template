@@ -134,6 +134,8 @@ describe("createChatTools", () => {
 
     expect(description).toContain("```json");
     expect(description).toContain(JSON.stringify(catalog));
+    expect(description).toMatch(/share full details/i);
+    expect(description).toMatch(/never show or mention ids/i);
     expect(description).not.toContain("spoofed");
   });
 });
