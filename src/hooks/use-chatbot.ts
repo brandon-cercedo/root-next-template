@@ -1,7 +1,9 @@
-"use client";
-
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, type UIMessage } from "ai";
+import {
+  DefaultChatTransport,
+  type ChatOnToolCallCallback,
+  type UIMessage,
+} from "ai";
 import { useEffect } from "react";
 
 import { paths } from "@/lib/config/paths";
@@ -61,12 +63,27 @@ export type ChatUIMessage = UIMessage<ChatMessageMetadata>;
 
 type UseChatbotOptions = {
   initialMessages?: ChatUIMessage[];
+  onToolCall?: ChatOnToolCallCallback<ChatUIMessage>;
+  sendAutomaticallyWhen?: (options: {
+    messages: ChatUIMessage[];
+  }) => boolean | PromiseLike<boolean>;
+  body?: () => Record<string, unknown>;
 };
 
-export function useChatbot({ initialMessages }: UseChatbotOptions = {}) {
+export function useChatbot({
+  initialMessages,
+  onToolCall,
+  sendAutomaticallyWhen,
+  body,
+}: UseChatbotOptions = {}) {
   const chat = useChat<ChatUIMessage>({
     messages: initialMessages,
-    transport: new DefaultChatTransport({ api: paths.api.chat() }),
+    transport: new DefaultChatTransport({
+      api: paths.api.chat(),
+      body,
+    }),
+    onToolCall,
+    sendAutomaticallyWhen,
     onFinish: ({ message, messages }) => {
       if (message.role !== "assistant") {
         return;
@@ -96,5 +113,6 @@ export function useChatbot({ initialMessages }: UseChatbotOptions = {}) {
     status: chat.status,
     stop: chat.stop,
     error: chat.error,
+    addToolOutput: chat.addToolOutput,
   };
 }

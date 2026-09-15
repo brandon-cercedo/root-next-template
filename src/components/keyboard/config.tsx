@@ -23,19 +23,22 @@ export const COMMAND_GROUPS = [
 
 export type CommandGroup = (typeof COMMAND_GROUPS)[number];
 
-export type CommandId =
-  | "toggle-palette"
-  | "open-palette"
-  | "toggle-theme"
-  | "theme-light"
-  | "theme-dark"
-  | "theme-system"
-  | "toggle-sidebar"
-  | "go-home"
-  | "log-out"
-  | "confetti"
-  | "open-flag-toolbar"
-  | "open-keyboard-help";
+export const COMMAND_IDS = [
+  "toggle-palette",
+  "open-palette",
+  "toggle-theme",
+  "theme-light",
+  "theme-dark",
+  "theme-system",
+  "toggle-sidebar",
+  "go-home",
+  "log-out",
+  "confetti",
+  "open-flag-toolbar",
+  "open-keyboard-help",
+] as const;
+
+export type CommandId = (typeof COMMAND_IDS)[number];
 
 type Shortcut = {
   chord: string; // e.g. "$mod+k"
@@ -63,7 +66,7 @@ export function getShortcutKeys({ labels }: Shortcut) {
   return isMac() ? labels.mac : labels.windows;
 }
 
-const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
+export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
   {
     id: "toggle-palette",
     label: "Toggle command palette",
