@@ -7,8 +7,9 @@ import { CHAT_MODEL, CHAT_SYSTEM_PROMPT } from "@/features/chat/config";
 import { ChatRequestSchema } from "@/features/chat/schema/chat";
 import { createChatTools } from "@/features/chat/services/tools/create-chat-tools";
 import { createRepairToolCall } from "@/features/chat/services/tools/create-repair-tool-call";
-import { ChatUIMessage } from "@/hooks/use-chatbot";
 import { serverDebugFlag } from "@/lib/flags";
+
+import type { ChatUIMessage } from "@/types/chat";
 
 export const maxDuration = 30;
 

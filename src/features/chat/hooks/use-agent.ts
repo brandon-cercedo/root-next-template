@@ -5,10 +5,12 @@ import {
   type ChatOnToolCallCallback,
 } from "ai";
 
-import { useChatbot, type ChatUIMessage } from "@/hooks/use-chatbot";
+import { useChatbot } from "@/hooks/use-chatbot";
 import { useKeyboard } from "@/hooks/use-keyboard";
 
 import { KeyboardCommandInput } from "../schema/tools";
+
+import type { ChatUIMessage } from "@/types/chat";
 
 type AgentToolCall = Parameters<
   ChatOnToolCallCallback<ChatUIMessage>

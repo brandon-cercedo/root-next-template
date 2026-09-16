@@ -11,7 +11,7 @@ import LoadingMessage from "./LoadingMessage";
 import MessageMarkdown from "./markdown/MessageMarkdown";
 import MessageActions from "./MessageActions";
 
-import type { ChatUIMessage } from "@/hooks/use-chatbot";
+import type { ChatUIMessage } from "@/types/chat";
 
 function MessageSteps({ message }: { message: ChatUIMessage }) {
   const nonTextParts = message.parts.filter((part) => part.type !== "text");

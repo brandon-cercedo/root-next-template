@@ -1,12 +1,10 @@
 import { useChat } from "@ai-sdk/react";
-import {
-  DefaultChatTransport,
-  type ChatOnToolCallCallback,
-  type UIMessage,
-} from "ai";
+import { DefaultChatTransport, type ChatOnToolCallCallback } from "ai";
 import { useEffect } from "react";
 
 import { paths } from "@/lib/config/paths";
+
+import type { ChatUIMessage } from "@/types/chat";
 
 type SendMessageInput = Parameters<
   ReturnType<typeof useChat<ChatUIMessage>>["sendMessage"]
@@ -53,13 +51,6 @@ function composeAssistantMessage(
     metadata: { timestamp, durationMs },
   };
 }
-
-export type ChatMessageMetadata = {
-  timestamp: string; // When the message was sent (user) or finished (assistant) in ISO format.
-  durationMs?: number; // Assistant only: ms from user send to stream finish.
-};
-
-export type ChatUIMessage = UIMessage<ChatMessageMetadata>;
 
 type UseChatbotOptions = {
   initialMessages?: ChatUIMessage[];

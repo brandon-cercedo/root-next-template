@@ -21,14 +21,15 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String        @id @default(cuid())
   name          String?
-  email         String    @unique
+  email         String        @unique
   emailVerified DateTime?
   image         String?
   password      String?
   accounts      Account[]
   setting       UserSetting?
+  chatSessions  ChatSession[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -65,4 +66,29 @@ model UserSetting {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum ChatSessionStatus {
+  submitted
+  streaming
+  ready
+  error
+}
+
+model ChatSession {
+  id          String            @id @default(cuid())
+  title       String
+  status      ChatSessionStatus @default(submitted)
+  error       String?
+  /// [ChatUIMessageType[]]
+  messages    Json              @default("[]")
+  isFavourite Boolean           @default(false)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  // Relationships
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, updatedAt])
 }
