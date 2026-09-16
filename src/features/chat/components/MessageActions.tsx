@@ -5,8 +5,9 @@ import moment from "moment";
 
 import Clipboard from "@/components/ui/Clipboard";
 import Tooltip from "@/components/ui/Tooltip";
-import { ChatMessageMetadata } from "@/hooks/use-chatbot";
 import { humanizeDate } from "@/lib/utils/date";
+
+import type { ChatMessageMetadata } from "@/types/chat";
 
 function getDurationSeconds(durationMs: number) {
   return Math.round(durationMs / 1000);

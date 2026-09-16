@@ -7,13 +7,14 @@ import Alert from "@/components/ui/Alert";
 import ScrollableContainer from "@/components/ui/ScrollableContainer";
 import { useAgent } from "@/features/chat/hooks/use-agent";
 import GreetingMessage from "@/features/home/components/GreetingMessage";
-import { type ChatUIMessage } from "@/hooks/use-chatbot";
 import { useFlag } from "@/hooks/use-flag";
 import { mergeClsx } from "@/lib/utils/styles";
 import { User } from "@/prisma/types/generated/browser";
 
 import ChatInput from "./ChatInput";
 import ChatMessages from "./ChatMessages";
+
+import type { ChatUIMessage } from "@/types/chat";
 
 type ChatSectionProps = {
   user: User;
