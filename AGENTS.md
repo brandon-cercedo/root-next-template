@@ -77,6 +77,8 @@ Enforced by ESLint / Prettier / Commitlint — follow these over conflicting pro
   - Pull requests:
     - Pattern: `<type>(<task_id>): <subject>`.
     - Example: `feat(123): add new feature`.
+    - Always run `pnpm test:all` before creating a PR. On failure, stop
+      immediately and ONLY report a concise failure summary.
 - Tests:
   - Framework: Vitest + Testing Library.
   - File naming: `src/**/*.{test,spec}.ts(x)?`.
