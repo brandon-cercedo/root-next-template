@@ -71,14 +71,14 @@ model UserSetting {
 enum ChatSessionStatus {
   submitted
   streaming
-  ready
+  ready      // ready to be shown to the user; to continue the conversation; or, to start a empty conversation.
   error
 }
 
 model ChatSession {
   id          String            @id @default(cuid())
   title       String
-  status      ChatSessionStatus @default(submitted)
+  status      ChatSessionStatus @default(ready)
   error       String?
   /// [ChatUIMessageType[]]
   messages    Json              @default("[]")
