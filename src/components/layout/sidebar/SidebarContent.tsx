@@ -69,7 +69,7 @@ export default function SidebarContent({
   return (
     <ScrollableContainer.nav
       rootClassName="h-full"
-      containerClassName="[scrollbar-width:none] overscroll-none px-2 py-2 pb-16 [&::-webkit-scrollbar]:w-0"
+      containerClassName="scrollbar-none overscroll-none px-2 py-2 pb-16"
     >
       {validSections.map((section, index) => (
         <div
