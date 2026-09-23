@@ -3,6 +3,7 @@
 import clsx from "clsx";
 import { useState } from "react";
 
+import ScrollableContainer from "@/components/ui/ScrollableContainer";
 import TruncatedText from "@/components/ui/TruncatedText";
 
 import SidebarItem, { SidebarItemType } from "./SidebarItem";
@@ -66,7 +67,10 @@ export default function SidebarContent({
   }
 
   return (
-    <nav className="h-full overflow-y-auto px-2 py-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+    <ScrollableContainer.nav
+      rootClassName="h-full"
+      containerClassName="[scrollbar-width:none] overscroll-none px-2 py-2 pb-16 [&::-webkit-scrollbar]:w-0"
+    >
       {validSections.map((section, index) => (
         <div
           key={index}
@@ -83,6 +87,6 @@ export default function SidebarContent({
           </ul>
         </div>
       ))}
-    </nav>
+    </ScrollableContainer.nav>
   );
 }

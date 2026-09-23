@@ -40,7 +40,7 @@ export default function Sidebar({ user }: { user: FullUser }) {
       aria-label="Sidebar"
     >
       <div className="relative flex h-full max-h-full flex-col justify-between gap-3 py-3">
-        <div className="flex size-full flex-col overflow-y-auto">
+        <div className="flex size-full min-h-0 flex-col">
           <SidebarHeader />
           <SidebarContent sections={sections} />
         </div>

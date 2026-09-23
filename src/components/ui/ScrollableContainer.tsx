@@ -19,7 +19,7 @@ type ScrollableContainerProps = {
   buttonClassName?: string;
 };
 
-type RootTag = "div" | "section" | "main";
+type RootTag = "div" | "section" | "main" | "nav";
 
 type ScrollableContainerRootProps = ScrollableContainerProps & {
   tag?: RootTag;
@@ -120,6 +120,7 @@ const ScrollableContainer = Object.assign(createComponent("div"), {
   div: createComponent("div"),
   section: createComponent("section"),
   main: createComponent("main"),
+  nav: createComponent("nav"),
 });
 
 export default ScrollableContainer;
