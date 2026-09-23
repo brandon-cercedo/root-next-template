@@ -11,14 +11,12 @@ describe("sanitizeFlagOverrides", () => {
         "client-debug": true,
         "server-debug": false,
         "user-message-markdown": true,
-        "chat-initial-message": false,
         unknown: true,
       } as PartialFlagOverrides)
     ).toEqual({
       "client-debug": true,
       "server-debug": false,
       "user-message-markdown": true,
-      "chat-initial-message": false,
     });
   });
 

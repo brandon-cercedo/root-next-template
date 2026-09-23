@@ -26,12 +26,11 @@ Merge order: P0 → P1 → P2. After P0 lands on `main`, retarget P1’s PR to `
 
 ## Current state
 
-- Chat is client-only on home
-  (`src/features/chat/components/ChatSection.tsx` via
-  `src/app/dashboard/_components/HomeView.tsx`).
-- `POST /api/chat` does not persist; metadata is client-composed in
-  `src/hooks/use-chatbot.ts`.
-- No `ChatSession` model; sidebar has no CHATS group.
+- P1 persistence is in place: `/dashboard/chats`, sidebar CHATS,
+  `createChatSession`, and `POST /api/chat` status lifecycle
+  (`streaming` → `ready` | `aborted` | `error`).
+- `submitted` remains the schema default / unused app write path.
+- P2 enhancements (favorite/delete/tooltips) still open.
 
 ## Checklist
 
@@ -41,11 +40,12 @@ Merge order: P0 → P1 → P2. After P0 lands on `main`, retarget P1’s PR to `
 
 ### P1
 
-- [ ] DB helpers + feature actions create/get/list/update; FullUser.chatSessions
-- [ ] chatId in request; server metadata; onEnd update; drop client composition
-- [ ] `/dashboard/chats` + `/dashboard/chats/[id]`; move ChatSection; empty home
-- [ ] New chat item + CHATS section (list/hide/Plus); no dropdown yet
-- [ ] Schema/action/API tests only; update `docs/chatbot.md`
+- [x] DB helpers + feature actions create/get/list/update; FullUser.chatSessions
+- [x] chatId in request; server metadata; onStart/onEnd status; drop client composition
+- [x] `/dashboard/chats` + `/dashboard/chats/[id]`; move ChatSection; empty home
+- [x] New chat item + CHATS section (list/hide/Plus); no dropdown yet
+- [x] Schema/action/API tests only; update `docs/chatbot.md`
+- [x] `ChatSessionStatus.aborted`; persist `streaming` / `ready` / `aborted` / `error`
 
 ### P2
 
@@ -65,10 +65,11 @@ enum ChatSessionStatus {
   streaming
   ready
   error
+  aborted
 }
 
 model ChatSession {
-  id          String            @id @default(cuid())
+  id          String            @id @default(uuid(7))
   title       String
   status      ChatSessionStatus @default(submitted)
   error       String?
@@ -103,7 +104,7 @@ Core persistence so refresh/return keeps history.
 | `listChatSessions()` | Current user, `updatedAt` desc |
 | `updateChatSession({ id, ... })` | Auth, Zod, revalidate |
 
-- DB layer: `src/actions/db/chat-session.ts`
+- DB layer: `src/services/chat-session.ts`
 - Feature: `src/features/chat/actions.ts`
 - Load `chatSessions` on `FullUser` via `src/actions/db/user.ts`
 
@@ -113,19 +114,23 @@ Core persistence so refresh/return keeps history.
 flowchart TD
   NewChat["/dashboard/chats"] --> FirstSend["First sendMessage"]
   FirstSend --> Create["createChatSession title from text"]
-  Create --> SetId["set chatId + history.replaceState"]
+  Create --> SetId["set chatId + router.push"]
   SetId --> Stream["POST /api/chat with chatId"]
   Existing["/dashboard/chats/id"] --> Load["getChatSession seed initialMessages"]
   Load --> Stream
-  Stream --> OnEnd["toUIMessageStreamResponse onEnd"]
-  OnEnd --> Persist["updateChatSession messages status metadata"]
+  Stream --> OnStart["streamText onStart → streaming"]
+  OnStart --> OnEnd["toUIMessageStream onEnd"]
+  OnEnd --> Persist["updateChatSession messages + ready|aborted|error"]
 ```
 
 1. Create on first send: title from user text; keep `chatId` in state;
-   `history.replaceState` to avoid remount mid-stream; pass `chatId` in
-   transport body.
-2. Update in `src/app/api/chat/route.ts` via
-   `toUIMessageStreamResponse({ originalMessages, messageMetadata, onEnd })`.
+   `router.push` (live `Chat` reused); pass `chatId` in transport body.
+   Create writes `status: "ready"` with the first user message.
+2. Update in `src/app/api/chat/route.ts`:
+   - `streamText.onStart` → `status: "streaming"` (+ revalidate)
+   - `streamText.onError` → `hasError` flag (log; do not persist alone)
+   - `toUIMessageStream({ originalMessages, messageMetadata, onEnd })`
+     → messages + terminal `ready` | `aborted` | `error`
 3. Extend `src/features/chat/schema/chat.ts` with `chatId`.
 4. Drop client metadata composition; stamp timestamps on server.
 
@@ -153,7 +158,8 @@ Update `src/components/layout/sidebar/config.tsx` to take `user`:
 ### Tests & docs (P1)
 
 - Tests for Zod + create/get/list/update actions + API persistence
-  (`chatId`, `onEnd` metadata). No React component tests.
+  (`chatId`, `onStart` streaming, `onEnd` ready/aborted/error,
+  `onError` → error). No React component tests.
 - Update `docs/chatbot.md` for chats routes and persistence.
 
 ---

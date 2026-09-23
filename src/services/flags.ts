@@ -5,7 +5,6 @@ import { evaluate } from "flags/next";
 import { cookies } from "next/headers";
 
 import {
-  chatInitialMessageFlag,
   clientDebugFlag,
   serverDebugFlag,
   userMessageMarkdownFlag,
@@ -18,23 +17,14 @@ import {
 import { sanitizeFlagOverrides } from "@/lib/flags/utils";
 
 export async function getFlagValues() {
-  const [
-    isClientDebug,
-    isServerDebug,
-    isUserMessageMarkdown,
-    isChatInitialMessage,
-  ] = await evaluate([
-    clientDebugFlag,
-    serverDebugFlag,
-    userMessageMarkdownFlag,
-    chatInitialMessageFlag,
-  ]);
+  const [isClientDebug, isServerDebug, isUserMessageMarkdown] = await evaluate(
+    [clientDebugFlag, serverDebugFlag, userMessageMarkdownFlag]
+  );
 
   const values: FlagOverrides = {
     "client-debug": isClientDebug,
     "server-debug": isServerDebug,
     "user-message-markdown": isUserMessageMarkdown,
-    "chat-initial-message": isChatInitialMessage,
   };
 
   return values;

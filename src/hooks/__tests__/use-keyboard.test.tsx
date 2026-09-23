@@ -82,7 +82,7 @@ describe("useKeyboard", () => {
     );
   });
 
-  it("should return commands, commandsById, shortcuts, and openHelp", () => {
+  it("should return commands, commandsById, commandsByIdRef, shortcuts, and openHelp", () => {
     const { result } = renderHook(() => useKeyboard(), {
       wrapper: Wrapper,
     });
@@ -90,6 +90,9 @@ describe("useKeyboard", () => {
     expect(result.current.commands.length).toBeGreaterThan(0);
     expect(result.current.commandsById.size).toBe(
       result.current.commands.length
+    );
+    expect(result.current.commandsByIdRef.current).toBe(
+      result.current.commandsById
     );
     expect(result.current.shortcuts.length).toBeGreaterThan(0);
     expect(typeof result.current.openHelp).toBe("function");

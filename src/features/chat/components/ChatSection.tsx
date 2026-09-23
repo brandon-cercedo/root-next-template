@@ -1,44 +1,110 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { v7 as uuidv7 } from "uuid";
 
-import chatSession from "@/../scripts/seed/data/chat-session-tools";
 import Alert from "@/components/ui/Alert";
 import ScrollableContainer from "@/components/ui/ScrollableContainer";
+import { createChatSession } from "@/features/chat/actions";
 import { useAgent } from "@/features/chat/hooks/use-agent";
+import { getChatTitle } from "@/features/chat/utils";
 import GreetingMessage from "@/features/home/components/GreetingMessage";
 import { useFlag } from "@/hooks/use-flag";
+import { paths } from "@/lib/config/paths";
 import { mergeClsx } from "@/lib/utils/styles";
-import { User } from "@/prisma/types/generated/browser";
+import { ChatSession, User } from "@/prisma/types/generated/browser";
 
 import ChatInput from "./ChatInput";
 import ChatMessages from "./ChatMessages";
 
-import type { ChatUIMessage } from "@/types/chat";
-
 type ChatSectionProps = {
   user: User;
+  chat?: ChatSession;
   className?: string;
 };
 
-export default function ChatSection({ user, className }: ChatSectionProps) {
-  const { values } = useFlag();
-  const isClientDebug = Boolean(values?.["client-debug"]);
-  const isChatInitialMessage = Boolean(values?.["chat-initial-message"]);
+export default function ChatSection({
+  user,
+  chat,
+  className,
+}: ChatSectionProps) {
+  const chatId = chat?.id;
 
-  const { messages, sendMessage, status, stop, error } = useAgent({
-    initialMessages: isChatInitialMessage
-      ? (chatSession.messages as ChatUIMessage[])
-      : undefined,
+  const router = useRouter();
+  const { values } = useFlag();
+  const [id, setId] = useState(() => chatId ?? uuidv7());
+  const [isCreated, setIsCreated] = useState(() => Boolean(chatId));
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!chatId) {
+      return;
+    }
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setId(chatId);
+    setIsCreated(true);
+  }, [chatId]);
+
+  const isClientDebug = Boolean(values?.["client-debug"]);
+
+  const {
+    messages,
+    sendMessage,
+    status,
+    stop,
+    error: agentError,
+  } = useAgent({
+    id: id,
+    initialMessages: chat?.messages,
   });
-  const isNew = !messages.length;
+  const isNew = !isCreated;
+  const error = createError ?? agentError?.message;
 
   if (isClientDebug) {
     console.log("🌵 [ChatSection]", {
+      id,
+      isCreated,
       messages,
       status,
       error,
     });
+  }
+
+  async function handleSend(text: string) {
+    setCreateError(null);
+
+    if (isCreated) {
+      void sendMessage({ text });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await createChatSession({
+        id: id,
+        title: getChatTitle(text),
+        text,
+      });
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      if (isClientDebug) {
+        console.error("🌵 [ChatSection] createChatSession error", error);
+      }
+      setCreateError("Failed to save chat. Please try again.");
+      throw new Error("Failed to create chat session");
+    } finally {
+      setIsLoading(false);
+    }
+
+    setIsCreated(true);
+    await sendMessage({ text });
+    router.push(paths.dashboard.chat(id));
   }
 
   return (
@@ -63,9 +129,7 @@ export default function ChatSection({ user, className }: ChatSectionProps) {
 
           <ChatMessages messages={messages} status={status} />
 
-          {error && (
-            <Alert type="danger" variant="soft" message={error.message} />
-          )}
+          {error && <Alert type="danger" variant="soft" message={error} />}
         </div>
 
         <motion.div
@@ -79,9 +143,8 @@ export default function ChatSection({ user, className }: ChatSectionProps) {
         >
           <ChatInput
             status={status}
-            onSend={(text) => {
-              void sendMessage({ text });
-            }}
+            disabled={isLoading}
+            onSend={handleSend}
             onStop={stop}
           />
         </motion.div>

@@ -2,13 +2,14 @@
 
 import { truncate } from "lodash";
 
-import Tooltip from "./Tooltip";
+import Tooltip, { TooltipPlacement } from "./Tooltip";
 
 interface TruncatedTextProps {
   text: string | null | undefined;
   chars: number;
   className?: string;
   omission?: string;
+  placement?: TooltipPlacement;
 }
 
 export default function TruncatedText({
@@ -16,6 +17,7 @@ export default function TruncatedText({
   chars,
   className,
   omission = "...",
+  placement = "top",
 }: TruncatedTextProps) {
   if (!text) {
     return null;
@@ -29,7 +31,7 @@ export default function TruncatedText({
   }
 
   return (
-    <Tooltip content={text} placement="top">
+    <Tooltip content={text} placement={placement}>
       <span className={className}>{truncatedText}</span>
     </Tooltip>
   );

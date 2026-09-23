@@ -4,11 +4,13 @@ High-level overview of the dashboard Q&A chatbot in this template.
 
 ## Overview
 
-Streaming chat on the dashboard home page for **JavaScript, TypeScript,
-Node.js, and Next.js**, plus **App/DB** answers and **UI keyboard
-commands** via tools:
+Streaming chat on `/dashboard/chats` (and `/dashboard/chats/[id]`) for
+**JavaScript, TypeScript, Node.js, and Next.js**, plus **App/DB**
+answers and **UI keyboard commands** via tools:
 
 - OpenAI via `@ai-sdk/openai` and the Vercel AI SDK (no AI Gateway).
+- Sessions persist in `ChatSession` (create on first send; update on
+  stream end).
 
 ### Defaults
 
@@ -31,19 +33,43 @@ commands** via tools:
 | Direct `@ai-sdk/openai`          | Single `OPENAI_API_KEY`; no Gateway routing                 |
 | Session-scoped tools             | Never trust client-supplied user ids                        |
 | Client keyboard tool             | UI commands must run in the browser via `useKeyboard`       |
+| `commandsByIdRef`                | Long-lived keyboard Map for off-screen streaming chats      |
+| `ChatInstancesProvider`          | Keep `Chat` instances across route changes (keep streams)   |
 | Client-sent `keyboardCommandIds` | Tool enum = registry ids with `run`; server allowlists them |
+| Server message metadata          | Assistant `timestamp` / `durationMs` stamped in the API     |
+| Client user timestamp            | User `timestamp` stamped on send for immediate UI           |
 
 ## Flow
 
-Chat mounts from `HomeView` → `ChatSection` → `useAgent` →
-`useChatbot` → `/api/chat`.
+Chat mounts from routes `/dashboard/chats` and `/dashboard/chats/[id]` →
+`ChatView` → `ChatSection` → `useAgent` → `/api/chat`.
+
+- ChatSession persistence
 
 ```mermaid
 flowchart TD
-  Home["HomeView"] --> Section["ChatSection"]
-  Section --> AgentHook["useAgent"]
-  AgentHook --> Hook["useChatbot"]
-  Hook --> Transport["DefaultChatTransport /api/chat"]
+  NewChat["/dashboard/chats"] --> FirstSend["First send"]
+  FirstSend --> Create["createChatSession title + user message"]
+  Create --> Stream["sendMessage POST /api/chat"]
+  Stream --> Push["router.push /dashboard/chats/id"]
+  Push --> Reuse["ChatInstancesProvider reuses Chat"]
+  Existing["/dashboard/chats/id"] --> Load["getChatSession seed if no live Chat"]
+  Load --> Later["Later sendMessage"]
+  Reuse --> OnStart["streamText onStart → status streaming"]
+  Later --> OnStart
+  OnStart --> OnEnd["toUIMessageStream onEnd"]
+  OnEnd --> Persist["updateChatSession messages + terminal status"]
+```
+
+- Chat lifecycle
+
+```mermaid
+flowchart TD
+  View["ChatView"] --> Section["ChatSection"]
+  Section --> Hook["useAgent"]
+  Hook --> Provider["ChatInstancesProvider Map"]
+  Provider --> UseChat["useChat chat instance"]
+  UseChat --> Transport["DefaultChatTransport /api/chat"]
   Transport --> Route["POST /api/chat"]
   Route --> Auth["getUser"]
   Auth -->|401| Unauthorized
@@ -53,11 +79,11 @@ flowchart TD
   Stream -->|server execute| GetUser["getCurrentUser Prisma"]
   Stream -->|no execute| KbSchema["runKeyboardCommand schema"]
   Stream --> UI["toUIMessageStreamResponse"]
-  UI --> Hook
-  Hook -->|onToolCall| KbRun["useKeyboard commandsById.run"]
-  KbRun -->|addToolOutput| Hook
-  Hook -->|sendAutomaticallyWhen| Transport
-  Hook --> Messages["ChatMessages + ChatInput"]
+  UI --> UseChat
+  UseChat -->|onToolCall| KbRun["commandsByIdRef.run"]
+  KbRun -->|addToolOutput| UseChat
+  UseChat -->|sendAutomaticallyWhen| Transport
+  UseChat --> Messages["ChatMessages + ChatInput"]
 ```
 
 Some relevant details:
@@ -66,19 +92,16 @@ Some relevant details:
   session.
 - **Errors:** Request parse failures and stream errors are logged;
   soft danger `Alert` shows the client error message. Tool failures use
-  `addToolOutput({ state: "output-error", errorText })`.
-- **`useChatbot`:** wraps `useChat` and stamps message metadata
-  (`timestamp`, assistant `durationMs`).
-- **`useAgent`:** feature hook; skips dynamic tools; sends
-  `keyboardCommandIds` from `useKeyboard().commandsById`; runs
-  `runKeyboardCommand` on the client; does not await `addToolOutput`.
+ `addToolOutput({ state: "output-error", errorText })`. `ChatSession.status` is
+ updated to `error` or `aborted` on `streamText.onEnd`.
+- **`useAgent`:** creates `Chat` instance; stamps user `timestamp` on send;
+  skips dynamic tools; sends `keyboardCommandIds` and `chatId`; runs
+  `runKeyboardCommand` via `commandsByIdRef`.
 - **Agent loop:** `stopWhen: stepCountIs(5)`, `maxRetries: 2`,
   `temperature: 0.2`, `repairToolCall` (re-ask; no `Output.object`).
 - **Input:** Enter sends; Shift+Enter inserts a newline.
 - **`client-debug`:** Logs section state and shows non-text **Steps**
   under assistant bubbles.
-- **`chat-initial-message`:** When on, seeds `initialMessages` from
-  `scripts/seed/data/chat-session.js`; when off, no seeding.
 - **`server-debug`:** Logs chat input and `streamText` `onEnd` output in
   the API route.
 - **`user-message-markdown`:** When on, user bubbles render via
@@ -113,7 +136,7 @@ flowchart TD
 **Step-by-step:**
 
 1. **User asks about their profile** (Client) — ChatSection /
-   `useAgent` → `useChatbot.sendMessage`
+   `useAgent.sendMessage`
 2. **POST /api/chat** (Client) — `DefaultChatTransport` sends UI
    messages
 3. **Auth + request parse** (Server) — `getUser()` then
@@ -161,7 +184,7 @@ flowchart TD
 **Step-by-step:**
 
 1. **User asks for a UI action** (Client) — e.g. “switch to dark
-   mode” via `useAgent` → `useChatbot`
+   mode” via `useAgent`
 2. **POST /api/chat** (Client) — `DefaultChatTransport` sends UI
    messages
 3. **Auth + request parse** (Server) — `getUser()` then
@@ -192,4 +215,4 @@ flowchart TD
     `ChatUIMessage`.
   - Add more tools under `schema/tools.ts` + `createChatTools`.
   - Debug fixtures live under `scripts/seed/data/` (for example
-    `chat-session.js`, `chat-request.json`).
+    `chat-session.ts`, `chat-request.json`).

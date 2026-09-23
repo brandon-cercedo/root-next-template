@@ -1,34 +1,59 @@
 "use client";
 
+import { Chat, useChat } from "@ai-sdk/react";
 import {
+  DefaultChatTransport,
   lastAssistantMessageIsCompleteWithToolCalls,
   type ChatOnToolCallCallback,
 } from "ai";
 
-import { useChatbot } from "@/hooks/use-chatbot";
+import { useChatInstances } from "@/hooks/use-chat-instances";
 import { useKeyboard } from "@/hooks/use-keyboard";
+import { paths } from "@/lib/config/paths";
 
 import { KeyboardCommandInput } from "../schema/tools";
 
 import type { ChatUIMessage } from "@/types/chat";
 
+type SendMessageInput = Parameters<
+  ReturnType<typeof useChat<ChatUIMessage>>["sendMessage"]
+>[0];
+
+function composeUserMessage(message?: SendMessageInput) {
+  const timestamp = new Date().toISOString();
+
+  const newMessage = message
+    ? {
+        ...message,
+        metadata: {
+          ...message.metadata,
+          timestamp,
+        },
+      }
+    : undefined;
+
+  return newMessage;
+}
+
+type AgentChat = Chat<ChatUIMessage>;
+
 type AgentToolCall = Parameters<
   ChatOnToolCallCallback<ChatUIMessage>
 >[0]["toolCall"];
 
-type AgentChatbot = Pick<ReturnType<typeof useChatbot>, "addToolOutput">;
-
 type UseAgentOptions = {
+  id: string;
   initialMessages?: ChatUIMessage[];
 };
 
-export function useAgent({ initialMessages }: UseAgentOptions = {}) {
-  const { commandsById } = useKeyboard();
+export function useAgent({ id, initialMessages }: UseAgentOptions) {
+  const { getOrCreateInstance } = useChatInstances();
+  const { commandsByIdRef } = useKeyboard();
 
-  function runKeyboardCommand(toolCall: AgentToolCall, chatbot: AgentChatbot) {
+  const runKeyboardCommand = (toolCall: AgentToolCall, chat: AgentChat) => {
     const commandId = (toolCall.input as KeyboardCommandInput).commandId;
     if (!commandId) {
-      chatbot.addToolOutput({
+      chat.addToolOutput({
         tool: toolCall.toolName,
         toolCallId: toolCall.toolCallId,
         state: "output-error",
@@ -37,9 +62,9 @@ export function useAgent({ initialMessages }: UseAgentOptions = {}) {
       return;
     }
 
-    const command = commandsById.get(commandId);
+    const command = commandsByIdRef.current.get(commandId);
     if (!command) {
-      chatbot.addToolOutput({
+      chat.addToolOutput({
         tool: toolCall.toolName,
         toolCallId: toolCall.toolCallId,
         state: "output-error",
@@ -50,37 +75,62 @@ export function useAgent({ initialMessages }: UseAgentOptions = {}) {
 
     try {
       command.run();
-      chatbot.addToolOutput({
+      chat.addToolOutput({
         tool: toolCall.toolName,
         toolCallId: toolCall.toolCallId,
         output: { success: true, commandId },
       });
     } catch {
-      chatbot.addToolOutput({
+      chat.addToolOutput({
         tool: toolCall.toolName,
         toolCallId: toolCall.toolCallId,
         state: "output-error",
         errorText: `Failed to run command "${commandId}".`,
       });
     }
-  }
+  };
 
-  const chatbot = useChatbot({
-    initialMessages,
-    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
-    body: () => ({
-      keyboardCommandIds: Array.from(commandsById.keys()),
-    }),
-    onToolCall: async ({ toolCall }) => {
-      if (toolCall.dynamic) {
-        return;
-      }
+  const createInstance = () => {
+    const chat: AgentChat = new Chat({
+      id,
+      messages: initialMessages,
+      transport: new DefaultChatTransport({
+        api: paths.api.chat(),
+        body: () => ({
+          keyboardCommandIds: Array.from(commandsByIdRef.current.keys()),
+          chatId: id,
+        }),
+      }),
+      sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+      onToolCall: async ({ toolCall }) => {
+        if (toolCall.dynamic) {
+          return;
+        }
 
-      if (toolCall.toolName === "runKeyboardCommand") {
-        runKeyboardCommand(toolCall, chatbot);
-      }
-    },
-  });
+        if (toolCall.toolName === "runKeyboardCommand") {
+          runKeyboardCommand(toolCall, chat);
+        }
+      },
+    });
+    return chat;
+  };
 
-  return chatbot;
+  // eslint-disable-next-line react-hooks/refs -- create only stores deferred readers; .current is not read during this render call.
+  const instance = getOrCreateInstance({ id, create: createInstance });
+
+  const chat = useChat({ chat: instance });
+
+  const sendMessage: typeof chat.sendMessage = (message, options) => {
+    const newMessage = composeUserMessage(message);
+    return chat.sendMessage(newMessage, options);
+  };
+
+  return {
+    messages: chat.messages,
+    sendMessage,
+    status: chat.status,
+    stop: chat.stop,
+    error: chat.error,
+    addToolOutput: chat.addToolOutput,
+  };
 }

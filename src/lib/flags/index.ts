@@ -13,4 +13,3 @@ function createFlag(key: FlagKey): Flag<boolean, unknown> {
 export const clientDebugFlag = createFlag("client-debug");
 export const serverDebugFlag = createFlag("server-debug");
 export const userMessageMarkdownFlag = createFlag("user-message-markdown");
-export const chatInitialMessageFlag = createFlag("chat-initial-message");

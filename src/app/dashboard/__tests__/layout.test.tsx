@@ -47,7 +47,6 @@ const defaultFlagValues = {
   "client-debug": false,
   "server-debug": false,
   "user-message-markdown": false,
-  "chat-initial-message": false,
 };
 
 const getFlagValues = vi.fn().mockResolvedValue(defaultFlagValues);
@@ -132,7 +131,11 @@ afterEach(() => {
 });
 
 describe("DashboardLayout", () => {
-  const mockUser = fakeUserComplete();
+  const mockUser = {
+    ...fakeUserComplete(),
+    setting: null,
+    chatSessions: [],
+  };
 
   it("should export dashboard metadata", async () => {
     const { metadata } = await import("@/app/dashboard/layout");
@@ -227,7 +230,6 @@ describe("DashboardLayout", () => {
       "client-debug": false,
       "server-debug": false,
       "user-message-markdown": false,
-      "chat-initial-message": false,
     });
 
     await renderLayout(<p>Home child content</p>);
@@ -242,7 +244,6 @@ describe("DashboardLayout", () => {
       "client-debug": true,
       "server-debug": false,
       "user-message-markdown": false,
-      "chat-initial-message": false,
     });
 
     const { container } = await renderLayout(<p>Home child content</p>);
@@ -265,7 +266,6 @@ describe("DashboardLayout", () => {
       "client-debug": true,
       "server-debug": true,
       "user-message-markdown": true,
-      "chat-initial-message": false,
     });
 
     await renderLayout(<p>Home child content</p>);
