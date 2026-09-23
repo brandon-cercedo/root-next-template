@@ -28,7 +28,6 @@ values without redeploying via an encrypted cookie.
 | `client-debug`          | `clientDebugFlag`          | `false` | Enables debug UI                 |
 | `server-debug`          | `serverDebugFlag`          | `false` | Enables debug server actions     |
 | `user-message-markdown` | `userMessageMarkdownFlag`  | `false` | User chat messages as markdown   |
-| `chat-initial-message`  | `chatInitialMessageFlag`   | `false` | Seed chat with initial messages  |
 
 All flags are boolean with Off / On options. Production behavior comes from
 each flag's `decide()` until overridden via cookie.

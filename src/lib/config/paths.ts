@@ -20,6 +20,8 @@ export const paths = {
   },
   dashboard: {
     home: () => "/dashboard",
+    chats: () => "/dashboard/chats",
+    chat: (id: string) => `/dashboard/chats/${id}`,
   },
   api: {
     chat: () => "/api/chat",

@@ -39,7 +39,11 @@ function BreadcrumbItem({
           )}
         >
           {item.icon}
-          <TruncatedText text={item.label} chars={24} />
+          <TruncatedText
+            text={item.label}
+            chars={24}
+            placement="bottom-left"
+          />
         </NullableLink>
       )}
       {!isActive && (

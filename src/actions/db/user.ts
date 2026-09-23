@@ -4,7 +4,8 @@ import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma-client";
-import { User, UserSetting } from "@/prisma/types/client";
+import { ChatSession, User, UserSetting } from "@/prisma/types/client";
+import { listChatSessions } from "@/services/chat-session";
 
 export async function getUser() {
   const session = await getServerSession(authOptions);
@@ -22,8 +23,28 @@ export async function getUser() {
   return user;
 }
 
+export async function getUserId() {
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
+  if (!userId) {
+    return null;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return user?.id ?? null;
+}
+
 export type FullUser = User & {
   setting: UserSetting | null;
+  chatSessions: ChatSession[];
 };
 
 export async function getFullUser(): Promise<FullUser | null> {
@@ -34,8 +55,9 @@ export async function getFullUser(): Promise<FullUser | null> {
   }
 
   // Fetch extra data
-  const [setting] = await Promise.all([
+  const [setting, chatSessions] = await Promise.all([
     prisma.userSetting.findUnique({ where: { userId: user.id } }),
+    listChatSessions(user.id),
   ]);
 
   // Prepare payload
@@ -43,6 +65,7 @@ export async function getFullUser(): Promise<FullUser | null> {
     ...user,
     password: null,
     setting,
+    chatSessions,
   };
 
   return fullUser;

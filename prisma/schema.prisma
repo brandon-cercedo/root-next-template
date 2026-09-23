@@ -69,14 +69,15 @@ model UserSetting {
 }
 
 enum ChatSessionStatus {
-  submitted
+  submitted  // Not implemented yet
   streaming
   ready      // ready to be shown to the user; to continue the conversation; or, to start a empty conversation.
   error
+  aborted
 }
 
 model ChatSession {
-  id          String            @id @default(cuid())
+  id          String            @id @default(uuid(7))
   title       String
   status      ChatSessionStatus @default(ready)
   error       String?

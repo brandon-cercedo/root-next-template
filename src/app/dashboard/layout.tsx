@@ -8,6 +8,7 @@ import CommandPalette from "@/components/keyboard/CommandPalette";
 import KeyboardHelpOffcanvas from "@/components/keyboard/KeyboardHelpOffcanvas";
 import Sidebar from "@/components/layout/sidebar/Sidebar";
 import LoginConfetti from "@/features/home/components/LoginConfetti";
+import { ChatInstancesProvider } from "@/hooks/use-chat-instances";
 import { FlagProvider } from "@/hooks/use-flag";
 import { KeyboardProvider } from "@/hooks/use-keyboard";
 import { UserProvider } from "@/hooks/use-user";
@@ -34,9 +35,11 @@ async function DashboardProviders({
     <UserProvider user={user}>
       <FlagProvider values={values} overrides={overrides}>
         <KeyboardProvider>
-          {children}
-          <CommandPalette />
-          <KeyboardHelpOffcanvas />
+          <ChatInstancesProvider>
+            {children}
+            <CommandPalette />
+            <KeyboardHelpOffcanvas />
+          </ChatInstancesProvider>
         </KeyboardProvider>
       </FlagProvider>
     </UserProvider>

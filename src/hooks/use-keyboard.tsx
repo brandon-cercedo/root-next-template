@@ -1,7 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { createContext, ReactNode, useContext, useEffect } from "react";
+import {
+  createContext,
+  ReactNode,
+  RefObject,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import {
   defaultKeybindingsHandlerIgnore,
   KeybindingsMap,
@@ -31,6 +39,7 @@ import { isEditableTarget } from "@/lib/utils/html";
 type KeyboardContextType = {
   commands: KeyboardCommand[];
   commandsById: Map<CommandId, KeyboardCommand>;
+  commandsByIdRef: RefObject<Map<CommandId, KeyboardCommand>>;
   shortcuts: ShortcutCommand[];
   shortcutsById: Map<CommandId, ShortcutCommand>;
   openHelp: () => void;
@@ -104,14 +113,22 @@ export function KeyboardProvider({ children }: { children: ReactNode }) {
       : {}),
   };
   const commands = getKeyboardCommands(actions);
-  const commandsById = new Map(
-    commands.map((command) => [command.id, command])
+  const commandsById = useMemo(
+    () => new Map(commands.map((command) => [command.id, command])),
+    [commands]
   );
   const shortcuts = getShortcutCommands(commands);
-  const shortcutsById = new Map(
-    shortcuts.map((command) => [command.id, command])
+  const shortcutsById = useMemo(
+    () => new Map(shortcuts.map((command) => [command.id, command])),
+    [shortcuts]
   );
   const togglePaletteShortcut = shortcutsById.get("toggle-palette");
+
+  // Keep the latest commandsById for long-lived Chat callbacks.
+  const commandsByIdRef = useRef(commandsById);
+  useEffect(() => {
+    commandsByIdRef.current = commandsById;
+  }, [commandsById]);
 
   useEffect(() => {
     const keybindings = shortcuts.reduce<KeybindingsMap>((acc, command) => {
@@ -173,6 +190,7 @@ export function KeyboardProvider({ children }: { children: ReactNode }) {
       value={{
         commands,
         commandsById,
+        commandsByIdRef,
         shortcuts,
         shortcutsById,
         openHelp,

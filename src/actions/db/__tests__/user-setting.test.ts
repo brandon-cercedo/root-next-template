@@ -10,6 +10,8 @@ import {
   fakeUserSettingComplete,
 } from "@/prisma/utils/fake-data";
 
+vi.mock("server-only", () => ({}));
+
 vi.mock("next-auth", () => ({
   getServerSession: vi.fn(),
 }));

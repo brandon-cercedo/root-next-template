@@ -6,23 +6,33 @@ import TextareaAutoHeight from "@/components/ui/forms/TextareaAutoHeight";
 
 type ChatInputProps = {
   status: ChatStatus;
-  onSend: (text: string) => undefined;
+  disabled?: boolean;
+  onSend: (text: string) => void | Promise<void>;
   onStop: () => void;
 };
 
-export default function ChatInput({ status, onSend, onStop }: ChatInputProps) {
+export default function ChatInput({
+  status,
+  disabled = false,
+  onSend,
+  onStop,
+}: ChatInputProps) {
   const [input, setInput] = useState("");
   const isWorking = status === "submitted" || status === "streaming";
-  const shouldSend = input.trim().length > 0 && !isWorking;
+  const shouldSend = input.trim().length > 0 && !isWorking && !disabled;
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!shouldSend) {
       return;
     }
 
     const text = input.trim();
-    onSend(text);
     setInput("");
+    try {
+      await onSend(text);
+    } catch {
+      setInput(text);
+    }
   };
 
   return (
@@ -36,6 +46,7 @@ export default function ChatInput({ status, onSend, onStop }: ChatInputProps) {
       <TextareaAutoHeight
         value={input}
         rows={1}
+        disabled={disabled}
         placeholder="Ask about code, your profile, or a UI action…"
         onChange={(event) => {
           setInput(event.target.value);
@@ -48,7 +59,7 @@ export default function ChatInput({ status, onSend, onStop }: ChatInputProps) {
           event.preventDefault();
           handleSend();
         }}
-        className="max-h-106 min-h-10 w-full resize-none border-0 bg-transparent p-2 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-0 focus:outline-hidden dark:bg-transparent dark:text-neutral-200 dark:placeholder:text-neutral-500"
+        className="max-h-106 min-h-10 w-full resize-none border-0 bg-transparent p-2 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-0 focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 dark:bg-transparent dark:text-neutral-200 dark:placeholder:text-neutral-500"
       />
 
       <div className="flex items-center gap-2">
@@ -57,8 +68,9 @@ export default function ChatInput({ status, onSend, onStop }: ChatInputProps) {
             <button
               type="button"
               aria-label="Stop response"
+              disabled={disabled}
               onClick={onStop}
-              className="inline-flex size-8 flex-none items-center justify-center rounded-lg border border-transparent bg-gray-900 text-white dark:bg-white dark:text-neutral-800"
+              className="inline-flex size-8 flex-none items-center justify-center rounded-lg border border-transparent bg-gray-900 text-white disabled:pointer-events-none disabled:opacity-50 dark:bg-white dark:text-neutral-800"
             >
               <LucideSquare className="size-3.5 fill-current" />
             </button>

@@ -1,12 +1,15 @@
 import { getServerSession } from "next-auth";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getFullUser, getUser } from "@/actions/db/user";
+import { getFullUser, getUser, getUserId } from "@/actions/db/user";
 import prisma from "@/lib/prisma-client";
 import {
+  fakeChatSessionComplete,
   fakeUserComplete,
   fakeUserSettingComplete,
 } from "@/prisma/utils/fake-data";
+
+vi.mock("server-only", () => ({}));
 
 vi.mock("next-auth", () => ({
   getServerSession: vi.fn(),
@@ -20,6 +23,9 @@ vi.mock("@/lib/prisma-client", () => ({
     userSetting: {
       findUnique: vi.fn(),
     },
+    chatSession: {
+      findMany: vi.fn(),
+    },
   },
 }));
 
@@ -30,6 +36,7 @@ vi.mock("@/lib/auth", () => ({
 const mockGetServerSession = vi.mocked(getServerSession);
 const mockFindUnique = vi.mocked(prisma.user.findUnique);
 const mockFindSetting = vi.mocked(prisma.userSetting.findUnique);
+const mockFindChatSessions = vi.mocked(prisma.chatSession.findMany);
 
 function mockSessionFor(user: { id: string; email: string }) {
   return {
@@ -67,6 +74,36 @@ describe("getUser", () => {
   });
 });
 
+describe("getUserId", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should return null when there is no session", async () => {
+    mockGetServerSession.mockResolvedValue(null);
+
+    const userId = await getUserId();
+
+    expect(userId).toBeNull();
+    expect(mockFindUnique).not.toHaveBeenCalled();
+  });
+
+  it("should return only the user id for a valid session", async () => {
+    const mockUser = fakeUserComplete();
+
+    mockGetServerSession.mockResolvedValue(mockSessionFor(mockUser));
+    mockFindUnique.mockResolvedValue({ id: mockUser.id } as never);
+
+    const userId = await getUserId();
+
+    expect(userId).toBe(mockUser.id);
+    expect(mockFindUnique).toHaveBeenCalledWith({
+      where: { id: mockUser.id },
+      select: { id: true },
+    });
+  });
+});
+
 describe("getFullUser", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -82,16 +119,23 @@ describe("getFullUser", () => {
     expect(mockFindSetting).not.toHaveBeenCalled();
   });
 
-  it("should return the user with setting and a cleared password", async () => {
+  it("should return the user with setting, chats, and a cleared password", async () => {
     const mockUser = fakeUserComplete();
     const mockSetting = {
       ...fakeUserSettingComplete(),
       userId: mockUser.id,
     };
+    const mockSessions = [
+      {
+        ...fakeChatSessionComplete(),
+        userId: mockUser.id,
+      },
+    ];
 
     mockGetServerSession.mockResolvedValue(mockSessionFor(mockUser));
     mockFindUnique.mockResolvedValue(mockUser);
     mockFindSetting.mockResolvedValue(mockSetting);
+    mockFindChatSessions.mockResolvedValue(mockSessions);
 
     const fullUser = await getFullUser();
 
@@ -99,12 +143,17 @@ describe("getFullUser", () => {
       ...mockUser,
       password: null,
       setting: mockSetting,
+      chatSessions: mockSessions,
     });
     expect(mockFindUnique).toHaveBeenCalledWith({
       where: { id: mockUser.id },
     });
     expect(mockFindSetting).toHaveBeenCalledWith({
       where: { userId: mockUser.id },
+    });
+    expect(mockFindChatSessions).toHaveBeenCalledWith({
+      where: { userId: mockUser.id },
+      orderBy: { updatedAt: "desc" },
     });
   });
 
@@ -115,6 +164,7 @@ describe("getFullUser", () => {
     mockGetServerSession.mockResolvedValue(mockSessionFor(mockUser));
     mockFindUnique.mockResolvedValue(mockUser);
     mockFindSetting.mockResolvedValue(null);
+    mockFindChatSessions.mockResolvedValue([]);
 
     const fullUser = await getFullUser();
 
@@ -122,6 +172,7 @@ describe("getFullUser", () => {
       ...mockUser,
       password: null,
       setting: null,
+      chatSessions: [],
     });
     expect(errorSpy).not.toHaveBeenCalled();
     errorSpy.mockRestore();

@@ -22,7 +22,7 @@ function SidebarLabel({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={clsx(
-          "group flex w-full items-center justify-between gap-x-2 p-2 text-start text-[10px] leading-5 font-medium text-gray-500 uppercase dark:text-neutral-500",
+          "group flex w-full items-center justify-between gap-x-2 p-2 py-1 text-start text-[10px] leading-5 font-medium text-gray-500 uppercase dark:text-neutral-500",
           {
             "rounded-lg hover:bg-gray-200 focus:bg-gray-200 focus:outline-hidden dark:hover:bg-neutral-800 dark:focus:bg-neutral-800":
               actions.length > 0,
@@ -60,9 +60,7 @@ export default function SidebarContent({
 }: {
   sections: SidebarSectionType[];
 }) {
-  const validSections = sections.filter(
-    (section) => section.items.length > 0 || section.actions.length > 0
-  );
+  const validSections = sections.filter((section) => section.items.length > 0);
   if (validSections.length === 0) {
     return null;
   }
@@ -75,7 +73,7 @@ export default function SidebarContent({
           className="hs-accordion-group flex w-full flex-col flex-wrap"
           data-hs-accordion-always-open
         >
-          <ul className="space-y-1">
+          <ul className="space-y-0.5">
             {section.label && (
               <SidebarLabel label={section.label} actions={section.actions} />
             )}

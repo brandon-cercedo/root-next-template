@@ -30,7 +30,7 @@ function SidebarFooter({ user }: { user: FullUser }) {
 }
 
 export default function Sidebar({ user }: { user: FullUser }) {
-  const sections = getSidebarSections();
+  const sections = getSidebarSections({ user });
   return (
     <aside
       id={OVERLAY_IDS.SIDEBAR}

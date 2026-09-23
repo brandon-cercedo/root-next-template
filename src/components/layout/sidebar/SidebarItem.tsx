@@ -101,7 +101,7 @@ export default function SidebarItem({ item, level = 0 }: SidebarItemProps) {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={clsx(
-          "group flex w-full items-center justify-between gap-x-2 rounded-lg p-2 text-start text-[13px] leading-5 text-gray-800 hover:bg-gray-200 focus:bg-gray-200 focus:outline-hidden dark:text-neutral-200 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800",
+          "group flex w-full items-center justify-between gap-x-2 rounded-lg p-2 py-1 text-start text-[13px] leading-5 text-gray-800 hover:bg-gray-200 focus:bg-gray-200 focus:outline-hidden dark:text-neutral-200 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800",
           {
             "hs-accordion-heading": hasChildren,
           }
@@ -125,7 +125,11 @@ export default function SidebarItem({ item, level = 0 }: SidebarItemProps) {
               isHovered={isHovered}
               hasChildren={hasChildren}
             />
-            <TruncatedText text={item.label} chars={isHovered ? 20 : 30} />
+            <TruncatedText
+              text={item.label}
+              chars={isHovered && hasActions ? 20 : 28}
+              placement="bottom-left"
+            />
           </NullableLink>
         )}
         {hasActions && (
