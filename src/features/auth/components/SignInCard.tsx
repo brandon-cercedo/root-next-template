@@ -59,6 +59,7 @@ function CredentialsSignIn() {
               disabled={isLoading}
               placeholder="you@example.com"
               aria-describedby="email-error"
+              autoFocus
             />
           </div>
         </div>
