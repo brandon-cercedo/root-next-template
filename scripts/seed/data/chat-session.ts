@@ -10,7 +10,7 @@ type SeedChatSession = {
 export const SEED_CHAT_SESSIONS: { sessions: SeedChatSession[] } = {
   sessions: [
     {
-      title: "What is the latest stable version of Next.js?",
+      title: "Markdown: full assistant message",
       status: ChatSessionStatus.ready,
       messages: [
         {
@@ -90,7 +90,7 @@ export const SEED_CHAT_SESSIONS: { sessions: SeedChatSession[] } = {
       ] as PrismaJson.ChatUIMessageType[],
     },
     {
-      title: "Summarize my signed-in profile.",
+      title: "Tools: Server + client",
       status: ChatSessionStatus.ready,
       messages: [
         {
@@ -294,7 +294,7 @@ export const SEED_CHAT_SESSIONS: { sessions: SeedChatSession[] } = {
       ] as PrismaJson.ChatUIMessageType[],
     },
     {
-      title: "wdyt about the following theme feature flow:",
+      title: "Markdown: input and output messages",
       status: ChatSessionStatus.ready,
       messages: [
         {
