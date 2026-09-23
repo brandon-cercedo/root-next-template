@@ -9,7 +9,7 @@ import {
 } from "ai";
 import { revalidatePath } from "next/cache";
 
-import { getUser } from "@/actions/db/user";
+import { getUserId } from "@/actions/db/user";
 import { CommandId } from "@/components/keyboard/config";
 import { CHAT_MODEL, CHAT_SYSTEM_PROMPT } from "@/features/chat/config";
 import { ChatRequestSchema } from "@/features/chat/schema/chat";
@@ -18,7 +18,7 @@ import { createRepairToolCall } from "@/features/chat/services/tools/create-repa
 import { paths } from "@/lib/config/paths";
 import { serverDebugFlag } from "@/lib/flags";
 import { Prisma } from "@/prisma/types/generated/browser";
-import { updateChatSession } from "@/services/chat-session";
+import { getChatSession, updateChatSession } from "@/services/chat-session";
 
 import type { ChatUIMessage } from "@/types/chat";
 
@@ -73,8 +73,8 @@ function getOutputMetadata(messages: ChatUIMessage[]) {
 }
 
 export async function POST(req: Request) {
-  const user = await getUser();
-  if (!user) {
+  const userId = await getUserId();
+  if (!userId) {
     console.error("[POST /api/chat] Unauthorized request");
     return new Response("Unauthorized", { status: 401 });
   }
@@ -91,6 +91,15 @@ export async function POST(req: Request) {
     keyboardCommandIds: Partial<CommandId[]>;
     chatId: string;
   };
+
+  const chat = await getChatSession({ id: chatId, userId });
+  if (!chat) {
+    console.error(
+      `[POST /api/chat] Chat not found or forbidden for chatId: ${chatId}`
+    );
+    return new Response("Not Found", { status: 404 });
+  }
+
   const isDebug = await serverDebugFlag();
   if (isDebug) {
     console.log(
@@ -100,7 +109,7 @@ export async function POST(req: Request) {
   }
 
   const tools = createChatTools({
-    userId: user.id,
+    userId,
     keyboardCommandIds,
   });
   const modelMessages = await convertToModelMessages(messages, {
@@ -122,7 +131,7 @@ export async function POST(req: Request) {
       try {
         await updateChatSession({
           id: chatId,
-          userId: user.id,
+          userId,
           data: { status: "streaming" },
         });
         revalidatePath(paths.dashboard.chat(chatId));
@@ -169,7 +178,7 @@ export async function POST(req: Request) {
             hasError,
           });
 
-          await updateChatSession({ id: chatId, userId: user.id, data });
+          await updateChatSession({ id: chatId, userId, data });
           revalidatePath(paths.dashboard.chat(chatId));
         } catch (error) {
           console.error(

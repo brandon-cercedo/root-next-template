@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getFullUser, getUser } from "@/actions/db/user";
+import { getFullUser, getUser, getUserId } from "@/actions/db/user";
 import prisma from "@/lib/prisma-client";
 import {
   fakeChatSessionComplete,
@@ -70,6 +70,36 @@ describe("getUser", () => {
     expect(user).toEqual(mockUser);
     expect(mockFindUnique).toHaveBeenCalledWith({
       where: { id: mockUser.id },
+    });
+  });
+});
+
+describe("getUserId", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should return null when there is no session", async () => {
+    mockGetServerSession.mockResolvedValue(null);
+
+    const userId = await getUserId();
+
+    expect(userId).toBeNull();
+    expect(mockFindUnique).not.toHaveBeenCalled();
+  });
+
+  it("should return only the user id for a valid session", async () => {
+    const mockUser = fakeUserComplete();
+
+    mockGetServerSession.mockResolvedValue(mockSessionFor(mockUser));
+    mockFindUnique.mockResolvedValue({ id: mockUser.id } as never);
+
+    const userId = await getUserId();
+
+    expect(userId).toBe(mockUser.id);
+    expect(mockFindUnique).toHaveBeenCalledWith({
+      where: { id: mockUser.id },
+      select: { id: true },
     });
   });
 });

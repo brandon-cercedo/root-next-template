@@ -1,7 +1,10 @@
 import { LucideMessageCircleX } from "lucide-react";
+import { redirect } from "next/navigation";
 
+import { getUserId } from "@/actions/db/user";
 import ChatView from "@/app/dashboard/chats/_components/ChatView";
 import MessageWithImage from "@/components/ui/MessageWithImage";
+import { paths } from "@/lib/config/paths";
 import { getChatSession } from "@/services/chat-session";
 
 export default async function Chat({
@@ -9,8 +12,13 @@ export default async function Chat({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const userId = await getUserId();
+  if (!userId) {
+    redirect(paths.auth.signIn());
+  }
+
   const { id } = await params;
-  const chat = await getChatSession(id);
+  const chat = await getChatSession({ id, userId });
   if (!chat) {
     return (
       <MessageWithImage

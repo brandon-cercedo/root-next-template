@@ -27,24 +27,30 @@ describe("getChatSession", () => {
     vi.clearAllMocks();
   });
 
-  it("should look up by id", async () => {
+  it("should look up by id and userId", async () => {
     const { getChatSession } = await import("@/services/chat-session");
     const session = fakeChatSessionComplete();
     mockFindUnique.mockResolvedValue(session);
 
-    const result = await getChatSession(session.id);
+    const result = await getChatSession({
+      id: session.id,
+      userId: session.userId,
+    });
 
     expect(result).toEqual(session);
     expect(mockFindUnique).toHaveBeenCalledWith({
-      where: { id: session.id },
+      where: { id: session.id, userId: session.userId },
     });
   });
 
-  it("should return null when not found", async () => {
+  it("should return null when not found for the user", async () => {
     const { getChatSession } = await import("@/services/chat-session");
     mockFindUnique.mockResolvedValue(null);
 
-    const result = await getChatSession("missing");
+    const result = await getChatSession({
+      id: "missing",
+      userId: "user-1",
+    });
 
     expect(result).toBeNull();
   });

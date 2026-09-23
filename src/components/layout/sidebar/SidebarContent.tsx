@@ -60,9 +60,7 @@ export default function SidebarContent({
 }: {
   sections: SidebarSectionType[];
 }) {
-  const validSections = sections.filter(
-    (section) => section.items.length > 0 || section.actions.length > 0
-  );
+  const validSections = sections.filter((section) => section.items.length > 0);
   if (validSections.length === 0) {
     return null;
   }

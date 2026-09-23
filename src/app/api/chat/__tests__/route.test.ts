@@ -1,12 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mockGetUser = vi.fn();
+const mockGetUserId = vi.fn();
 const mockServerDebugFlag = vi.fn();
 const mockStreamText = vi.fn();
 const mockConvertToModelMessages = vi.fn();
 const mockToUIMessageStream = vi.fn();
 const mockCreateUIMessageStreamResponse = vi.fn();
 const mockOpenai = vi.fn((model: string) => ({ modelId: model }));
+const mockGetChatSession = vi.fn();
 const mockUpdateChatSession = vi.fn();
 const mockRevalidatePath = vi.fn();
 const mockCreateChatTools = vi.fn();
@@ -17,8 +18,11 @@ vi.mock("server-only", () => ({}));
 vi.mock("next/cache", () => ({
   revalidatePath: (...args: unknown[]) => mockRevalidatePath(...args),
 }));
-vi.mock("@/actions/db/user", () => ({ getUser: () => mockGetUser() }));
+vi.mock("@/actions/db/user", () => ({
+  getUserId: () => mockGetUserId(),
+}));
 vi.mock("@/services/chat-session", () => ({
+  getChatSession: (...args: unknown[]) => mockGetChatSession(...args),
   updateChatSession: (...args: unknown[]) => mockUpdateChatSession(...args),
 }));
 vi.mock("@/lib/flags", () => ({
@@ -65,7 +69,11 @@ describe("POST /api/chat", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.resetModules();
-    mockGetUser.mockResolvedValue({ id: "user-1" });
+    mockGetUserId.mockResolvedValue("user-1");
+    mockGetChatSession.mockResolvedValue({
+      id: validBody.chatId,
+      userId: "user-1",
+    });
     mockServerDebugFlag.mockResolvedValue(false);
     mockConvertToModelMessages.mockResolvedValue([]);
     mockUpdateChatSession.mockResolvedValue(undefined);
@@ -92,7 +100,7 @@ describe("POST /api/chat", () => {
   }
 
   it("should return 401 without a session", async () => {
-    mockGetUser.mockResolvedValue(null);
+    mockGetUserId.mockResolvedValue(null);
     const response = await post();
     expect(response.status).toBe(401);
     expect(mockStreamText).not.toHaveBeenCalled();
@@ -113,6 +121,17 @@ describe("POST /api/chat", () => {
     expect(mockStreamText).not.toHaveBeenCalled();
   });
 
+  it("should return 404 when chat is missing or not owned", async () => {
+    mockGetChatSession.mockResolvedValue(null);
+    const response = await post();
+    expect(response.status).toBe(404);
+    expect(mockGetChatSession).toHaveBeenCalledWith({
+      id: validBody.chatId,
+      userId: "user-1",
+    });
+    expect(mockStreamText).not.toHaveBeenCalled();
+  });
+
   it("should stream with server metadata and persist onEnd", async () => {
     mockCreateChatTools.mockReturnValue({
       getCurrentUser: {},
@@ -128,6 +147,10 @@ describe("POST /api/chat", () => {
 
       expect(response.status).toBe(200);
       expect(await response.text()).toBe("ok");
+      expect(mockGetChatSession).toHaveBeenCalledWith({
+        id: validBody.chatId,
+        userId: "user-1",
+      });
       expect(mockCreateChatTools).toHaveBeenCalledWith({
         userId: "user-1",
         keyboardCommandIds: ["theme-dark", "go-home"],

@@ -3,9 +3,15 @@ import "server-only";
 import prisma from "@/lib/prisma-client";
 import { Prisma } from "@/prisma/types/client";
 
-export async function getChatSession(id: string) {
+export async function getChatSession({
+  id,
+  userId,
+}: {
+  id: string;
+  userId: string;
+}) {
   return prisma.chatSession.findUnique({
-    where: { id },
+    where: { id, userId },
   });
 }
 
