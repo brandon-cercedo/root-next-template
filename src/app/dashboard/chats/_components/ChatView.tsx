@@ -44,7 +44,7 @@ export default function ChatView({ chat }: ChatViewProps) {
         <ChatSection
           user={user}
           chat={chat}
-          className="sm:max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl"
+          className="sm:max-w-xl md:max-w-2xl lg:max-w-3xl 2xl:max-w-206"
         />
       </DashboardPageContainer>
     </Fragment>

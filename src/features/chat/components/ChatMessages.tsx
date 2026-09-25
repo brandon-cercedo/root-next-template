@@ -56,7 +56,7 @@ function ChatMessage({
       })}
     >
       {isUser && (
-        <div className="w-full space-y-3 rounded-2xl border border-gray-200 bg-white p-4 text-sm text-gray-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
+        <div className="w-fit space-y-3 rounded-2xl rounded-br-md border border-gray-200 bg-white p-4 py-2.5 text-sm text-gray-800 shadow-xs dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:shadow-none">
           <ClampedContainer className="max-h-24.5">
             {isUserMarkdown ? (
               <MessageMarkdown isAnimating={false}>{text}</MessageMarkdown>
