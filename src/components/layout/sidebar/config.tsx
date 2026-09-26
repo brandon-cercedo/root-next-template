@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 
 import { FullUser } from "@/actions/db/user";
+import ShortcutKbdList from "@/components/keyboard/ShortcutKbdList";
 import { paths } from "@/lib/config/paths";
 import { ChatSession } from "@/prisma/types/client";
 
@@ -31,7 +32,9 @@ function getTopSection(): SidebarSectionType {
         label: "New chat",
         icon: <LucideMessageCirclePlus className="size-4 flex-none" />,
         href: paths.dashboard.chats(),
-        renderActions: () => [],
+        renderActions: () => [
+          <ShortcutKbdList key="shortcut" commandId="new-chat" />,
+        ],
         children: [],
       },
     ],
