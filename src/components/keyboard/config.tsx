@@ -2,6 +2,7 @@ import {
   Home,
   Keyboard,
   LogOut,
+  MessageCirclePlus,
   Monitor,
   Moon,
   PanelLeft,
@@ -32,6 +33,7 @@ export const COMMAND_IDS = [
   "theme-system",
   "toggle-sidebar",
   "go-home",
+  "new-chat",
   "log-out",
   "confetti",
   "open-flag-toolbar",
@@ -162,6 +164,22 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
     keywords: ["dashboard"],
     icon: (
       <Home className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
+  },
+  {
+    id: "new-chat",
+    label: "New chat",
+    group: "Navigation",
+    keywords: ["chat", "conversation", "message", "start"],
+    shortcut: {
+      chord: "$mod+Shift+o",
+      labels: {
+        mac: ["⌘", "⇧", "O"],
+        windows: ["Ctrl", "Shift", "O"],
+      },
+    },
+    icon: (
+      <MessageCirclePlus className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
     ),
   },
   {

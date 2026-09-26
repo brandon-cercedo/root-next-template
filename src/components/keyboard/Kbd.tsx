@@ -29,7 +29,7 @@ export function Kbd({ label, size = "md", className }: KbdProps) {
     <kbd
       aria-hidden="true"
       className={mergeClsx(
-        "inline-flex flex-none items-center justify-center rounded-md border border-gray-200 bg-white font-mono text-gray-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white",
+        "inline-flex flex-none items-center justify-center rounded-md border border-gray-200 bg-white font-mono text-gray-800 select-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white",
         KBD_CHIP_SIZES[size],
         className
       )}
@@ -42,12 +42,14 @@ export function Kbd({ label, size = "md", className }: KbdProps) {
 type KbdListProps = {
   keys: string[];
   size?: KbdSize;
+  containerClassName?: string;
   className?: string;
 };
 
 export default function KbdList({
   keys,
   size = "sm",
+  containerClassName,
   className,
 }: KbdListProps) {
   if (keys.length === 0) {
@@ -57,13 +59,18 @@ export default function KbdList({
   return (
     <span
       className={mergeClsx(
-        "flex flex-none flex-wrap items-center text-gray-600 dark:text-neutral-300",
+        "flex flex-none flex-nowrap items-center text-gray-600 dark:text-neutral-300",
         KBD_WRAPPER_SIZES[size],
-        className
+        containerClassName
       )}
     >
       {keys.map((key, index) => (
-        <Kbd key={`${key}-${index}`} label={key} size={size} />
+        <Kbd
+          key={`${key}-${index}`}
+          label={key}
+          size={size}
+          className={className}
+        />
       ))}
     </span>
   );
