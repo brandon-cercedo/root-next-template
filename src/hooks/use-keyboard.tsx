@@ -49,10 +49,11 @@ const KeyboardContext = createContext<KeyboardContextType | undefined>(
   undefined
 );
 
-function isTogglePaletteEvent(
-  event: KeyboardEvent,
-  shortcut: ShortcutCommand
-) {
+function isShortcutEvent(event: KeyboardEvent, shortcut?: ShortcutCommand) {
+  if (!shortcut) {
+    return false;
+  }
+
   const chord = shortcut.shortcut.chord;
   const press = parseKeybinding(chord)[0];
   return press && matchKeybindingPress(event, press);
@@ -102,6 +103,7 @@ export function KeyboardProvider({ children }: { children: ReactNode }) {
     "toggle-sidebar": toggleSidebar,
     "open-keyboard-help": openHelp,
     "go-home": () => router.push(paths.dashboard.home()),
+    "new-chat": () => router.push(paths.dashboard.chats()),
     "log-out": () => router.push(paths.auth.signOut()),
     confetti: confettiSchoolPride,
     ...(isAdmin(user)
@@ -123,6 +125,7 @@ export function KeyboardProvider({ children }: { children: ReactNode }) {
     [shortcuts]
   );
   const togglePaletteShortcut = shortcutsById.get("toggle-palette");
+  const newChatShortcut = shortcutsById.get("new-chat");
 
   // Keep the latest commandsById for long-lived Chat callbacks.
   const commandsByIdRef = useRef(commandsById);
@@ -170,8 +173,8 @@ export function KeyboardProvider({ children }: { children: ReactNode }) {
     const unsubscribe = tinykeys(window, keybindings, {
       ignore: (event) => {
         if (
-          togglePaletteShortcut &&
-          isTogglePaletteEvent(event, togglePaletteShortcut)
+          isShortcutEvent(event, togglePaletteShortcut) ||
+          isShortcutEvent(event, newChatShortcut)
         ) {
           return false;
         }

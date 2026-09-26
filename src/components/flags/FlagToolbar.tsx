@@ -31,7 +31,10 @@ export default function FlagToolbar({ user }: { user: User }) {
         autoClose="inside"
         isKeyActionsEnabled={false}
       >
-        <ShortcutTooltip commandId="open-flag-toolbar" placement="left">
+        <ShortcutTooltip
+          commandId="open-flag-toolbar"
+          tooltipOptions={{ placement: "left" }}
+        >
           <button
             type="button"
             className="inline-flex size-9.5 items-center justify-center rounded-full bg-indigo-600 text-white shadow-md hover:bg-indigo-700 focus:bg-indigo-700 focus:outline-hidden dark:bg-indigo-500 dark:hover:bg-indigo-600 dark:focus:bg-indigo-600"
