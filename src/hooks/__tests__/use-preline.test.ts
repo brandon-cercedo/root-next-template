@@ -125,6 +125,25 @@ describe("usePreline", () => {
     });
   });
 
+  it("should autoInit when a nested data-hs-select is added", async () => {
+    const { usePreline } = await import("@/hooks/use-preline");
+    renderHook(() => usePreline());
+
+    const callsAfterMount = await settleAutoInit();
+
+    const wrapper = document.createElement("div");
+    const select = document.createElement("select");
+    select.setAttribute("data-hs-select", "{}");
+    wrapper.appendChild(select);
+    await act(async () => {
+      document.body.appendChild(wrapper);
+    });
+
+    await waitFor(() => {
+      expect(mockAutoInit.mock.calls.length).toBeGreaterThan(callsAfterMount);
+    });
+  });
+
   it("should debounce autoInit when plugin roots are added quickly", async () => {
     const { usePreline } = await import("@/hooks/use-preline");
     renderHook(() => usePreline());

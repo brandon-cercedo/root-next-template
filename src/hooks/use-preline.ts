@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef } from "react";
 type PrelineModule = typeof import("preline/non-auto");
 
 const PRELINE_CLASS_PREFIX = "hs-";
+const PRELINE_DATA_ATTRIBUTES = ["data-hs-select"];
 const PRELINE_INTERNAL_SELECTORS = [
   ".hs-overlay-backdrop",
   "[data-hs-overlay-backdrop-template]",
@@ -19,8 +20,15 @@ function hasPrelineSelector(element: Element) {
     return false;
   }
 
-  return Array.from(element.classList).some((token) => {
+  const hasClass = Array.from(element.classList).some((token) => {
     return token.startsWith(PRELINE_CLASS_PREFIX);
+  });
+  if (hasClass) {
+    return true;
+  }
+
+  return PRELINE_DATA_ATTRIBUTES.some((attribute) => {
+    return element.hasAttribute(attribute);
   });
 }
 
@@ -36,7 +44,11 @@ function hasPrelineElement(node: Node) {
   }
 
   // Check children
-  return Array.from(element.querySelectorAll("[class]")).some(
+  const selector = [
+    "[class]",
+    ...PRELINE_DATA_ATTRIBUTES.map((attribute) => `[${attribute}]`),
+  ].join(", ");
+  return Array.from(element.querySelectorAll(selector)).some(
     hasPrelineSelector
   );
 }
