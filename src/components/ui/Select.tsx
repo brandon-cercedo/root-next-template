@@ -1,7 +1,10 @@
+"use client";
+
 import { LucideCheck, LucideChevronsUpDown } from "lucide-react";
-import { useId } from "react";
+import { useEffect, useId } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
+import { useSelect } from "@/hooks/use-select";
 import { mergeClsx } from "@/lib/utils/styles";
 
 type SelectSize = "xs" | "sm" | "md";
@@ -94,7 +97,9 @@ type SelectProps = {
   name?: string;
   options: SelectOption[];
   onChange: (value: string) => void;
+  value?: string;
   placeholder?: string;
+  allowEmptyOption?: boolean;
   containerClassName?: string;
   size?: SelectSize;
   disabled?: boolean;
@@ -106,7 +111,9 @@ export default function Select({
   name,
   options,
   onChange,
+  value,
   placeholder = "Select option...",
+  allowEmptyOption = false,
   containerClassName,
   size = "md",
   disabled = false,
@@ -115,9 +122,20 @@ export default function Select({
   const reactId = useId();
   const selectId = id ?? `select-${reactId.replaceAll(":", "")}`;
   const sizing = SELECT_SIZES[size];
+  const { setValue } = useSelect();
+
+  // Preline renders its own UI and ignores later native `value` updates.
+  useEffect(() => {
+    if (value === undefined) {
+      return;
+    }
+
+    void setValue(selectId, value);
+  }, [selectId, value, setValue]);
 
   const config = {
     placeholder,
+    optionAllowEmptyOption: allowEmptyOption,
     toggleTag: '<button type="button" aria-expanded="false"></button>',
     toggleClasses: mergeClsx(
       "relative flex w-full cursor-pointer rounded-lg border border-gray-200 bg-white text-start text-nowrap text-gray-800 hover:bg-gray-50 focus:bg-gray-50 focus:outline-hidden dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50",
@@ -147,6 +165,7 @@ export default function Select({
         data-hs-select={JSON.stringify(config)}
         disabled={disabled}
         aria-label={ariaLabel}
+        value={value}
         onChange={(event) => onChange(event.target.value)}
       >
         {placeholder && <option value="">{placeholder}</option>}
