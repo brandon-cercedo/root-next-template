@@ -64,6 +64,22 @@
   @apply rounded-md bg-gray-100 text-red-600 dark:bg-neutral-800 dark:text-red-500;
 }
 
+/**
+ * Chat typing dots
+ */
+@keyframes typing-wave {
+  0%,
+  70%,
+  100% {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(-0.4em);
+  }
+}
+
 /* 
  * Default hover styles on all devices
  */

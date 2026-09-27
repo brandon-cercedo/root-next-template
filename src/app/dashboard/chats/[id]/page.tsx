@@ -26,7 +26,7 @@ export default async function Chat({
         message="We couldn't find the chat you're looking for."
         image={
           <LucideMessageCircleX
-            className="size-10 flex-none"
+            className="size-10 flex-none text-gray-800 dark:text-neutral-200"
             strokeWidth={1.5}
           />
         }
