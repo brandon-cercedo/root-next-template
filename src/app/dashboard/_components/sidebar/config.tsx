@@ -3,17 +3,17 @@ import {
   LucideMessageCircle,
   LucideMessageCirclePlus,
   LucideSettings,
-  LucideStar,
 } from "lucide-react";
 
 import { FullUser } from "@/actions/db/user";
 import ShortcutKbdList from "@/components/keyboard/ShortcutKbdList";
+import { SidebarSectionType } from "@/components/layout/sidebar/SidebarContent";
+import { SidebarItemType } from "@/components/layout/sidebar/SidebarItem";
+import ChatConfigDropdown from "@/features/chat/components/ChatConfigDropdown";
 import { paths } from "@/lib/config/paths";
 import { ChatSession } from "@/prisma/types/client";
 
 import ChatCreateButton from "./ChatCreateButton";
-import { SidebarSectionType } from "./SidebarContent";
-import { SidebarItemType } from "./SidebarItem";
 
 function getTopSection(): SidebarSectionType {
   const section: SidebarSectionType = {
@@ -61,31 +61,41 @@ function getBottomSection(): SidebarSectionType {
   return section;
 }
 
-function getFavoritesSection(): SidebarSectionType {
+function getFavoritesSection(chatSessions: ChatSession[]): SidebarSectionType {
+  const chats = chatSessions.filter((session) => session.isFavourite);
+
   const section: SidebarSectionType = {
     label: "Favorites",
     actions: [],
-    items: [
-      {
-        id: "favorites",
-        label: "Favorites",
-        icon: <LucideStar className="size-4 flex-none" />,
-        renderActions: () => [],
-        children: [],
-      },
-    ],
+    items: chats.map((session) =>
+      composeSidebarItemFromChat({ session, prefix: "favorite-" })
+    ),
   };
 
   return section;
 }
 
-function composeSidebarItemFromChat(session: ChatSession): SidebarItemType {
+function composeSidebarItemFromChat({
+  session,
+  prefix,
+}: {
+  session: ChatSession;
+  prefix?: string;
+}): SidebarItemType {
+  const id = `${prefix}${session.id}`;
+
   return {
-    id: session.id,
+    id,
     label: session.title,
     icon: <LucideMessageCircle className="size-4 flex-none" />,
     href: paths.dashboard.chat(session.id),
-    renderActions: () => [],
+    renderActions: (isHovered: boolean) => [
+      <ChatConfigDropdown
+        key={`config-chat-${id}`}
+        chat={session}
+        isHovered={isHovered}
+      />,
+    ],
     children: [],
   };
 }
@@ -94,7 +104,9 @@ function getChatsSection(chatSessions: ChatSession[]) {
   const section: SidebarSectionType = {
     label: "Chats",
     actions: [<ChatCreateButton key="chat-create" />],
-    items: chatSessions.map(composeSidebarItemFromChat),
+    items: chatSessions.map((session) =>
+      composeSidebarItemFromChat({ session })
+    ),
   };
   return section;
 }
@@ -108,7 +120,7 @@ export function getSidebarSections({
 
   const topSection = getTopSection();
   const bottomSection = getBottomSection();
-  const favoritesSection = getFavoritesSection();
+  const favoritesSection = getFavoritesSection(user.chatSessions);
   const chatsSection = getChatsSection(user.chatSessions);
 
   sections.push(topSection);

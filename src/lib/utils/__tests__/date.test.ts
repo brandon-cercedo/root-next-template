@@ -1,7 +1,7 @@
 import moment from "moment";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getTimeOfDay, humanizeDate } from "@/lib/utils/date";
+import { getTimeOfDay, humanizeDate, humanizeMs } from "@/lib/utils/date";
 
 describe("getTimeOfDay", () => {
   beforeEach(() => {
@@ -62,5 +62,25 @@ describe("humanizeDate", () => {
     expect(humanizeDate("2023-12-31T23:01:00Z", size)).toBe("1h ago");
     expect(humanizeDate("2024-01-01T00:07:00Z", size)).toBe("in 5m");
     expect(humanizeDate("2024-01-01T01:01:00Z", size)).toBe("in 1h");
+  });
+});
+
+describe("humanizeMs", () => {
+  it.each([0, -300])("should return a dash for %d", (durationMs) => {
+    expect(humanizeMs(durationMs)).toBe("—");
+  });
+
+  it.each([
+    { durationMs: 400, expected: "0.40s" },
+    { durationMs: 999, expected: "0.99s" },
+    { durationMs: 1000, expected: "1s" },
+    { durationMs: 1234, expected: "1.23s" },
+    { durationMs: 4500, expected: "4.50s" },
+    { durationMs: 10_000, expected: "10s" },
+    { durationMs: 125_250, expected: "2m 5.25s" },
+    { durationMs: 4_503_000, expected: "1h 15m" },
+    { durationMs: 90_061_000, expected: "1d 1h" },
+  ])("should format $durationMs as $expected", ({ durationMs, expected }) => {
+    expect(humanizeMs(durationMs)).toBe(expected);
   });
 });

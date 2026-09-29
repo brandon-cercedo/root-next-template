@@ -29,6 +29,14 @@ vi.mock("@/features/home/components/LoginConfetti", () => ({
   default: () => <div data-testid="login-confetti" />,
 }));
 
+vi.mock("@/features/chat/components/ChatConfigDropdown", () => ({
+  default: () => null,
+}));
+
+vi.mock("@/features/chat/components/ChatDeleteModal", () => ({
+  default: () => null,
+}));
+
 vi.mock("@/components/flags/FlagToolbar", async () => {
   const { isAdmin } = await import("@/lib/utils/db/user");
 

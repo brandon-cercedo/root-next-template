@@ -7,7 +7,7 @@ import { v7 as uuidv7 } from "uuid";
 
 import Alert from "@/components/ui/Alert";
 import ScrollableContainer from "@/components/ui/ScrollableContainer";
-import { createChatSession } from "@/features/chat/actions";
+import { handleCreateChatSession } from "@/features/chat/actions";
 import { useAgent } from "@/features/chat/hooks/use-agent";
 import { getChatTitle } from "@/features/chat/utils";
 import GreetingMessage from "@/features/home/components/GreetingMessage";
@@ -16,6 +16,7 @@ import { paths } from "@/lib/config/paths";
 import { mergeClsx } from "@/lib/utils/styles";
 import { ChatSession, User } from "@/prisma/types/generated/browser";
 
+import ChatCreatedAt from "./ChatCreatedAt";
 import ChatInput from "./ChatInput";
 import ChatMessages from "./ChatMessages";
 
@@ -84,7 +85,7 @@ export default function ChatSection({
 
     setIsLoading(true);
     try {
-      const result = await createChatSession({
+      const result = await handleCreateChatSession({
         id: id,
         title: getChatTitle(text),
         text,
@@ -94,7 +95,7 @@ export default function ChatSection({
       }
     } catch (error) {
       if (isClientDebug) {
-        console.error("🌵 [ChatSection] createChatSession error", error);
+        console.error("🌵 [ChatSection] handleCreateChatSession error", error);
       }
       setCreateError("Failed to save chat. Please try again.");
       throw new Error("Failed to create chat session");
@@ -126,6 +127,8 @@ export default function ChatSection({
           })}
         >
           {isNew && <GreetingMessage user={user} />}
+
+          <ChatCreatedAt chat={chat} />
 
           <ChatMessages messages={messages} status={status} />
 

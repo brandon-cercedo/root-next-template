@@ -2,11 +2,13 @@ import { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { FullUser, getFullUser } from "@/actions/db/user";
+import DashboardSidebar from "@/app/dashboard/_components/sidebar/DashboardSidebar";
 import FlagsBadge from "@/components/flags/FlagsBadge";
 import FlagToolbar from "@/components/flags/FlagToolbar";
 import CommandPalette from "@/components/keyboard/CommandPalette";
 import KeyboardHelpOffcanvas from "@/components/keyboard/KeyboardHelpOffcanvas";
-import Sidebar from "@/components/layout/sidebar/Sidebar";
+import ChatDeleteModal from "@/features/chat/components/ChatDeleteModal";
+import { ChatSessionProvider } from "@/features/chat/components/ChatSessionProvider";
 import LoginConfetti from "@/features/home/components/LoginConfetti";
 import { ChatInstancesProvider } from "@/hooks/use-chat-instances";
 import { FlagProvider } from "@/hooks/use-flag";
@@ -36,9 +38,12 @@ async function DashboardProviders({
       <FlagProvider values={values} overrides={overrides}>
         <KeyboardProvider>
           <ChatInstancesProvider>
-            {children}
-            <CommandPalette />
-            <KeyboardHelpOffcanvas />
+            <ChatSessionProvider>
+              {children}
+              <CommandPalette />
+              <KeyboardHelpOffcanvas />
+              <ChatDeleteModal />
+            </ChatSessionProvider>
           </ChatInstancesProvider>
         </KeyboardProvider>
       </FlagProvider>
@@ -58,7 +63,7 @@ export default async function DashboardLayout({
 
   return (
     <DashboardProviders user={user}>
-      <Sidebar user={user} />
+      <DashboardSidebar user={user} />
       <div className="bg-gray-100 p-3 transition-all duration-300 lg:fixed lg:inset-0 dark:bg-neutral-950 lg:hs-overlay-layout-open:ps-60">
         <div className="relative flex h-[calc(100dvh-62px)] flex-col overflow-hidden rounded-lg border border-gray-200 bg-white text-black shadow-xs lg:h-full dark:border-neutral-700 dark:bg-neutral-900 dark:text-white">
           <div className="flex size-full flex-1 flex-col">{children}</div>

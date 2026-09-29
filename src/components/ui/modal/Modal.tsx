@@ -1,11 +1,13 @@
 "use client";
 
+import { LucideX } from "lucide-react";
 import { Fragment, KeyboardEvent, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { ModalProvider } from "@/hooks/use-modal";
 import { mergeClsx } from "@/lib/utils/styles";
 
+import ModalCloseButton from "./ModalCloseButton";
 import ModalTrigger from "./ModalTrigger";
 
 function fixOverlayOptions(options?: OverlayOptions) {
@@ -38,6 +40,7 @@ interface ModalContentProps {
   transition?: ModalTransition;
   isVerticallyCentered?: boolean;
   isKeyActionsEnabled?: boolean;
+  showCloseButton?: boolean;
 }
 
 function ModalContent({
@@ -54,6 +57,7 @@ function ModalContent({
   transition = "slide-down",
   isVerticallyCentered = false,
   isKeyActionsEnabled = true,
+  showCloseButton = false,
 }: ModalContentProps) {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -117,6 +121,7 @@ function ModalContent({
             "pointer-events-auto flex w-full flex-col rounded-xl border border-gray-200 bg-white shadow-2xs dark:border-neutral-700 dark:bg-neutral-800",
             {
               "max-h-full overflow-hidden": scrollScope === "parent",
+              relative: showCloseButton,
             },
             className
           )}
@@ -124,6 +129,14 @@ function ModalContent({
           <ModalProvider id={id} isMounted={isMounted}>
             {children}
           </ModalProvider>
+          {showCloseButton && (
+            <ModalCloseButton
+              modalId={id}
+              className="absolute -top-2.5 -right-2.5 size-5 border-gray-200 bg-white hover:bg-gray-100 focus:bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
+            >
+              <LucideX className="size-3 flex-none" />
+            </ModalCloseButton>
+          )}
         </div>
       </div>
     </div>,
@@ -150,6 +163,7 @@ type ModalProps = {
   transition?: ModalTransition;
   isVerticallyCentered?: boolean;
   isKeyActionsEnabled?: boolean;
+  showCloseButton?: boolean;
 };
 
 export default function Modal({
@@ -167,6 +181,7 @@ export default function Modal({
   transition = "slide-down",
   isVerticallyCentered = false,
   isKeyActionsEnabled = true,
+  showCloseButton = false,
 }: ModalProps) {
   return (
     <Fragment>
@@ -184,6 +199,7 @@ export default function Modal({
         transition={transition}
         isVerticallyCentered={isVerticallyCentered}
         isKeyActionsEnabled={isKeyActionsEnabled}
+        showCloseButton={showCloseButton}
       >
         {children}
       </ModalContent>
