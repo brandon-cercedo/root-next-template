@@ -1,4 +1,5 @@
 import moment from "moment";
+import prettyMilliseconds from "pretty-ms";
 
 type HumanizeDateSize = "xs" | "sm" | "base";
 
@@ -69,6 +70,21 @@ export function humanizeDate(
   fixedDate.locale(locale);
 
   return fixedDate.fromNow();
+}
+
+/**
+ * @see {@link https://github.com/sindresorhus/pretty-ms | pretty-ms}
+ */
+export function humanizeMs(durationMs: number): string {
+  if (durationMs <= 0) {
+    return "—";
+  }
+
+  return prettyMilliseconds(durationMs, {
+    secondsDecimalDigits: 2,
+    subSecondsAsDecimals: true,
+    unitCount: 2,
+  });
 }
 
 type TimeOfDay = "morning" | "afternoon" | "evening" | "night";

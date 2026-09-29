@@ -7,8 +7,7 @@ import AppLogo from "@/components/brand/AppLogo";
 import { OVERLAY_IDS } from "@/components/constants";
 import { paths } from "@/lib/config/paths";
 
-import { getSidebarSections } from "./config";
-import SidebarContent from "./SidebarContent";
+import SidebarContent, { SidebarSectionType } from "./SidebarContent";
 import UserMenu from "./UserMenu";
 
 function SidebarHeader() {
@@ -29,8 +28,12 @@ function SidebarFooter({ user }: { user: FullUser }) {
   );
 }
 
-export default function Sidebar({ user }: { user: FullUser }) {
-  const sections = getSidebarSections({ user });
+type SidebarProps = {
+  user: FullUser;
+  sections: SidebarSectionType[];
+};
+
+export default function Sidebar({ user, sections }: SidebarProps) {
   return (
     <aside
       id={OVERLAY_IDS.SIDEBAR}

@@ -2,7 +2,8 @@
 
 import BreadcrumbItems, {
   BreadcrumbItemType,
-} from "./breadcrumb/BreadcrumbItems";
+} from "@/components/layout/breadcrumb/BreadcrumbItems";
+
 import SidebarToggleButton from "./sidebar/SidebarToggleButton";
 
 interface NavbarProps {

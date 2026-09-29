@@ -1,14 +1,15 @@
 import { revalidatePath } from "next/cache";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import prisma from "@/lib/prisma-client";
 import {
   fakeChatSessionComplete,
   fakeUserComplete,
 } from "@/prisma/utils/fake-data";
 
 const mockGetUser = vi.fn();
-const mockListChatSessionsRecord = vi.fn();
+const mockCreateChatSession = vi.fn();
+const mockUpdateChatSession = vi.fn();
+const mockDeleteChatSession = vi.fn();
 
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
@@ -18,23 +19,15 @@ vi.mock("@/actions/db/user", () => ({
   getUser: () => mockGetUser(),
 }));
 
-vi.mock("@/lib/prisma-client", () => ({
-  default: {
-    chatSession: {
-      create: vi.fn(),
-    },
-  },
-}));
-
 vi.mock("@/services/chat-session", () => ({
-  listChatSessions: (...args: unknown[]) =>
-    mockListChatSessionsRecord(...args),
+  createChatSession: (...args: unknown[]) => mockCreateChatSession(...args),
+  updateChatSession: (...args: unknown[]) => mockUpdateChatSession(...args),
+  deleteChatSession: (...args: unknown[]) => mockDeleteChatSession(...args),
 }));
 
-const mockCreate = vi.mocked(prisma.chatSession.create);
 const mockRevalidatePath = vi.mocked(revalidatePath);
 
-describe("createChatSession", () => {
+describe("handleCreateChatSession", () => {
   const chatId = "01a0cacd-a092-706e-b0e8-63e89f857148";
 
   beforeEach(() => {
@@ -50,35 +43,34 @@ describe("createChatSession", () => {
       userId: user.id,
     };
     mockGetUser.mockResolvedValue(user);
-    mockCreate.mockResolvedValue(session);
+    mockCreateChatSession.mockResolvedValue(session);
 
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-09-16T12:00:00.000Z"));
 
     try {
-      const { createChatSession } = await import("@/features/chat/actions");
-      const result = await createChatSession({
+      const { handleCreateChatSession } =
+        await import("@/features/chat/actions");
+      const result = await handleCreateChatSession({
         id: chatId,
         title: "Hello",
         text: "Hello",
       });
 
       expect(result).toEqual({ success: true, id: chatId });
-      expect(mockCreate).toHaveBeenCalledWith({
-        data: {
-          id: chatId,
-          title: "Hello",
-          userId: user.id,
-          status: "ready",
-          messages: [
-            {
-              id: expect.any(String),
-              role: "user",
-              parts: [{ type: "text", text: "Hello" }],
-              metadata: { timestamp: "2026-09-16T12:00:00.000Z" },
-            },
-          ],
-        },
+      expect(mockCreateChatSession).toHaveBeenCalledWith({
+        id: chatId,
+        title: "Hello",
+        userId: user.id,
+        status: "ready",
+        messages: [
+          {
+            id: expect.any(String),
+            role: "user",
+            parts: [{ type: "text", text: "Hello" }],
+            metadata: { timestamp: "2026-09-16T12:00:00.000Z" },
+          },
+        ],
       });
       expect(mockRevalidatePath).toHaveBeenCalled();
     } finally {
@@ -89,8 +81,9 @@ describe("createChatSession", () => {
   it("should return failure when unauthenticated", async () => {
     mockGetUser.mockResolvedValue(null);
 
-    const { createChatSession } = await import("@/features/chat/actions");
-    const result = await createChatSession({
+    const { handleCreateChatSession } =
+      await import("@/features/chat/actions");
+    const result = await handleCreateChatSession({
       id: chatId,
       title: "Hello",
       text: "Hello",
@@ -100,6 +93,145 @@ describe("createChatSession", () => {
       success: false,
       message: "Unauthorized",
     });
-    expect(mockCreate).not.toHaveBeenCalled();
+    expect(mockCreateChatSession).not.toHaveBeenCalled();
+  });
+
+  it("should return failure when create throws", async () => {
+    mockGetUser.mockResolvedValue(fakeUserComplete());
+    mockCreateChatSession.mockRejectedValue(new Error("duplicate id"));
+
+    const { handleCreateChatSession } =
+      await import("@/features/chat/actions");
+    const result = await handleCreateChatSession({
+      id: chatId,
+      title: "Hello",
+      text: "Hello",
+    });
+
+    expect(result).toEqual({
+      success: false,
+      message: "Failed to create chat",
+    });
+    expect(mockRevalidatePath).not.toHaveBeenCalled();
+  });
+});
+
+describe("handleDeleteChatSession", () => {
+  const chatId = "01a0cacd-a092-706e-b0e8-63e89f857148";
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.resetModules();
+  });
+
+  it("should delete and return success", async () => {
+    const user = fakeUserComplete();
+    mockGetUser.mockResolvedValue(user);
+    mockDeleteChatSession.mockResolvedValue(fakeChatSessionComplete());
+
+    const { handleDeleteChatSession } =
+      await import("@/features/chat/actions");
+    const result = await handleDeleteChatSession({ id: chatId });
+
+    expect(result).toEqual({ success: true });
+    expect(mockDeleteChatSession).toHaveBeenCalledWith({
+      id: chatId,
+      userId: user.id,
+    });
+    expect(mockRevalidatePath).toHaveBeenCalled();
+  });
+
+  it("should return failure when unauthenticated", async () => {
+    mockGetUser.mockResolvedValue(null);
+
+    const { handleDeleteChatSession } =
+      await import("@/features/chat/actions");
+    const result = await handleDeleteChatSession({ id: chatId });
+
+    expect(result).toEqual({
+      success: false,
+      message: "Unauthorized",
+    });
+    expect(mockDeleteChatSession).not.toHaveBeenCalled();
+  });
+
+  it("should return failure when delete throws", async () => {
+    const user = fakeUserComplete();
+    mockGetUser.mockResolvedValue(user);
+    mockDeleteChatSession.mockRejectedValue(new Error("not found"));
+
+    const { handleDeleteChatSession } =
+      await import("@/features/chat/actions");
+    const result = await handleDeleteChatSession({ id: chatId });
+
+    expect(result).toEqual({
+      success: false,
+      message: "Failed to delete chat",
+    });
+  });
+});
+
+describe("toggleFavoriteChatSession", () => {
+  const chatId = "01a0cacd-a092-706e-b0e8-63e89f857148";
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.resetModules();
+  });
+
+  it("should toggle favorite and return success", async () => {
+    const user = fakeUserComplete();
+    mockGetUser.mockResolvedValue(user);
+    mockUpdateChatSession.mockResolvedValue(fakeChatSessionComplete());
+
+    const { toggleFavoriteChatSession } =
+      await import("@/features/chat/actions");
+    const result = await toggleFavoriteChatSession({
+      id: chatId,
+      isFavourite: true,
+    });
+
+    expect(result).toEqual({ success: true });
+    expect(mockUpdateChatSession).toHaveBeenCalledWith({
+      id: chatId,
+      userId: user.id,
+      data: { isFavourite: true },
+    });
+    expect(mockRevalidatePath).toHaveBeenCalled();
+  });
+
+  it("should return failure when unauthenticated", async () => {
+    mockGetUser.mockResolvedValue(null);
+
+    const { toggleFavoriteChatSession } =
+      await import("@/features/chat/actions");
+    const result = await toggleFavoriteChatSession({
+      id: chatId,
+      isFavourite: true,
+    });
+
+    expect(result).toEqual({
+      success: false,
+      message: "Unauthorized",
+    });
+    expect(mockUpdateChatSession).not.toHaveBeenCalled();
+  });
+
+  it("should return failure when update throws", async () => {
+    const user = fakeUserComplete();
+    mockGetUser.mockResolvedValue(user);
+    mockUpdateChatSession.mockRejectedValue(new Error("not found"));
+
+    const { toggleFavoriteChatSession } =
+      await import("@/features/chat/actions");
+    const result = await toggleFavoriteChatSession({
+      id: chatId,
+      isFavourite: true,
+    });
+
+    expect(result).toEqual({
+      success: false,
+      message: "Failed to update favorite",
+    });
   });
 });

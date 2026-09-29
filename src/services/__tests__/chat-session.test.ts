@@ -11,16 +11,42 @@ vi.mock("server-only", () => ({}));
 vi.mock("@/lib/prisma-client", () => ({
   default: {
     chatSession: {
+      create: vi.fn(),
       findUnique: vi.fn(),
       findMany: vi.fn(),
       update: vi.fn(),
+      delete: vi.fn(),
     },
   },
 }));
 
+const mockCreate = vi.mocked(prisma.chatSession.create);
 const mockFindUnique = vi.mocked(prisma.chatSession.findUnique);
 const mockFindMany = vi.mocked(prisma.chatSession.findMany);
 const mockUpdate = vi.mocked(prisma.chatSession.update);
+const mockDelete = vi.mocked(prisma.chatSession.delete);
+
+describe("createChatSession", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should create with the given data", async () => {
+    const { createChatSession } = await import("@/services/chat-session");
+    const session = fakeChatSessionComplete();
+    mockCreate.mockResolvedValue(session);
+    const data = {
+      id: session.id,
+      title: session.title,
+      userId: session.userId,
+    };
+
+    const result = await createChatSession(data);
+
+    expect(result).toEqual(session);
+    expect(mockCreate).toHaveBeenCalledWith({ data });
+  });
+});
 
 describe("getChatSession", () => {
   beforeEach(() => {
@@ -98,7 +124,6 @@ describe("updateChatSession", () => {
       ...fakeChatSessionComplete(),
       status: "ready" as const,
     };
-    mockFindUnique.mockResolvedValue({ id: session.id } as never);
     mockUpdate.mockResolvedValue(session);
 
     const result = await updateChatSession({
@@ -108,27 +133,31 @@ describe("updateChatSession", () => {
     });
 
     expect(result).toEqual(session);
-    expect(mockFindUnique).toHaveBeenCalledWith({
-      where: { id: session.id, userId: session.userId },
-      select: { id: true },
-    });
     expect(mockUpdate).toHaveBeenCalledWith({
-      where: { id: session.id },
+      where: { id: session.id, userId: session.userId },
       data: { status: "ready" },
     });
   });
+});
 
-  it("should throw when not found for the user", async () => {
-    const { updateChatSession } = await import("@/services/chat-session");
-    mockFindUnique.mockResolvedValue(null);
+describe("deleteChatSession", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-    await expect(
-      updateChatSession({
-        id: "missing",
-        userId: "user-1",
-        data: { status: "ready" },
-      })
-    ).rejects.toThrow("[updateChatSession] Chat session not found: missing");
-    expect(mockUpdate).not.toHaveBeenCalled();
+  it("should delete by id for the owning user", async () => {
+    const { deleteChatSession } = await import("@/services/chat-session");
+    const session = fakeChatSessionComplete();
+    mockDelete.mockResolvedValue(session);
+
+    const result = await deleteChatSession({
+      id: session.id,
+      userId: session.userId,
+    });
+
+    expect(result).toEqual(session);
+    expect(mockDelete).toHaveBeenCalledWith({
+      where: { id: session.id, userId: session.userId },
+    });
   });
 });

@@ -3,6 +3,12 @@ import "server-only";
 import prisma from "@/lib/prisma-client";
 import { Prisma } from "@/prisma/types/client";
 
+export async function createChatSession(
+  data: Prisma.ChatSessionUncheckedCreateInput
+) {
+  return prisma.chatSession.create({ data });
+}
+
 export async function getChatSession({
   id,
   userId,
@@ -31,16 +37,20 @@ export async function updateChatSession({
   userId: string;
   data: Prisma.ChatSessionUpdateInput;
 }) {
-  const chat = await prisma.chatSession.findUnique({
-    where: { id, userId },
-    select: { id: true },
-  });
-  if (!chat) {
-    throw new Error(`[updateChatSession] Chat session not found: ${id}`);
-  }
-
   return prisma.chatSession.update({
-    where: { id: chat.id },
+    where: { id, userId },
     data,
+  });
+}
+
+export async function deleteChatSession({
+  id,
+  userId,
+}: {
+  id: string;
+  userId: string;
+}) {
+  return prisma.chatSession.delete({
+    where: { id, userId },
   });
 }

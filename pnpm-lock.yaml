@@ -92,6 +92,9 @@ importers:
       preline:
         specifier: ^4.2.0
         version: 4.2.0
+      pretty-ms:
+        specifier: ^9.3.1
+        version: 9.3.1
       react:
         specifier: 19.2.8
         version: 19.2.8
@@ -4297,6 +4300,10 @@ packages:
     resolution: {integrity: sha512-ayCKvm/phCGxOkYRSCM82iDwct8/EonSEgCSxWxD7ve6jHggsFl4fZVQBPRNgQoKiuV/odhFrGzQXZwbifC8Rg==}
     engines: {node: '>=8'}
 
+  parse-ms@4.0.0:
+    resolution: {integrity: sha512-TXfryirbmq34y8QBwgqCVLi+8oA3oWx2eAnSn62ITyEhEYaWRlVZ2DvMM9eZbMs/RfxPu/PK/aBLyGj4IrqMHw==}
+    engines: {node: '>=18'}
+
   parse5@7.3.0:
     resolution: {integrity: sha512-IInvU7fabl34qmi9gY8XOVxhYyMyuH2xUNpb2q8/Y+7552KlejkRvqvD19nMoUW/uQGGbqNpA6Tufu5FL5BZgw==}
 
@@ -4509,6 +4516,10 @@ packages:
 
   pretty-format@3.8.0:
     resolution: {integrity: sha512-WuxUnVtlWL1OfZFQFuqvnvs6MiAGk9UNsBostyBOB0Is9wb5uRESevA6rnl/rkksXaGX3GzZhPup5d6Vp1nFew==}
+
+  pretty-ms@9.3.1:
+    resolution: {integrity: sha512-HzMy3Geq23nVALD/M2LliU+F+M+gVNsvkQWWqeBZ8HDiCgzo6YPJ/Omrmtq24EFrIsk0a3EkQGEd7bDOo+IhGA==}
+    engines: {node: '>=18'}
 
   prisma-generator-fake-data@0.18.3:
     resolution: {integrity: sha512-HQuM5ybZ1kv7rwq0WyD4aYdSUkLu3ZItDgiD9o0o2fnqFsylfpCnp/3sPvp3Q8dI6w+pTaqJmsXh4ll6i8SFeQ==}
@@ -9835,6 +9846,8 @@ snapshots:
       json-parse-even-better-errors: 2.3.1
       lines-and-columns: 1.2.4
 
+  parse-ms@4.0.0: {}
+
   parse5@7.3.0:
     dependencies:
       entities: 6.0.1
@@ -9978,6 +9991,10 @@ snapshots:
       react-is: 17.0.2
 
   pretty-format@3.8.0: {}
+
+  pretty-ms@9.3.1:
+    dependencies:
+      parse-ms: 4.0.0
 
   prisma-generator-fake-data@0.18.3(typescript@5.9.3):
     dependencies:

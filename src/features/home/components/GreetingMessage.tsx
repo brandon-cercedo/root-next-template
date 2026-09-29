@@ -9,7 +9,7 @@ const NAME_COLORS: Readonly<string[]> = [
   "text-indigo-600 dark:text-indigo-500",
   "text-teal-500",
   "text-blue-600 dark:text-blue-500",
-  "text-yellow-500",
+  "text-yellow-400",
 ];
 
 function getNameColor() {

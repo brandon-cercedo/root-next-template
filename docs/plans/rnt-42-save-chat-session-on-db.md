@@ -30,7 +30,7 @@ Merge order: P0 → P1 → P2. After P0 lands on `main`, retarget P1’s PR to `
   `createChatSession`, and `POST /api/chat` status lifecycle
   (`streaming` → `ready` | `aborted` | `error`).
 - `submitted` remains the schema default / unused app write path.
-- P2 enhancements (favorite/delete/tooltips) still open.
+- P2 enhancements (favorite/delete/tooltips) are implemented.
 
 ## Checklist
 
@@ -49,9 +49,9 @@ Merge order: P0 → P1 → P2. After P0 lands on `main`, retarget P1’s PR to `
 
 ### P2
 
-- [ ] `deleteChatSession` + `toggleFavoriteChatSession` actions
-- [ ] Settings dropdown (Favorite, Copy link, Delete); Favorites section wiring
-- [ ] createdAt above chat; updatedAt tooltip with duration + message counts
+- [x] `deleteChatSession` + `toggleFavoriteChatSession` actions
+- [x] Settings dropdown (Favorite, Copy link, Delete); Favorites section wiring
+- [x] createdAt above chat; updatedAt tooltip with duration + message counts
 
 ---
 
