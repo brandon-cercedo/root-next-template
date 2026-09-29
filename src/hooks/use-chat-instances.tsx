@@ -4,13 +4,26 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useState,
   type ReactNode,
 } from "react";
 
+import type { ChatUIMessage } from "@/types/chat";
+import type { Chat } from "@ai-sdk/react";
+
+type ChatInstance = Chat<ChatUIMessage>;
+
+function isActiveInstance(instance: ChatInstance) {
+  return ["submitted", "streaming"].includes(instance.status);
+}
+
 type ChatInstancesContextType = {
-  instances: Map<string, unknown>;
-  getOrCreateInstance: <T>(options: { id: string; create: () => T }) => T;
+  instances: Map<string, ChatInstance>;
+  getOrCreateInstance: (options: {
+    id: string;
+    create: () => ChatInstance;
+  }) => ChatInstance;
   deleteInstance: (id: string) => void;
 };
 
@@ -19,11 +32,11 @@ const ChatInstancesContext = createContext<
 >(undefined);
 
 export function ChatInstancesProvider({ children }: { children: ReactNode }) {
-  const [instances] = useState(() => new Map<string, unknown>());
+  const [instances] = useState(() => new Map<string, ChatInstance>());
 
   const getOrCreateInstance = useCallback(
-    <T,>({ id, create }: { id: string; create: () => T }) => {
-      const instance = instances.get(id) as T | undefined;
+    ({ id, create }: { id: string; create: () => ChatInstance }) => {
+      const instance = instances.get(id);
       if (instance) {
         return instance;
       }
@@ -42,6 +55,21 @@ export function ChatInstancesProvider({ children }: { children: ReactNode }) {
     },
     [instances]
   );
+
+  useEffect(() => {
+    const run = (event: BeforeUnloadEvent) => {
+      const hasActiveInstance = Array.from(instances.values()).some(
+        isActiveInstance
+      );
+      if (!hasActiveInstance) {
+        return;
+      }
+      event.preventDefault();
+    };
+
+    window.addEventListener("beforeunload", run);
+    return () => window.removeEventListener("beforeunload", run);
+  }, [instances]);
 
   return (
     <ChatInstancesContext.Provider
