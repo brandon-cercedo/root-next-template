@@ -77,19 +77,20 @@ enum ChatSessionStatus {
 }
 
 model ChatSession {
-  id          String            @id @default(uuid(7))
-  title       String
-  status      ChatSessionStatus @default(ready)
-  error       String?
+  id            String            @id @default(uuid(7))
+  title         String
+  status        ChatSessionStatus @default(ready)
+  error         String?
   /// [ChatUIMessageType[]]
-  messages    Json              @default("[]")
-  isFavourite Boolean           @default(false)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  messages      Json              @default("[]")
+  isFavourite   Boolean           @default(false)
+  lastMessageAt DateTime          @default(now())
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 
   // Relationships
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId, updatedAt])
+  @@index([userId, lastMessageAt])
 }
