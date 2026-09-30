@@ -63,8 +63,6 @@ const validBody = {
   chatId: "01a0cacd-a092-706e-b0e8-63e89f857148",
   keyboardCommandIds: ["theme-dark", "go-home"],
 };
-const chatPath = `/dashboard/chats/${validBody.chatId}`;
-
 describe("POST /api/chat", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -179,7 +177,11 @@ describe("POST /api/chat", () => {
 
       const persistedMessages = [
         { id: "msg-1", role: "user" },
-        { id: "msg-2", role: "assistant" },
+        {
+          id: "msg-2",
+          role: "assistant",
+          metadata: { timestamp: "2026-09-16T12:00:01.000Z" },
+        },
       ];
       await streamOptions.onEnd({
         messages: persistedMessages,
@@ -194,15 +196,16 @@ describe("POST /api/chat", () => {
           messages: persistedMessages,
           status: "ready",
           error: null,
+          lastMessageAt: new Date("2026-09-16T12:00:01.000Z"),
         },
       });
-      expect(mockRevalidatePath).toHaveBeenCalledWith(chatPath);
+      expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard", "layout");
     } finally {
       vi.useRealTimers();
     }
   });
 
-  it("should mark session streaming onStart", async () => {
+  it("should only mark streaming onStart without revalidating", async () => {
     await post();
     await mockStreamText.mock.calls[0]![0].onStart();
 
@@ -211,7 +214,7 @@ describe("POST /api/chat", () => {
       userId: "user-1",
       data: { status: "streaming" },
     });
-    expect(mockRevalidatePath).toHaveBeenCalledWith(chatPath);
+    expect(mockRevalidatePath).not.toHaveBeenCalled();
   });
 
   it("should persist aborted status onEnd when stream is aborted", async () => {
@@ -226,7 +229,12 @@ describe("POST /api/chat", () => {
     expect(mockUpdateChatSession).toHaveBeenCalledWith({
       id: validBody.chatId,
       userId: "user-1",
-      data: { messages, status: "aborted", error: null },
+      data: {
+        messages,
+        status: "aborted",
+        error: null,
+        lastMessageAt: expect.any(Date),
+      },
     });
   });
 
@@ -253,6 +261,7 @@ describe("POST /api/chat", () => {
           status: "error",
           error:
             "Something went wrong while generating a reply. Please try again.",
+          lastMessageAt: expect.any(Date),
         },
       });
       expect(errorSpy).toHaveBeenCalledWith(

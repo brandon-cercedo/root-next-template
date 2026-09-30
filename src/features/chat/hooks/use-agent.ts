@@ -6,6 +6,7 @@ import {
   lastAssistantMessageIsCompleteWithToolCalls,
   type ChatOnToolCallCallback,
 } from "ai";
+import { useRouter } from "next/navigation";
 
 import { useChatInstances } from "@/hooks/use-chat-instances";
 import { useKeyboard } from "@/hooks/use-keyboard";
@@ -14,26 +15,6 @@ import { paths } from "@/lib/config/paths";
 import { KeyboardCommandInput } from "../schema/tools";
 
 import type { ChatUIMessage } from "@/types/chat";
-
-type SendMessageInput = Parameters<
-  ReturnType<typeof useChat<ChatUIMessage>>["sendMessage"]
->[0];
-
-function composeUserMessage(message?: SendMessageInput) {
-  const timestamp = new Date().toISOString();
-
-  const newMessage = message
-    ? {
-        ...message,
-        metadata: {
-          ...message.metadata,
-          timestamp,
-        },
-      }
-    : undefined;
-
-  return newMessage;
-}
 
 type AgentChat = Chat<ChatUIMessage>;
 
@@ -47,6 +28,7 @@ type UseAgentOptions = {
 };
 
 export function useAgent({ id, initialMessages }: UseAgentOptions) {
+  const router = useRouter();
   const { getOrCreateInstance } = useChatInstances();
   const { commandsByIdRef } = useKeyboard();
 
@@ -102,6 +84,7 @@ export function useAgent({ id, initialMessages }: UseAgentOptions) {
         }),
       }),
       sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+      onFinish: () => router.refresh(),
       onToolCall: async ({ toolCall }) => {
         if (toolCall.dynamic) {
           return;
@@ -120,10 +103,8 @@ export function useAgent({ id, initialMessages }: UseAgentOptions) {
 
   const chat = useChat({ chat: instance });
 
-  const sendMessage: typeof chat.sendMessage = (message, options) => {
-    const newMessage = composeUserMessage(message);
-    return chat.sendMessage(newMessage, options);
-  };
+  const sendMessage: typeof chat.sendMessage = (message, options) =>
+    chat.sendMessage(message, options);
 
   return {
     messages: chat.messages,

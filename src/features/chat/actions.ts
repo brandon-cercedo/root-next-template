@@ -1,9 +1,8 @@
 "use server";
 
-import { generateId } from "ai";
 import { revalidatePath } from "next/cache";
 
-import { getUser } from "@/actions/db/user";
+import { getUser, getUserId } from "@/actions/db/user";
 import { paths } from "@/lib/config/paths";
 import {
   createChatSession,
@@ -11,12 +10,19 @@ import {
   updateChatSession,
 } from "@/services/chat-session";
 
-import { CreateChatSessionSchema } from "./schema/chat";
+import {
+  CreateChatSessionSchema,
+  UpdateChatMessageSchema,
+} from "./schema/chat";
+import { getLastMessageAt } from "./utils";
+
+import type { ChatSessionStatus } from "@/prisma/types/generated/browser";
+import type { ChatUIMessage } from "@/types/chat";
 
 export async function handleCreateChatSession(input: {
   id: string;
   title: string;
-  text: string;
+  message: ChatUIMessage;
 }) {
   const user = await getUser();
   if (!user) {
@@ -30,21 +36,16 @@ export async function handleCreateChatSession(input: {
     return { success: false, message: "Invalid chat session data" };
   }
   const data = parsed.data;
-
-  const userMessage: PrismaJson.ChatUIMessageType = {
-    id: generateId(),
-    role: "user",
-    parts: [{ type: "text", text: data.text }],
-    metadata: { timestamp: new Date().toISOString() },
-  };
+  const messages = [data.message as ChatUIMessage];
 
   try {
     await createChatSession({
       id: data.id,
       title: data.title,
       userId: user.id,
-      messages: [userMessage],
-      status: "ready",
+      messages,
+      status: "submitted",
+      lastMessageAt: getLastMessageAt(messages),
     });
   } catch (error) {
     console.error("[handleCreateChatSession] Failed to create", error);
@@ -54,6 +55,45 @@ export async function handleCreateChatSession(input: {
   revalidatePath(paths.dashboard.home(), "layout");
 
   return { success: true, id: data.id };
+}
+
+export async function handleUpdateChatMessage(input: {
+  id: string;
+  status: ChatSessionStatus;
+  messages: ChatUIMessage[];
+}) {
+  const userId = await getUserId();
+  if (!userId) {
+    console.error("[handleUpdateChatMessage] User not authenticated");
+    return { success: false, message: "Unauthorized" };
+  }
+
+  const parsed = UpdateChatMessageSchema.safeParse(input);
+  if (!parsed.success) {
+    console.error("[handleUpdateChatMessage] Invalid data", parsed.error);
+    return { success: false, message: "Invalid chat message data" };
+  }
+  const data = parsed.data;
+  const messages = data.messages as ChatUIMessage[];
+
+  try {
+    await updateChatSession({
+      id: data.id,
+      userId,
+      data: {
+        status: data.status,
+        messages,
+        lastMessageAt: getLastMessageAt(messages),
+      },
+    });
+  } catch (error) {
+    console.error("[handleUpdateChatMessage] Failed to update", error);
+    return { success: false, message: "Failed to save message" };
+  }
+
+  revalidatePath(paths.dashboard.home(), "layout");
+
+  return { success: true };
 }
 
 export async function handleDeleteChatSession({ id }: { id: string }) {

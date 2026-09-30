@@ -115,7 +115,7 @@ function Content({ chat }: { chat: ChatSession }) {
           <DateRow
             icon={LucideHistory}
             label="Updated"
-            date={chat.updatedAt}
+            date={chat.lastMessageAt}
           />
         </dl>
       </div>

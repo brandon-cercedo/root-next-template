@@ -69,7 +69,7 @@ model UserSetting {
 }
 
 enum ChatSessionStatus {
-  submitted  // Not implemented yet
+  submitted
   streaming
   ready      // ready to be shown to the user; to continue the conversation; or, to start a empty conversation.
   error

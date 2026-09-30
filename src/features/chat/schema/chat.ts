@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { ChatSessionStatus } from "@/prisma/types/generated/browser";
+
 const ChatMessageMetadataSchema = z.object({
   timestamp: z.string(),
   durationMs: z.number().optional(),
@@ -31,5 +33,11 @@ export const TITLE_MAX_LENGTH = 60;
 export const CreateChatSessionSchema = z.object({
   id: z.uuidv7(),
   title: z.string().trim().min(1).max(TITLE_MAX_LENGTH),
-  text: z.string().trim().min(1),
+  message: ChatUIMessageSchema,
+});
+
+export const UpdateChatMessageSchema = z.object({
+  id: z.uuidv7(),
+  status: z.enum(ChatSessionStatus),
+  messages: z.array(ChatUIMessageSchema),
 });

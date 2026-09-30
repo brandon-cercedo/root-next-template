@@ -87,7 +87,7 @@ describe("listChatSessions", () => {
     vi.clearAllMocks();
   });
 
-  it("should order by updatedAt desc for the user", async () => {
+  it("should order by lastMessageAt desc for the user", async () => {
     const { listChatSessions } = await import("@/services/chat-session");
     const user = fakeUserComplete();
     const sessions = [fakeChatSessionComplete()];
@@ -98,7 +98,7 @@ describe("listChatSessions", () => {
     expect(result).toEqual(sessions);
     expect(mockFindMany).toHaveBeenCalledWith({
       where: { userId: user.id },
-      orderBy: { updatedAt: "desc" },
+      orderBy: { lastMessageAt: "desc" },
     });
   });
 

@@ -153,7 +153,7 @@ describe("getFullUser", () => {
     });
     expect(mockFindChatSessions).toHaveBeenCalledWith({
       where: { userId: mockUser.id },
-      orderBy: { updatedAt: "desc" },
+      orderBy: { lastMessageAt: "desc" },
     });
   });
 

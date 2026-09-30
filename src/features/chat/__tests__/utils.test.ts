@@ -1,6 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { getChatStats, getChatTitle } from "@/features/chat/utils";
+import {
+  composeUserMessage,
+  getChatStats,
+  getChatTitle,
+  getLastMessageAt,
+} from "@/features/chat/utils";
 
 import type { ChatUIMessage } from "@/types/chat";
 
@@ -15,6 +20,57 @@ function message(
     metadata: { timestamp: "2026-02-03T14:30:00.000Z", durationMs },
   };
 }
+
+describe("composeUserMessage", () => {
+  it("should build a timestamped user text message", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-09-16T12:00:00.000Z"));
+
+    try {
+      expect(composeUserMessage("Hello")).toEqual({
+        id: expect.any(String),
+        role: "user",
+        parts: [{ type: "text", text: "Hello" }],
+        metadata: { timestamp: "2026-09-16T12:00:00.000Z" },
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("should generate a unique id per message", () => {
+    expect(composeUserMessage("a").id).not.toBe(composeUserMessage("a").id);
+  });
+});
+
+describe("getLastMessageAt", () => {
+  it("should use the last message timestamp", () => {
+    const messages = [
+      message("user"),
+      {
+        ...message("assistant"),
+        metadata: { timestamp: "2026-02-03T14:31:00.000Z" },
+      },
+    ];
+
+    expect(getLastMessageAt(messages)).toEqual(
+      new Date("2026-02-03T14:31:00.000Z")
+    );
+  });
+
+  it("should fall back to now without messages", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-09-16T12:00:00.000Z"));
+
+    try {
+      expect(getLastMessageAt([])).toEqual(
+        new Date("2026-09-16T12:00:00.000Z")
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
 
 describe("getChatTitle", () => {
   it("should truncate the first line", () => {

@@ -24,7 +24,7 @@ export async function getChatSession({
 export async function listChatSessions(userId: string) {
   return prisma.chatSession.findMany({
     where: { userId },
-    orderBy: { updatedAt: "desc" },
+    orderBy: { lastMessageAt: "desc" },
   });
 }
 
