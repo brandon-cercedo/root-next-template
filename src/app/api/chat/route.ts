@@ -3,6 +3,7 @@ import {
   consumeStream,
   convertToModelMessages,
   createUIMessageStreamResponse,
+  generateId,
   stepCountIs,
   streamText,
   toUIMessageStream,
@@ -165,6 +166,7 @@ export async function POST(req: Request) {
     stream: toUIMessageStream({
       stream: result.stream,
       originalMessages: messages,
+      generateMessageId: generateId,
       messageMetadata: ({ part }) => {
         if (part.type === "finish") {
           return getOutputMetadata(messages);

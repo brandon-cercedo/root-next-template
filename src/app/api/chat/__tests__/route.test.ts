@@ -163,6 +163,7 @@ describe("POST /api/chat", () => {
       expect(streamOptions.originalMessages[0]?.metadata?.timestamp).toBe(
         "2026-09-16T12:00:00.000Z"
       );
+      expect(streamOptions.generateMessageId()).toMatch(/.+/);
       expect(
         streamOptions.messageMetadata({ part: { type: "start" } })
       ).toBeUndefined();
