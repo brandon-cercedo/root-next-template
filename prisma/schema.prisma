@@ -84,7 +84,9 @@ model ChatSession {
   /// [ChatUIMessageType[]]
   messages      Json              @default("[]")
   isFavourite   Boolean           @default(false)
+  isArchived    Boolean           @default(false)
   lastMessageAt DateTime          @default(now())
+  archivedAt    DateTime?
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
 
