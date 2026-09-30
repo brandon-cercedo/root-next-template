@@ -35,6 +35,7 @@ answers and **UI keyboard commands** via tools:
 | Client keyboard tool             | UI commands must run in the browser via `useKeyboard`       |
 | `commandsByIdRef`                | Long-lived keyboard Map for off-screen streaming chats      |
 | `ChatInstancesProvider`          | Keep `Chat` instances across route changes (keep streams)   |
+| `beforeunload` guard             | Tab close/reload aborts streams; warn while a chat works    |
 | Client-sent `keyboardCommandIds` | Tool enum = registry ids with `run`; server allowlists them |
 | Server message metadata          | Assistant `timestamp` / `durationMs` stamped in the API     |
 | Client user timestamp            | User `timestamp` stamped on send for immediate UI           |
@@ -105,6 +106,11 @@ Some relevant details:
 - **`useAgent`:** creates `Chat` instance; sends the pre-composed user
   message (metadata `timestamp`); skips dynamic tools; sends `keyboardCommandIds`
   and `chatId`; runs `runKeyboardCommand` via `commandsByIdRef`.
+- **Streams across pages:** `ChatInstancesProvider` keeps each `Chat` by id; so
+  moving between `/dashboard` pages doesn't stop a response; reopening the chat
+  reuses the live instance.
+- **Leave-site prompt:** shown while any chat is `submitted` or `streaming` by
+  the `beforeunload` listener in `ChatInstancesProvider`.
 - **Agent loop:** `stopWhen: stepCountIs(5)`, `maxRetries: 2`,
   `temperature: 0.2`, `repairToolCall` (re-ask; no `Output.object`).
 - **Input:** Enter sends; Shift+Enter inserts a newline.
