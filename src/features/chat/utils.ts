@@ -1,9 +1,26 @@
+import { generateId, type UIMessage } from "ai";
 import { truncate } from "lodash";
 
 import { TITLE_MAX_LENGTH } from "@/features/chat/schema/chat";
 
 import type { ChatUIMessage } from "@/types/chat";
-import type { UIMessage } from "ai";
+
+export function composeUserMessage(text: string) {
+  const timestamp = new Date().toISOString();
+  const message: ChatUIMessage = {
+    id: generateId(),
+    role: "user",
+    parts: [{ type: "text", text }],
+    metadata: { timestamp },
+  };
+  return message;
+}
+
+export function getLastMessageAt(messages: ChatUIMessage[]) {
+  const message = messages.at(-1);
+  const timestamp = message?.metadata?.timestamp;
+  return timestamp ? new Date(timestamp) : new Date();
+}
 
 export function getMessageText(message: UIMessage) {
   return message.parts

@@ -7,9 +7,12 @@ import { v7 as uuidv7 } from "uuid";
 
 import Alert from "@/components/ui/Alert";
 import ScrollableContainer from "@/components/ui/ScrollableContainer";
-import { handleCreateChatSession } from "@/features/chat/actions";
+import {
+  handleCreateChatSession,
+  handleUpdateChatMessage,
+} from "@/features/chat/actions";
 import { useAgent } from "@/features/chat/hooks/use-agent";
-import { getChatTitle } from "@/features/chat/utils";
+import { composeUserMessage, getChatTitle } from "@/features/chat/utils";
 import GreetingMessage from "@/features/home/components/GreetingMessage";
 import { useFlag } from "@/hooks/use-flag";
 import { paths } from "@/lib/config/paths";
@@ -37,7 +40,7 @@ export default function ChatSection({
   const { values } = useFlag();
   const [id, setId] = useState(() => chatId ?? uuidv7());
   const [isCreated, setIsCreated] = useState(() => Boolean(chatId));
-  const [createError, setCreateError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -63,7 +66,7 @@ export default function ChatSection({
     initialMessages: chat?.messages,
   });
   const isNew = !isCreated;
-  const error = createError ?? agentError?.message;
+  const error = saveError ?? agentError?.message;
 
   if (isClientDebug) {
     console.log("🌵 [ChatSection]", {
@@ -76,35 +79,50 @@ export default function ChatSection({
   }
 
   async function handleSend(text: string) {
-    setCreateError(null);
+    const message = composeUserMessage(text);
+    const save = async () => {
+      if (isCreated) {
+        return handleUpdateChatMessage({
+          id,
+          status: "submitted",
+          messages: [...messages, message],
+        });
+      }
 
-    if (isCreated) {
-      void sendMessage({ text });
-      return;
-    }
+      return handleCreateChatSession({
+        id,
+        title: getChatTitle(text),
+        message,
+      });
+    };
 
+    setSaveError(null);
     setIsLoading(true);
     try {
-      const result = await handleCreateChatSession({
-        id: id,
-        title: getChatTitle(text),
-        text,
-      });
+      const result = await save();
       if (!result.success) {
         throw new Error(result.message);
       }
     } catch (error) {
       if (isClientDebug) {
-        console.error("🌵 [ChatSection] handleCreateChatSession error", error);
+        console.error("🌵 [ChatSection] save error", {
+          error,
+          isCreated,
+        });
       }
-      setCreateError("Failed to save chat. Please try again.");
-      throw new Error("Failed to create chat session");
+      setSaveError("Failed to save chat. Please try again.");
+      throw new Error("Failed to save chat message");
     } finally {
       setIsLoading(false);
     }
 
+    if (isCreated) {
+      void sendMessage(message);
+      return;
+    }
+
     setIsCreated(true);
-    await sendMessage({ text });
+    await sendMessage(message);
     router.push(paths.dashboard.chat(id));
   }
 

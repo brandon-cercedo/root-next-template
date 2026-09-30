@@ -3,6 +3,7 @@ import {
   consumeStream,
   convertToModelMessages,
   createUIMessageStreamResponse,
+  generateId,
   stepCountIs,
   streamText,
   toUIMessageStream,
@@ -15,6 +16,7 @@ import { CHAT_MODEL, CHAT_SYSTEM_PROMPT } from "@/features/chat/config";
 import { ChatRequestSchema } from "@/features/chat/schema/chat";
 import { createChatTools } from "@/features/chat/services/tools/create-chat-tools";
 import { createRepairToolCall } from "@/features/chat/services/tools/create-repair-tool-call";
+import { getLastMessageAt } from "@/features/chat/utils";
 import { paths } from "@/lib/config/paths";
 import { serverDebugFlag } from "@/lib/flags";
 import { Prisma } from "@/prisma/types/generated/browser";
@@ -22,7 +24,7 @@ import { getChatSession, updateChatSession } from "@/services/chat-session";
 
 import type { ChatUIMessage } from "@/types/chat";
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 function getUpdateData({
   messages,
@@ -39,6 +41,7 @@ function getUpdateData({
     messages,
     status: "ready",
     error: null,
+    lastMessageAt: getLastMessageAt(messages),
   };
 
   if (isAborted) {
@@ -134,7 +137,6 @@ export async function POST(req: Request) {
           userId,
           data: { status: "streaming" },
         });
-        revalidatePath(paths.dashboard.chat(chatId));
       } catch (error) {
         console.error(
           `[POST /api/chat] failed to mark streaming for chatId: ${chatId}`,
@@ -164,6 +166,7 @@ export async function POST(req: Request) {
     stream: toUIMessageStream({
       stream: result.stream,
       originalMessages: messages,
+      generateMessageId: generateId,
       messageMetadata: ({ part }) => {
         if (part.type === "finish") {
           return getOutputMetadata(messages);
@@ -179,7 +182,7 @@ export async function POST(req: Request) {
           });
 
           await updateChatSession({ id: chatId, userId, data });
-          revalidatePath(paths.dashboard.chat(chatId));
+          revalidatePath(paths.dashboard.home(), "layout");
         } catch (error) {
           console.error(
             `[POST /api/chat] failed to update chatId: ${chatId}`,

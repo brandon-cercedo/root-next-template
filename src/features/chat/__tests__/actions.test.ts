@@ -6,6 +6,8 @@ import {
   fakeUserComplete,
 } from "@/prisma/utils/fake-data";
 
+import type { ChatUIMessage } from "@/types/chat";
+
 const mockGetUser = vi.fn();
 const mockCreateChatSession = vi.fn();
 const mockUpdateChatSession = vi.fn();
@@ -17,6 +19,7 @@ vi.mock("next/cache", () => ({
 
 vi.mock("@/actions/db/user", () => ({
   getUser: () => mockGetUser(),
+  getUserId: vi.fn(),
 }));
 
 vi.mock("@/services/chat-session", () => ({
@@ -29,13 +32,19 @@ const mockRevalidatePath = vi.mocked(revalidatePath);
 
 describe("handleCreateChatSession", () => {
   const chatId = "01a0cacd-a092-706e-b0e8-63e89f857148";
+  const message: ChatUIMessage = {
+    id: "msg-1",
+    role: "user",
+    parts: [{ type: "text", text: "Hello" }],
+    metadata: { timestamp: "2026-09-16T12:00:00.000Z" },
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
     vi.resetModules();
   });
 
-  it("should create and return success", async () => {
+  it("should create as submitted with the message", async () => {
     const user = fakeUserComplete();
     const session = {
       ...fakeChatSessionComplete(),
@@ -45,37 +54,24 @@ describe("handleCreateChatSession", () => {
     mockGetUser.mockResolvedValue(user);
     mockCreateChatSession.mockResolvedValue(session);
 
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-09-16T12:00:00.000Z"));
+    const { handleCreateChatSession } =
+      await import("@/features/chat/actions");
+    const result = await handleCreateChatSession({
+      id: chatId,
+      title: "Hello",
+      message,
+    });
 
-    try {
-      const { handleCreateChatSession } =
-        await import("@/features/chat/actions");
-      const result = await handleCreateChatSession({
-        id: chatId,
-        title: "Hello",
-        text: "Hello",
-      });
-
-      expect(result).toEqual({ success: true, id: chatId });
-      expect(mockCreateChatSession).toHaveBeenCalledWith({
-        id: chatId,
-        title: "Hello",
-        userId: user.id,
-        status: "ready",
-        messages: [
-          {
-            id: expect.any(String),
-            role: "user",
-            parts: [{ type: "text", text: "Hello" }],
-            metadata: { timestamp: "2026-09-16T12:00:00.000Z" },
-          },
-        ],
-      });
-      expect(mockRevalidatePath).toHaveBeenCalled();
-    } finally {
-      vi.useRealTimers();
-    }
+    expect(result).toEqual({ success: true, id: chatId });
+    expect(mockCreateChatSession).toHaveBeenCalledWith({
+      id: chatId,
+      title: "Hello",
+      userId: user.id,
+      status: "submitted",
+      messages: [message],
+      lastMessageAt: new Date("2026-09-16T12:00:00.000Z"),
+    });
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard", "layout");
   });
 
   it("should return failure when unauthenticated", async () => {
@@ -86,7 +82,7 @@ describe("handleCreateChatSession", () => {
     const result = await handleCreateChatSession({
       id: chatId,
       title: "Hello",
-      text: "Hello",
+      message,
     });
 
     expect(result).toEqual({
@@ -105,7 +101,7 @@ describe("handleCreateChatSession", () => {
     const result = await handleCreateChatSession({
       id: chatId,
       title: "Hello",
-      text: "Hello",
+      message,
     });
 
     expect(result).toEqual({

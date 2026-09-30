@@ -9,8 +9,8 @@ Streaming chat on `/dashboard/chats` (and `/dashboard/chats/[id]`) for
 answers and **UI keyboard commands** via tools:
 
 - OpenAI via `@ai-sdk/openai` and the Vercel AI SDK (no AI Gateway).
-- Sessions persist in `ChatSession` (create on first send; update on
-  stream end).
+- Sessions persist in `ChatSession` (save the user message before each
+  send; update on stream end).
 
 ### Defaults
 
@@ -50,16 +50,22 @@ Chat mounts from routes `/dashboard/chats` and `/dashboard/chats/[id]` →
 ```mermaid
 flowchart TD
   NewChat["/dashboard/chats"] --> FirstSend["First send"]
-  FirstSend --> Create["createChatSession title + user message"]
-  Create --> Stream["sendMessage POST /api/chat"]
-  Stream --> Push["router.push /dashboard/chats/id"]
-  Push --> Reuse["ChatInstancesProvider reuses Chat"]
-  Existing["/dashboard/chats/id"] --> Load["getChatSession seed if no live Chat"]
-  Load --> Later["Later sendMessage"]
-  Reuse --> OnStart["streamText onStart → status streaming"]
-  Later --> OnStart
+  Existing["/dashboard/chats/id"] --> Load["getChatSession"]
+  Load --> Seed["useAgent seeds initialMessages if no live Chat"]
+  Seed --> LaterSend["Later send"]
+  FirstSend --> Compose["composeUserMessage id + timestamp"]
+  LaterSend --> Compose
+  Compose -->|first send| Create["handleCreateChatSession status submitted"]
+  Compose -->|later send| Update["handleUpdateChatMessage status submitted + all messages"]
+  Create --> Send["await sendMessage(message) POST /api/chat"]
+  Update --> Send
+  Send --> OnStart["streamText onStart → status streaming"]
   OnStart --> OnEnd["toUIMessageStream onEnd"]
-  OnEnd --> Persist["updateChatSession messages + terminal status"]
+  OnEnd --> Persist["updateChatSession messages + status"]
+  Persist --> Refresh["useAgent onFinish → router.refresh"]
+  Refresh -->|first send| Push["router.push /dashboard/chats/id"]
+  Push --> Reuse["ChatInstancesProvider reuses live Chat"]
+  Reuse --> LaterSend
 ```
 
 - Chat lifecycle
@@ -72,14 +78,16 @@ flowchart TD
   Provider --> UseChat["useChat chat instance"]
   UseChat --> Transport["DefaultChatTransport /api/chat"]
   Transport --> Route["POST /api/chat"]
-  Route --> Auth["getUser"]
+  Route --> Auth["getUserId"]
   Auth -->|401| Unauthorized
   Auth --> Parse["ChatRequestSchema"]
   Parse -->|400| Invalid
-  Parse --> Stream["streamText + createChatTools"]
+  Parse --> Owner["getChatSession"]
+  Owner -->|404| NotFound
+  Owner --> Stream["streamText + createChatTools"]
   Stream -->|server execute| GetUser["getCurrentUser Prisma"]
   Stream -->|no execute| KbSchema["runKeyboardCommand schema"]
-  Stream --> UI["toUIMessageStreamResponse"]
+  Stream --> UI["createUIMessageStreamResponse"]
   UI --> UseChat
   UseChat -->|onToolCall| KbRun["commandsByIdRef.run"]
   KbRun -->|addToolOutput| UseChat
@@ -93,11 +101,11 @@ Some relevant details:
   session.
 - **Errors:** Request parse failures and stream errors are logged;
   soft danger `Alert` shows the client error message. Tool failures use
- `addToolOutput({ state: "output-error", errorText })`. `ChatSession.status` is
- updated to `error` or `aborted` on `streamText.onEnd`.
-- **`useAgent`:** creates `Chat` instance; stamps user `timestamp` on send;
-  skips dynamic tools; sends `keyboardCommandIds` and `chatId`; runs
-  `runKeyboardCommand` via `commandsByIdRef`.
+  `addToolOutput({ state: "output-error", errorText })`. `ChatSession.status`
+  is updated to `error` or `aborted` in `toUIMessageStream.onEnd`.
+- **`useAgent`:** creates `Chat` instance; sends the pre-composed user
+  message (metadata `timestamp`); skips dynamic tools; sends `keyboardCommandIds`
+  and `chatId`; runs `runKeyboardCommand` via `commandsByIdRef`.
 - **Streams across pages:** `ChatInstancesProvider` keeps each `Chat` by id; so
   moving between `/dashboard` pages doesn't stop a response; reopening the chat
   reuses the live instance.
@@ -115,6 +123,8 @@ Some relevant details:
   `whitespace-pre-wrap`.
 - **Env:** `OPENAI_API_KEY` in `envs.ts` / `.env.example`;
   required at runtime to chat (SDK reads it by default).
+- **`lastMessageAt`:** Timestamp of the last persisted message: user
+  message on send, then reply in `onEnd`.
 
 ### Server tool (`getCurrentUser`)
 
@@ -145,8 +155,8 @@ flowchart TD
    `useAgent.sendMessage`
 2. **POST /api/chat** (Client) — `DefaultChatTransport` sends UI
    messages
-3. **Auth + request parse** (Server) — `getUser()` then
-   `ChatRequestSchema`; 401 / 400 on failure
+3. **Auth + request parse** (Server) — `getUserId()`, then
+   `ChatRequestSchema`, then `getChatSession`; 401 / 400 / 404 on failure
 4. **createChatTools({ userId })** (Server) — Session `userId`
    closed over — never taken from tool args
 5. **streamText + tools** (Model) — Model may emit a
@@ -158,7 +168,7 @@ flowchart TD
 8. **Tool result returns to the model** (Model) — Same
    `streamText` loop; `stopWhen: stepCountIs(5)`
 9. **Assistant text streams back** (Client) —
-   `toUIMessageStreamResponse` → `ChatMessages`
+   `createUIMessageStreamResponse` → `ChatMessages`
 
 ### Client tool (`runKeyboardCommand`)
 
@@ -193,8 +203,8 @@ flowchart TD
    mode” via `useAgent`
 2. **POST /api/chat** (Client) — `DefaultChatTransport` sends UI
    messages
-3. **Auth + request parse** (Server) — `getUser()` then
-   `ChatRequestSchema`
+3. **Auth + request parse** (Server) — `getUserId()`, then
+   `ChatRequestSchema`, then `getChatSession`
 4. **createChatTools registers schema only** (Server) —
    `runKeyboardCommand` has `inputSchema`, no `execute`
 5. **Model produces tool call** (Model) — Args: `{ commandId }`
@@ -202,7 +212,7 @@ flowchart TD
 6. **Validate tool-call input** (Server) — dynamic
    `inputSchema` checks `commandId`
 7. **Stream tool call to client (no execute)** (Server) —
-   `toUIMessageStreamResponse` carries the pending tool call
+   `createUIMessageStreamResponse` carries the pending tool call
 8. **useAgent onToolCall** (Client) — Skip dynamic tools; handle
    `runKeyboardCommand` only
 9. **commandsById.get(commandId).run()** (Client) — Browser UI
