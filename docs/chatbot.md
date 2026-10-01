@@ -84,6 +84,7 @@ flowchart TD
   Parse -->|400| Invalid
   Parse --> Owner["getChatSession"]
   Owner -->|404| NotFound
+  Owner -->|403| Archived
   Owner --> Stream["streamText + createChatTools"]
   Stream -->|server execute| GetUser["getCurrentUser Prisma"]
   Stream -->|no execute| KbSchema["runKeyboardCommand schema"]
@@ -125,6 +126,11 @@ Some relevant details:
   required at runtime to chat (SDK reads it by default).
 - **`lastMessageAt`:** Timestamp of the last persisted message: user
   message on send, then reply in `onEnd`.
+- **Archive:** Archived chats (`isArchived` + `archivedAt`) are
+  read-only: the input is disabled and `POST /api/chat` returns `403`. Page
+  shows `ChatArchivedBanner` and sidebar only shows the Archived dropdown.
+- **Delete:** Deleting one chat or all archived chats asks for
+  confirmation via `useConfirmationModal` (shared `ConfirmationModal`);
 
 ### Server tool (`getCurrentUser`)
 
@@ -156,7 +162,8 @@ flowchart TD
 2. **POST /api/chat** (Client) — `DefaultChatTransport` sends UI
    messages
 3. **Auth + request parse** (Server) — `getUserId()`, then
-   `ChatRequestSchema`, then `getChatSession`; 401 / 400 / 404 on failure
+   `ChatRequestSchema`, then `getChatSession`; 401 / 400 / 404 on
+   failure, 403 when the chat is archived
 4. **createChatTools({ userId })** (Server) — Session `userId`
    closed over — never taken from tool args
 5. **streamText + tools** (Model) — Model may emit a

@@ -1,9 +1,13 @@
 "use client";
 
 import { LucideTrash2 } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Fragment } from "react/jsx-runtime";
+import { toast } from "sonner";
 
-import { OverlayAction } from "@/components/constants";
-import { useChatSession } from "@/features/chat/components/ChatSessionProvider";
+import { handleDeleteChatSession } from "@/features/chat/actions";
+import { useConfirmationModal } from "@/hooks/use-confirmation-modal";
+import { paths } from "@/lib/config/paths";
 import { mergeClsx } from "@/lib/utils/styles";
 import { ChatSession } from "@/prisma/types/generated/browser";
 
@@ -18,10 +22,36 @@ export default function ChatDeleteButton({
   className,
   label,
 }: ChatDeleteButtonProps) {
-  const { setChat } = useChatSession();
+  const router = useRouter();
+  const pathname = usePathname();
+  const { openConfirmation } = useConfirmationModal();
+
+  const handleDelete = async () => {
+    const result = await handleDeleteChatSession({ id: chat.id });
+    if (!result.success) {
+      toast.error("Failed to delete chat", {
+        description: "Please refresh the page and try again.",
+      });
+      return;
+    }
+
+    toast("Chat deleted permanently");
+    if (pathname === paths.dashboard.chat(chat.id)) {
+      router.push(paths.dashboard.chats());
+    }
+  };
 
   const handleClick = () => {
-    setChat(chat, OverlayAction.DELETE);
+    void openConfirmation({
+      title: "Delete this chat?",
+      message: (
+        <Fragment>
+          This will permanently delete <strong>{chat.title}</strong>. You
+          can&apos;t undo this.
+        </Fragment>
+      ),
+      confirmButton: { label: "Delete chat", handler: handleDelete },
+    });
   };
 
   return (

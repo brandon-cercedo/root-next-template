@@ -35,6 +35,7 @@ export default function ChatSection({
   className,
 }: ChatSectionProps) {
   const chatId = chat?.id;
+  const isArchived = Boolean(chat?.isArchived);
 
   const router = useRouter();
   const { values } = useFlag();
@@ -53,8 +54,6 @@ export default function ChatSection({
     setIsCreated(true);
   }, [chatId]);
 
-  const isClientDebug = Boolean(values?.["client-debug"]);
-
   const {
     messages,
     sendMessage,
@@ -68,6 +67,7 @@ export default function ChatSection({
   const isNew = !isCreated;
   const error = saveError ?? agentError?.message;
 
+  const isClientDebug = Boolean(values?.["client-debug"]);
   if (isClientDebug) {
     console.log("🌵 [ChatSection]", {
       id,
@@ -164,7 +164,7 @@ export default function ChatSection({
         >
           <ChatInput
             status={status}
-            disabled={isLoading}
+            disabled={isLoading || isArchived}
             onSend={handleSend}
             onStop={stop}
           />

@@ -3,6 +3,7 @@ import { truncate } from "lodash";
 
 import { TITLE_MAX_LENGTH } from "@/features/chat/schema/chat";
 
+import type { ChatSession } from "@/prisma/types/generated/browser";
 import type { ChatUIMessage } from "@/types/chat";
 
 export function composeUserMessage(text: string) {
@@ -77,4 +78,8 @@ export function getChatStats(chat: { messages: ChatUIMessage[] }) {
   };
 
   return stats;
+}
+
+export function filterArchivedChatSessions(chats: ChatSession[]) {
+  return chats.filter((chat) => !chat.isArchived);
 }

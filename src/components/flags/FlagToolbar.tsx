@@ -26,7 +26,7 @@ export default function FlagToolbar({ user }: { user: User }) {
         id={DROPDOWN_IDS.FLAG_TOOLBAR}
         content={<FlagToolbarContent values={values} overrides={overrides} />}
         containerClassName="w-full"
-        className="w-sm max-w-sm"
+        className="w-xs max-w-xs sm:w-sm sm:max-w-sm"
         placement="right"
         autoClose="inside"
         isKeyActionsEnabled={false}

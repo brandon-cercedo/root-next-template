@@ -77,10 +77,6 @@ describe("POST /api/chat", () => {
     mockUpdateChatSession.mockResolvedValue(undefined);
     mockCreateChatTools.mockReturnValue({ toolsFor: "user-1" });
     mockCreateRepairToolCall.mockReturnValue(vi.fn());
-    mockStepCountIs.mockImplementation((count: number) => ({
-      type: "step",
-      count,
-    }));
     mockStreamText.mockReturnValue({ stream: "mock-stream" });
     mockToUIMessageStream.mockReturnValue("mock-ui-stream");
     mockCreateUIMessageStreamResponse.mockReturnValue(new Response("ok"));
@@ -127,6 +123,13 @@ describe("POST /api/chat", () => {
       id: validBody.chatId,
       userId: "user-1",
     });
+    expect(mockStreamText).not.toHaveBeenCalled();
+  });
+
+  it("should return 403 when chat is archived", async () => {
+    mockGetChatSession.mockResolvedValue({ isArchived: true });
+    const response = await post();
+    expect(response.status).toBe(403);
     expect(mockStreamText).not.toHaveBeenCalled();
   });
 
