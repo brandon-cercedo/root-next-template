@@ -1,6 +1,6 @@
 "use client";
 
-import { LucideSearch, LucideSearchX } from "lucide-react";
+import { LucideSearchX } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Fragment } from "react/jsx-runtime";
 
@@ -11,6 +11,7 @@ import {
   getShortcutKeys,
   ShortcutCommand,
 } from "@/components/keyboard/config";
+import SearchInput from "@/components/ui/forms/SearchInput";
 import MessageWithImage from "@/components/ui/MessageWithImage";
 import Offcanvas from "@/components/ui/modal/Offcanvas";
 import { useKeyboard } from "@/hooks/use-keyboard";
@@ -78,19 +79,12 @@ function Content({ commands }: ContentProps) {
       </div>
       <div className="flex flex-col space-y-0.5 p-1">
         <div className="px-2 py-1">
-          <div className="relative">
-            <input
-              ref={inputRef}
-              type="text"
-              className="block w-full rounded-lg border-gray-200 px-3 py-1.5 ps-9.5 text-[13px] leading-5 focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:pointer-events-none disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-              placeholder="Search shortcuts..."
-              value={searchText}
-              onChange={(event) => setSearchText(event.target.value)}
-            />
-            <div className="pointer-events-none absolute inset-y-0 inset-s-0 z-20 flex items-center ps-3">
-              <LucideSearch className="size-3.5 flex-none text-gray-400 dark:text-neutral-600" />
-            </div>
-          </div>
+          <SearchInput
+            ref={inputRef}
+            placeholder="Search shortcuts..."
+            value={searchText}
+            onChange={(event) => setSearchText(event.target.value)}
+          />
         </div>
         <div className="size-full scrollbar-thin overflow-y-auto overscroll-contain">
           {filteredCommands.length === 0 && searchText.trim() && (

@@ -103,6 +103,11 @@ export async function POST(req: Request) {
     return new Response("Not Found", { status: 404 });
   }
 
+  if (chat.isArchived) {
+    console.error(`[POST /api/chat] Chat is archived for chatId: ${chatId}`);
+    return new Response("Chat is archived", { status: 403 });
+  }
+
   const isDebug = await serverDebugFlag();
   if (isDebug) {
     console.log(

@@ -3,6 +3,7 @@ export const OVERLAY_IDS = {
   COMMAND_PALETTE: "hs-overlay-command-palette",
   KEYBOARD_HELP: "hs-overlay-keyboard-help",
   CHAT_DELETE: "hs-overlay-delete-chat",
+  CONFIRMATION: "hs-overlay-confirmation",
 };
 
 export enum OverlayAction {

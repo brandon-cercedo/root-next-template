@@ -40,14 +40,21 @@ Merge order: P0 → P1. After P0 lands on `main`, retarget P1's PR to
 
 ### P1
 
-- [ ] `filterArchivedChatSessions` shared helper
-- [ ] `toggleArchivedChatSession` action; 409 in `POST /api/chat`
-- [ ] `ChatArchiveButton`; replace Delete with Archive in the config
-      dropdown
-- [ ] `ChatArchivedDropdown` + conditional Archived sidebar item
-- [ ] Filter archived chats out of Favorites and Chats sections
-- [ ] `ChatArchivedBanner`; read-only chat view when archived
-- [ ] Helper, action and API tests; `pnpm test:all`
+- [x] `filterArchivedChatSessions` chat feature helper
+- [x] `toggleArchivedChatSession` action; 403 in `POST /api/chat`
+- [x] `ChatArchiveButton` + `ChatRestoreButton`; replace Delete with
+      Archive in the config dropdown
+- [x] `ChatArchivedDropdown` + conditional Archived sidebar item
+- [x] Filter archived chats out of Favorites and Chats sections
+- [x] `ChatArchivedBanner`; read-only chat view when archived
+- [x] "Delete all" in `ChatArchivedDropdown`: `ChatDeleteAllButton`;
+      `handleDeleteAllChatSessions` action + `deleteAllChatSessions`
+      service (`deleteMany`)
+- [x] Shared `ConfirmationModalProvider` + `useConfirmationModal` +
+      `ConfirmationModal`; `ChatDeleteButton` and `ChatDeleteAllButton`
+      confirm through it (replaces `ChatDeleteModal`;
+      `ChatSessionProvider` and `OverlayAction` kept for now)
+- [x] Helper, action, service, hook and API tests; `pnpm test:all`
 
 ---
 
@@ -77,21 +84,23 @@ flowchart LR
   SidebarConfig -->|"all chats"| ArchivedDropdown["ChatArchivedDropdown: filters isArchived"]
   ConfigDropdown["ChatConfigDropdown: Archive"] --> ToggleAction["toggleArchivedChatSession"]
   ArchivedDropdown -->|Unarchive| ToggleAction
-  ArchivedDropdown -->|Delete| DeleteModal["ChatDeleteModal (existing)"]
+  ArchivedDropdown -->|Delete| Confirm["useConfirmationModal: ConfirmationModal"]
+  ArchivedDropdown -->|Delete all| Confirm
   Banner["ChatArchivedBanner"] --> ToggleAction
-  Banner --> DeleteModal
+  Banner -->|Delete| Confirm
+  Confirm -->|Delete| DeleteAction["handleDeleteChatSession"]
+  Confirm -->|Delete all| DeleteAllAction["handleDeleteAllChatSessions"]
   ToggleAction --> Revalidate["updateChatSession + revalidatePath layout"]
+  DeleteAction --> Revalidate
+  DeleteAllAction --> Revalidate
   Revalidate --> FullUser
 ```
 
-### Shared helper
+### Helper
 
-`src/lib/utils/db/chat-session.ts` (next to `src/lib/utils/db/user.ts`,
-so both app and features can import it):
+In `src/features/chat/utils.ts`, next to the other chat helpers:
 
 ```ts
-import { ChatSession } from "@/prisma/types/client";
-
 export function filterArchivedChatSessions(chats: ChatSession[]) {
   return chats.filter((chat) => !chat.isArchived);
 }
@@ -99,9 +108,10 @@ export function filterArchivedChatSessions(chats: ChatSession[]) {
 
 ### Mutations
 
-| Action                                          | Behavior                                                        |
-| ----------------------------------------------- | --------------------------------------------------------------- |
-| `toggleArchivedChatSession({ id, isArchived })` | Owner-only; sets `isArchived` + `archivedAt`; revalidate layout |
+| Action                                          | Behavior                                                                      |
+| ----------------------------------------------- | ----------------------------------------------------------------------------- |
+| `toggleArchivedChatSession({ id, isArchived })` | Owner-only; sets `isArchived` + `archivedAt`; revalidate layout               |
+| `handleDeleteAllChatSessions()`                 | Owner-only; `deleteAllChatSessions(userId)` (`deleteMany` where `isArchived`) |
 
 Mirrors `toggleFavoriteChatSession` and spentor `toggleTrashedPage`:
 
@@ -119,17 +129,16 @@ revalidatePath(paths.dashboard.home(), "layout");
 
 ### API guard
 
-In `src/app/api/chat/route.ts`, return `409 Conflict` after the chat
+In `src/app/api/chat/route.ts`, return `403 Forbidden` after the chat
 lookup when `chat.isArchived`. The disabled input alone is not enough.
 
 ### UI (`src/features/chat/components`)
 
 - **`buttons/ChatArchiveButton.tsx`** (mirror `PageTrashButton`):
   `useTransition` + spinner; `label` and `className` props like
-  `ChatDeleteButton`; toggles based on `chat.isArchived`.
-  - Active: `LucideArchive`, "Archive"; toast "Chat archived" with Undo.
-  - Archived: `LucideArchiveRestore`, "Unarchive"; toast
-    "Chat unarchived".
+  `ChatDeleteButton`. `LucideArchive`; toast "Chat archived" with Undo.
+- **`buttons/ChatRestoreButton.tsx`** (mirror `PageRestoreButton`): same
+  shape. `LucideArchiveRestore`; toast "Chat unarchived".
 - **`ChatConfigDropdown.tsx`**: replace the `ChatDeleteButton` group
   with `ChatArchiveButton`. Delete is no longer in this menu.
 - **`ChatArchivedDropdown.tsx`** (mirror `DashboardTrashLink`): receives
@@ -139,7 +148,24 @@ lookup when `chat.isArchived`. The disabled input alone is not enough.
     "No matching chats"
   - one row per archived chat: link, title, `humanizeDate(archivedAt)`
     when set
-  - inline `ChatArchiveButton` (unarchive) and `ChatDeleteButton`
+  - inline `ChatRestoreButton` and `ChatDeleteButton`
+  - footer `ChatDeleteAllButton` (red, receives the archived chats;
+    disabled when empty)
+- **`buttons/ChatDeleteButton.tsx`** and
+  **`buttons/ChatDeleteAllButton.tsx`**: call `openConfirmation` from
+  `useConfirmationModal` with a title, message and a
+  `confirmButton.handler` that runs the delete action, toasts, and
+  redirects to `/dashboard/chats` when the open chat was deleted.
+- **Shared confirmation** (`src/hooks/use-confirmation-modal.tsx` +
+  `src/components/ui/modal/ConfirmationModal.tsx`):
+  `ConfirmationModalProvider` wraps the dashboard providers and
+  `ConfirmationModal` is mounted once in the dashboard layout. Options:
+  `{ title, message, closeButton?, confirmButton? }`; each button takes
+  `{ label?, handler?, className? }` (sync or async handler). The hook
+  returns `{ options, openConfirmation, handleConfirm, handleCancel }`;
+  the modal closes after the handler resolves. Replaces
+  `ChatDeleteModal`; `ChatSessionProvider` and `OverlayAction` are kept
+  for now.
 - **`ChatArchivedBanner.tsx`** (mirror `PageTrashBanner`): takes
   `{ chat, user }` because chats do not load an `owner`; `user` comes
   from `useUser()` in `ChatView`. Button classes are written inline.
@@ -153,7 +179,7 @@ export default function ChatArchivedBanner({
     return null;
   }
 
-  const ownerName = user.name || user.email;
+  const ownerName = composeUserDisplayName(user);
   const archivedAtText = chat.archivedAt
     ? humanizeDate(chat.archivedAt)
     : "recently";
@@ -169,14 +195,14 @@ export default function ChatArchivedBanner({
       <div className="flex items-center justify-center gap-4">
         <div>{archivedText}</div>
         <div className="flex items-center gap-2">
-          <ChatArchiveButton
+          <ChatRestoreButton
             chat={chat}
             label="Unarchive"
             className="size-auto border border-white px-2 py-1 text-[13px] leading-5 text-nowrap text-white hover:bg-red-600 hover:text-white focus:bg-red-600 focus:text-white dark:border-white dark:text-white dark:hover:bg-red-600 dark:hover:text-white dark:focus:bg-red-600 dark:focus:text-white"
           />
           <ChatDeleteButton
             chat={chat}
-            label="Delete from Archive"
+            label="Delete permanently"
             className="size-auto border border-white px-2 py-1 text-[13px] leading-5 text-nowrap text-white hover:bg-red-600 hover:text-white focus:bg-red-600 focus:text-white dark:border-white dark:text-white dark:hover:bg-red-600 dark:hover:text-white dark:focus:bg-red-600 dark:focus:text-white"
           />
         </div>
@@ -213,16 +239,27 @@ export default function ChatArchivedBanner({
 
 No React component tests.
 
-- `src/lib/utils/db/__tests__/chat-session.test.ts`:
+- `src/features/chat/__tests__/utils.test.ts`:
   `filterArchivedChatSessions` removes archived chats, returns `[]` when
   all are archived, and returns the list unchanged when none are.
-- `src/features/chat/__tests__/actions.test.ts`:
-  `toggleArchivedChatSession` for archive
-  (`{ isArchived: true, archivedAt: Date }`), unarchive
-  (`{ isArchived: false, archivedAt: null }`), unauthenticated, and a
-  thrown error.
-- `src/app/api/chat/__tests__`: archived chat returns 409.
-- Service, `getFullUser` and layout tests need no changes.
+- `src/features/chat/__tests__/actions.archive.test.ts`:
+  - `toggleArchivedChatSession` for archive
+    (`{ isArchived: true, archivedAt: Date }`), unarchive
+    (`{ isArchived: false, archivedAt: null }`), unauthenticated, and a
+    thrown error.
+  - `handleDeleteAllChatSessions` for success, unauthenticated, and a
+    thrown error.
+- `src/services/__tests__/chat-session.test.ts`:
+  `deleteAllChatSessions` calls `deleteMany` with
+  `{ userId, isArchived: true }`.
+- `src/hooks/__tests__/use-confirmation-modal.test.tsx`: throws outside
+  the provider; `openConfirmation` stores options and opens the overlay;
+  `handleConfirm` awaits the async handler before closing;
+  `handleCancel` runs the sync handler and closes; both close without
+  handlers.
+- `src/app/api/chat/__tests__`: archived chat returns 403.
+- Layout test: mock `ChatArchivedDropdown`; `ChatDeleteModal` mock
+  removed. `getFullUser` tests need no changes.
 - Finish with `pnpm test:all`, `pnpm type:check` and `pnpm lint`.
 
 ---
@@ -232,5 +269,6 @@ No React component tests.
 - Seed data for archived chats
 - Server-side filtering of archived chats
 - RNT-85 (command palette chat search): `user.chatSessions` still
-  includes archived chats, so the palette must apply
-  `filterArchivedChatSessions` itself
+  includes archived chats. The palette is shared code and cannot import
+  from features, so the app layer must pass it chats already filtered
+  with `filterArchivedChatSessions`

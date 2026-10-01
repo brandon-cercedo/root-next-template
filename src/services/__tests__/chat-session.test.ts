@@ -16,6 +16,7 @@ vi.mock("@/lib/prisma-client", () => ({
       findMany: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      deleteMany: vi.fn(),
     },
   },
 }));
@@ -25,6 +26,7 @@ const mockFindUnique = vi.mocked(prisma.chatSession.findUnique);
 const mockFindMany = vi.mocked(prisma.chatSession.findMany);
 const mockUpdate = vi.mocked(prisma.chatSession.update);
 const mockDelete = vi.mocked(prisma.chatSession.delete);
+const mockDeleteMany = vi.mocked(prisma.chatSession.deleteMany);
 
 describe("createChatSession", () => {
   beforeEach(() => {
@@ -158,6 +160,25 @@ describe("deleteChatSession", () => {
     expect(result).toEqual(session);
     expect(mockDelete).toHaveBeenCalledWith({
       where: { id: session.id, userId: session.userId },
+    });
+  });
+});
+
+describe("deleteAllChatSessions", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should delete only archived chats for the user", async () => {
+    const { deleteAllChatSessions } = await import("@/services/chat-session");
+    const user = fakeUserComplete();
+    mockDeleteMany.mockResolvedValue({ count: 2 });
+
+    const result = await deleteAllChatSessions(user.id);
+
+    expect(result).toEqual({ count: 2 });
+    expect(mockDeleteMany).toHaveBeenCalledWith({
+      where: { userId: user.id, isArchived: true },
     });
   });
 });

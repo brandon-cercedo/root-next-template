@@ -52,7 +52,7 @@ function CommandEmpty() {
             strokeWidth={1}
           />
         }
-        className="gap-2 px-2 py-3"
+        className="gap-2 px-2 py-6"
         titleClassName="text-[13px] leading-5 font-medium text-gray-500 dark:text-gray-400"
       />
     </Command.Empty>

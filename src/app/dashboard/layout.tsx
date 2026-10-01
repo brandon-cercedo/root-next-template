@@ -7,10 +7,11 @@ import FlagsBadge from "@/components/flags/FlagsBadge";
 import FlagToolbar from "@/components/flags/FlagToolbar";
 import CommandPalette from "@/components/keyboard/CommandPalette";
 import KeyboardHelpOffcanvas from "@/components/keyboard/KeyboardHelpOffcanvas";
-import ChatDeleteModal from "@/features/chat/components/ChatDeleteModal";
+import ConfirmationModal from "@/components/ui/modal/ConfirmationModal";
 import { ChatSessionProvider } from "@/features/chat/components/ChatSessionProvider";
 import LoginConfetti from "@/features/home/components/LoginConfetti";
 import { ChatInstancesProvider } from "@/hooks/use-chat-instances";
+import { ConfirmationModalProvider } from "@/hooks/use-confirmation-modal";
 import { FlagProvider } from "@/hooks/use-flag";
 import { KeyboardProvider } from "@/hooks/use-keyboard";
 import { UserProvider } from "@/hooks/use-user";
@@ -34,20 +35,22 @@ async function DashboardProviders({
     : [undefined, undefined];
 
   return (
-    <UserProvider user={user}>
-      <FlagProvider values={values} overrides={overrides}>
-        <KeyboardProvider>
-          <ChatInstancesProvider>
-            <ChatSessionProvider>
-              {children}
-              <CommandPalette />
-              <KeyboardHelpOffcanvas />
-              <ChatDeleteModal />
-            </ChatSessionProvider>
-          </ChatInstancesProvider>
-        </KeyboardProvider>
-      </FlagProvider>
-    </UserProvider>
+    <ConfirmationModalProvider>
+      <UserProvider user={user}>
+        <FlagProvider values={values} overrides={overrides}>
+          <KeyboardProvider>
+            <ChatInstancesProvider>
+              <ChatSessionProvider>
+                {children}
+                <CommandPalette />
+                <KeyboardHelpOffcanvas />
+                <ConfirmationModal />
+              </ChatSessionProvider>
+            </ChatInstancesProvider>
+          </KeyboardProvider>
+        </FlagProvider>
+      </UserProvider>
+    </ConfirmationModalProvider>
   );
 }
 

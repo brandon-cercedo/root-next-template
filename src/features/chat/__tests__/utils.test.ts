@@ -2,10 +2,12 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   composeUserMessage,
+  filterArchivedChatSessions,
   getChatStats,
   getChatTitle,
   getLastMessageAt,
 } from "@/features/chat/utils";
+import { fakeChatSessionComplete } from "@/prisma/utils/fake-data";
 
 import type { ChatUIMessage } from "@/types/chat";
 
@@ -75,6 +77,31 @@ describe("getLastMessageAt", () => {
 describe("getChatTitle", () => {
   it("should truncate the first line", () => {
     expect(getChatTitle("Hello world")).toBe("Hello world");
+  });
+});
+
+describe("filterArchivedChatSessions", () => {
+  function composeChat(isArchived: boolean) {
+    return { ...fakeChatSessionComplete(), isArchived };
+  }
+
+  it("should remove archived chats", () => {
+    const active = composeChat(false);
+    const archived = composeChat(true);
+
+    expect(filterArchivedChatSessions([active, archived])).toEqual([active]);
+  });
+
+  it("should return an empty list when all chats are archived", () => {
+    const chats = [composeChat(true), composeChat(true)];
+
+    expect(filterArchivedChatSessions(chats)).toEqual([]);
+  });
+
+  it("should return the list unchanged when none are archived", () => {
+    const chats = [composeChat(false), composeChat(false)];
+
+    expect(filterArchivedChatSessions(chats)).toEqual(chats);
   });
 });
 

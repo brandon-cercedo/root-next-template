@@ -5,7 +5,7 @@ import { Fragment, useEffect, useId } from "react";
 import { toast } from "sonner";
 
 import Dropdown, { DropdownPlacement } from "@/components/ui/Dropdown";
-import ChatDeleteButton from "@/features/chat/components/buttons/ChatDeleteButton";
+import ChatArchiveButton from "@/features/chat/components/buttons/ChatArchiveButton";
 import ChatFavoriteButton from "@/features/chat/components/buttons/ChatFavoriteButton";
 import { useDropdown } from "@/hooks/use-dropdown";
 import { paths } from "@/lib/config/paths";
@@ -45,10 +45,10 @@ function Content({ chat }: { chat: ChatSession }) {
         </button>
       </div>
       <div className="w-full space-y-0.5 p-1">
-        <ChatDeleteButton
+        <ChatArchiveButton
           chat={chat}
-          label="Delete"
-          className="flex size-auto w-full items-center justify-normal gap-x-3 rounded-lg px-2 py-1.5 text-[13px] leading-5 text-red-600 hover:bg-red-50 focus:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/20 dark:focus:bg-red-500/20"
+          label="Archive"
+          className="flex size-auto w-full items-center justify-normal gap-x-3 rounded-lg px-2 py-1.5 text-[13px] leading-5 text-gray-800 hover:bg-gray-100 focus:bg-gray-100 focus:outline-hidden dark:text-neutral-200 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"
         />
       </div>
     </Fragment>

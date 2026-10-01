@@ -6,6 +6,7 @@ import { getUser, getUserId } from "@/actions/db/user";
 import { paths } from "@/lib/config/paths";
 import {
   createChatSession,
+  deleteAllChatSessions,
   deleteChatSession,
   updateChatSession,
 } from "@/services/chat-session";
@@ -115,6 +116,25 @@ export async function handleDeleteChatSession({ id }: { id: string }) {
   return { success: true };
 }
 
+export async function handleDeleteAllChatSessions() {
+  const user = await getUser();
+  if (!user) {
+    console.error("[handleDeleteAllChatSessions] User not authenticated");
+    return { success: false, message: "Unauthorized" };
+  }
+
+  try {
+    await deleteAllChatSessions(user.id);
+  } catch (error) {
+    console.error("[handleDeleteAllChatSessions] Failed", error);
+    return { success: false, message: "Failed to delete archived chats" };
+  }
+
+  revalidatePath(paths.dashboard.home(), "layout");
+
+  return { success: true };
+}
+
 export async function toggleFavoriteChatSession({
   id,
   isFavourite,
@@ -137,6 +157,38 @@ export async function toggleFavoriteChatSession({
   } catch (error) {
     console.error("[toggleFavoriteChatSession] Failed to update", error);
     return { success: false, message: "Failed to update favorite" };
+  }
+
+  revalidatePath(paths.dashboard.home(), "layout");
+
+  return { success: true };
+}
+
+export async function toggleArchivedChatSession({
+  id,
+  isArchived,
+}: {
+  id: string;
+  isArchived: boolean;
+}) {
+  const user = await getUser();
+  if (!user) {
+    console.error("[toggleArchivedChatSession] User not authenticated");
+    return { success: false, message: "Unauthorized" };
+  }
+
+  try {
+    await updateChatSession({
+      id,
+      userId: user.id,
+      data: {
+        isArchived,
+        archivedAt: isArchived ? new Date() : null,
+      },
+    });
+  } catch (error) {
+    console.error("[toggleArchivedChatSession] Failed to update", error);
+    return { success: false, message: "Failed to update archive" };
   }
 
   revalidatePath(paths.dashboard.home(), "layout");

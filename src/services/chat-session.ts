@@ -54,3 +54,9 @@ export async function deleteChatSession({
     where: { id, userId },
   });
 }
+
+export async function deleteAllChatSessions(userId: string) {
+  return prisma.chatSession.deleteMany({
+    where: { userId, isArchived: true },
+  });
+}
