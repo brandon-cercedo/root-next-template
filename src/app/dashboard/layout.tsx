@@ -8,7 +8,8 @@ import FlagToolbar from "@/components/flags/FlagToolbar";
 import CommandPalette from "@/components/keyboard/CommandPalette";
 import KeyboardHelpOffcanvas from "@/components/keyboard/KeyboardHelpOffcanvas";
 import ConfirmationModal from "@/components/ui/modal/ConfirmationModal";
-import { ChatSessionProvider } from "@/features/chat/components/ChatSessionProvider";
+import ChatOffcanvas from "@/features/chat/components/ChatOffcanvas";
+import { ChatSessionProvider } from "@/features/chat/hooks/use-chat-session";
 import LoginConfetti from "@/features/home/components/LoginConfetti";
 import { ChatInstancesProvider } from "@/hooks/use-chat-instances";
 import { ConfirmationModalProvider } from "@/hooks/use-confirmation-modal";
@@ -45,6 +46,7 @@ async function DashboardProviders({
                 <CommandPalette />
                 <KeyboardHelpOffcanvas />
                 <ConfirmationModal />
+                <ChatOffcanvas />
               </ChatSessionProvider>
             </ChatInstancesProvider>
           </KeyboardProvider>
@@ -68,7 +70,7 @@ export default async function DashboardLayout({
     <DashboardProviders user={user}>
       <DashboardSidebar user={user} />
       <div className="bg-gray-100 p-3 transition-all duration-300 lg:fixed lg:inset-0 dark:bg-neutral-950 lg:hs-overlay-layout-open:ps-60">
-        <div className="relative flex h-[calc(100dvh-62px)] flex-col overflow-hidden rounded-lg border border-gray-200 bg-white text-black shadow-xs lg:h-full dark:border-neutral-700 dark:bg-neutral-900 dark:text-white">
+        <div className="relative flex h-[calc(100dvh-62px)] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white text-black shadow-xs lg:h-full dark:border-neutral-700 dark:bg-neutral-900 dark:text-white">
           <div className="flex size-full flex-1 flex-col">{children}</div>
           <FlagsBadge />
           <FlagToolbar user={user} />

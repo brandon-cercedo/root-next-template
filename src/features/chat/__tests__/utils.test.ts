@@ -75,8 +75,30 @@ describe("getLastMessageAt", () => {
 });
 
 describe("getChatTitle", () => {
-  it("should truncate the first line", () => {
-    expect(getChatTitle("Hello world")).toBe("Hello world");
+  it("should keep a short first line as is", () => {
+    expect(getChatTitle("Hello world\nSecond line")).toBe("Hello world");
+  });
+
+  it("should collapse whitespace", () => {
+    expect(getChatTitle("  Hello   world  ")).toBe("Hello world");
+  });
+
+  it("should drop a word cut by the length limit", () => {
+    expect(
+      getChatTitle(
+        "What is the recommended length for a title in a dashboard app?"
+      )
+    ).toBe("What is the recommended length for a title in a dashboard");
+  });
+
+  it("should keep the last word when it ends at the limit", () => {
+    const text = `${"a".repeat(55)} bcde fgh`;
+
+    expect(getChatTitle(text)).toBe(`${"a".repeat(55)} bcde`);
+  });
+
+  it("should hard-cut a single word longer than the limit", () => {
+    expect(getChatTitle("a".repeat(80))).toBe("a".repeat(60));
   });
 });
 

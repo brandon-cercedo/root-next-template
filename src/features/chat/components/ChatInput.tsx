@@ -34,6 +34,8 @@ function getIsExpanded(textarea: HTMLTextAreaElement, isExpanded: boolean) {
 type ChatInputProps = {
   status: ChatStatus;
   disabled?: boolean;
+  className?: string;
+  containerClassName?: string;
   onSend: (text: string) => void | Promise<void>;
   onStop: () => void;
 };
@@ -41,6 +43,8 @@ type ChatInputProps = {
 export default function ChatInput({
   status,
   disabled = false,
+  className,
+  containerClassName,
   onSend,
   onStop,
 }: ChatInputProps) {
@@ -102,7 +106,8 @@ export default function ChatInput({
         {
           "flex-col": isExpanded,
           "flex-row items-center": !isExpanded,
-        }
+        },
+        containerClassName
       )}
     >
       <TextareaAutoHeight
@@ -124,7 +129,8 @@ export default function ChatInput({
           "max-h-106 min-h-8 w-full min-w-0 resize-none border-0 bg-transparent p-2 py-1.25 text-sm text-gray-800 caret-gray-800 placeholder:text-gray-400 focus:border-transparent focus:ring-0 focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 dark:bg-transparent dark:text-neutral-200 dark:caret-neutral-200 dark:placeholder:text-neutral-500",
           {
             "flex-1": !isExpanded,
-          }
+          },
+          className
         )}
       />
 

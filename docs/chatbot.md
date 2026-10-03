@@ -11,6 +11,8 @@ answers and **UI keyboard commands** via tools:
 - OpenAI via `@ai-sdk/openai` and the Vercel AI SDK (no AI Gateway).
 - Sessions persist in `ChatSession` (save the user message before each
   send; update on stream end).
+- The same chat also opens in a right-side **chat sidebar**
+  (`ChatOffcanvas`) on any dashboard page, without blocking the page.
 
 ### Defaults
 
@@ -39,11 +41,15 @@ answers and **UI keyboard commands** via tools:
 | Client-sent `keyboardCommandIds` | Tool enum = registry ids with `run`; server allowlists them |
 | Server message metadata          | Assistant `timestamp` / `durationMs` stamped in the API     |
 | Client user timestamp            | User `timestamp` stamped on send for immediate UI           |
+| `ChatSessionProvider` `key`      | Remount the sidebar chat on switch; keep it on first create |
 
 ## Flow
 
-Chat mounts from routes `/dashboard/chats` and `/dashboard/chats/[id]` →
-`ChatView` → `ChatSection` → `useAgent` → `/api/chat`.
+Chat mounts from:
+
+1. routes `/dashboard/chats` and `/dashboard/chats/[id]` → `ChatView` →
+  `ChatSection` → `useAgent` → `/api/chat`.
+2. `ChatOffcanvas` → `ChatSection variant="sidebar"` from the dashboard layout.
 
 - ChatSession persistence
 
@@ -52,6 +58,12 @@ flowchart TD
   NewChat["/dashboard/chats"] --> FirstSend["First send"]
   Existing["/dashboard/chats/id"] --> Load["getChatSession"]
   Load --> Seed["useAgent seeds initialMessages if no live Chat"]
+  OpenChat["openChat(id?)"] --> ChatSidebar["ChatOffcanvas"]
+  ChatSidebar -.->|on chat page| Redirect["router.push /dashboard/chats"]
+  ChatSidebar -->|id| SidebarExisting["getChat from user.chatSessions"]
+  ChatSidebar -->|no id| SidebarNew["New chat"]
+  SidebarNew --> FirstSend
+  SidebarExisting --> Seed
   Seed --> LaterSend["Later send"]
   FirstSend --> Compose["composeUserMessage id + timestamp"]
   LaterSend --> Compose
@@ -63,17 +75,18 @@ flowchart TD
   OnStart --> OnEnd["toUIMessageStream onEnd"]
   OnEnd --> Persist["updateChatSession messages + status"]
   Persist --> Refresh["useAgent onFinish → router.refresh"]
-  Refresh -->|first send| Push["router.push /dashboard/chats/id"]
+  Create -->|page| Push["router.push /dashboard/chats/id"]
+  Create -->|sidebar| OnCreate["onCreate → setChatId (same key)"]
   Push --> Reuse["ChatInstancesProvider reuses live Chat"]
+  OnCreate --> Reuse
   Reuse --> LaterSend
 ```
 
-- Chat lifecycle
+- Chat lifecycle (`ChatSection`)
 
 ```mermaid
 flowchart TD
-  View["ChatView"] --> Section["ChatSection"]
-  Section --> Hook["useAgent"]
+  Section["ChatSection"] --> Hook["useAgent"]
   Hook --> Provider["ChatInstancesProvider Map"]
   Provider --> UseChat["useChat chat instance"]
   UseChat --> Transport["DefaultChatTransport /api/chat"]
@@ -126,11 +139,15 @@ Some relevant details:
   required at runtime to chat (SDK reads it by default).
 - **`lastMessageAt`:** Timestamp of the last persisted message: user
   message on send, then reply in `onEnd`.
-- **Archive:** Archived chats (`isArchived` + `archivedAt`) are
-  read-only: the input is disabled and `POST /api/chat` returns `403`. Page
-  shows `ChatArchivedBanner` and sidebar only shows the Archived dropdown.
-- **Delete:** Deleting one chat or all archived chats asks for
-  confirmation via `useConfirmationModal` (shared `ConfirmationModal`);
+- **Archive:**
+  - Archived chats (`isArchived` + `archivedAt`) are
+  read-only: the input is disabled and `POST /api/chat` returns `403`.
+  - Page shows `ChatArchivedBanner`.
+  - Sidebar only shows the Archived dropdown.
+  - Chat sidebar shows `ChatArchivedBanner variant="sidebar"`.
+- **Delete:** Deleting one chat or all archived chats asks for confirmation via
+  `useConfirmationModal` (shared `ConfirmationModal`). On delete,
+  `closeChat(id)` resets the chat sidebar.
 
 ### Server tool (`getCurrentUser`)
 

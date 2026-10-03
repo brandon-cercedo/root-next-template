@@ -31,6 +31,7 @@ export default function ConfirmationModal() {
     <Modal
       id={OVERLAY_IDS.CONFIRMATION}
       className="gap-4 p-4"
+      overlayOptions={{ isClosePrev: false }}
       isVerticallyCentered={true}
       showCloseButton={true}
     >

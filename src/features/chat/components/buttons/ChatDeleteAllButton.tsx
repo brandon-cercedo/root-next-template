@@ -6,6 +6,7 @@ import { Fragment } from "react/jsx-runtime";
 import { toast } from "sonner";
 
 import { handleDeleteAllChatSessions } from "@/features/chat/actions";
+import { useChatSession } from "@/features/chat/hooks/use-chat-session";
 import { useConfirmationModal } from "@/hooks/use-confirmation-modal";
 import { paths } from "@/lib/config/paths";
 import { mergeClsx } from "@/lib/utils/styles";
@@ -23,6 +24,7 @@ export default function ChatDeleteAllButton({
   const router = useRouter();
   const pathname = usePathname();
   const { openConfirmation } = useConfirmationModal();
+  const { chatId, closeChat } = useChatSession();
 
   const label = pluralize("chat", chats.length);
 
@@ -36,10 +38,16 @@ export default function ChatDeleteAllButton({
     }
 
     toast("All archived chats deleted permanently");
-    const isPageOpened = chats.some(
+
+    const offcanvasChat = chats.find((chat) => chat.id === chatId);
+    if (offcanvasChat) {
+      closeChat(offcanvasChat.id);
+    }
+
+    const isChatPage = chats.some(
       (chat) => pathname === paths.dashboard.chat(chat.id)
     );
-    if (isPageOpened) {
+    if (isChatPage) {
       router.push(paths.dashboard.chats());
     }
   };

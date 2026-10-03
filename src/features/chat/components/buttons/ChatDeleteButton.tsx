@@ -6,6 +6,7 @@ import { Fragment } from "react/jsx-runtime";
 import { toast } from "sonner";
 
 import { handleDeleteChatSession } from "@/features/chat/actions";
+import { useChatSession } from "@/features/chat/hooks/use-chat-session";
 import { useConfirmationModal } from "@/hooks/use-confirmation-modal";
 import { paths } from "@/lib/config/paths";
 import { mergeClsx } from "@/lib/utils/styles";
@@ -25,6 +26,7 @@ export default function ChatDeleteButton({
   const router = useRouter();
   const pathname = usePathname();
   const { openConfirmation } = useConfirmationModal();
+  const { closeChat } = useChatSession();
 
   const handleDelete = async () => {
     const result = await handleDeleteChatSession({ id: chat.id });
@@ -36,6 +38,7 @@ export default function ChatDeleteButton({
     }
 
     toast("Chat deleted permanently");
+    closeChat(chat.id);
     if (pathname === paths.dashboard.chat(chat.id)) {
       router.push(paths.dashboard.chats());
     }
@@ -62,6 +65,7 @@ export default function ChatDeleteButton({
         className
       )}
       onClick={handleClick}
+      aria-label={label ? undefined : "Delete chat"}
     >
       <LucideTrash2 className="size-4 flex-none" />
       {label}

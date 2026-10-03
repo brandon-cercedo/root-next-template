@@ -40,6 +40,7 @@ interface ModalContentProps {
   transition?: ModalTransition;
   isVerticallyCentered?: boolean;
   isKeyActionsEnabled?: boolean;
+  isEscapeCloseEnabled?: boolean;
   showCloseButton?: boolean;
 }
 
@@ -57,6 +58,7 @@ function ModalContent({
   transition = "slide-down",
   isVerticallyCentered = false,
   isKeyActionsEnabled = true,
+  isEscapeCloseEnabled = true,
   showCloseButton = false,
 }: ModalContentProps) {
   const [isMounted, setIsMounted] = useState(false);
@@ -86,12 +88,14 @@ function ModalContent({
           "opacity-0 transition-all hs-overlay-open:opacity-100 hs-overlay-open:duration-500":
             transition === "fade",
           "[--overlay-backdrop:static]": overlayBackdrop === "static",
+          "[--overlay-backdrop:false]": overlayBackdrop === "false",
           "[--has-autofocus:false]": autoFocus === false,
         },
         rootClassName
       )}
       role="dialog"
       tabIndex={-1}
+      data-hs-overlay-keyboard={isEscapeCloseEnabled ? undefined : "false"}
       onKeyDownCapture={handleKeyDownCapture}
       data-hs-overlay-options={JSON.stringify(
         fixOverlayOptions(overlayOptions)
@@ -145,7 +149,7 @@ function ModalContent({
 }
 
 type ModalSize = "sm" | "md" | "lg" | "auto";
-export type OverlayBackdrop = "static";
+export type OverlayBackdrop = "static" | "false";
 type ScrollScope = "parent" | "body";
 
 type ModalProps = {
@@ -163,6 +167,7 @@ type ModalProps = {
   transition?: ModalTransition;
   isVerticallyCentered?: boolean;
   isKeyActionsEnabled?: boolean;
+  isEscapeCloseEnabled?: boolean;
   showCloseButton?: boolean;
 };
 
@@ -181,6 +186,7 @@ export default function Modal({
   transition = "slide-down",
   isVerticallyCentered = false,
   isKeyActionsEnabled = true,
+  isEscapeCloseEnabled = true,
   showCloseButton = false,
 }: ModalProps) {
   return (
@@ -199,6 +205,7 @@ export default function Modal({
         transition={transition}
         isVerticallyCentered={isVerticallyCentered}
         isKeyActionsEnabled={isKeyActionsEnabled}
+        isEscapeCloseEnabled={isEscapeCloseEnabled}
         showCloseButton={showCloseButton}
       >
         {children}

@@ -79,7 +79,7 @@ function ScrollableContainerRoot({
       <div
         ref={scrollRef}
         className={mergeClsx(
-          "min-h-0 w-full overflow-y-auto overscroll-contain",
+          "min-h-0 w-full overflow-x-hidden overflow-y-auto overscroll-contain",
           containerClassName
         )}
       >

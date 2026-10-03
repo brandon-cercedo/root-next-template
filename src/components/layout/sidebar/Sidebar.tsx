@@ -41,6 +41,7 @@ export default function Sidebar({ user, sections }: SidebarProps) {
       role="dialog"
       tabIndex={-1}
       aria-label="Sidebar"
+      data-hs-overlay-options={JSON.stringify({ isClosePrev: false })}
     >
       <div className="relative flex h-full max-h-full flex-col justify-between gap-3 py-3">
         <div className="flex size-full min-h-0 flex-col">

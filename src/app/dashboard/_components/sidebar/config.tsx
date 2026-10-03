@@ -9,6 +9,7 @@ import { FullUser } from "@/actions/db/user";
 import ShortcutKbdList from "@/components/keyboard/ShortcutKbdList";
 import { SidebarSectionType } from "@/components/layout/sidebar/SidebarContent";
 import { SidebarItemType } from "@/components/layout/sidebar/SidebarItem";
+import ChatOpenOffcanvasButton from "@/features/chat/components/buttons/ChatOpenOffcanvasButton";
 import ChatArchivedDropdown from "@/features/chat/components/ChatArchivedDropdown";
 import ChatConfigDropdown from "@/features/chat/components/ChatConfigDropdown";
 import { filterArchivedChatSessions } from "@/features/chat/utils";
@@ -37,7 +38,15 @@ function getTopSection(chats: ChatSession[]): SidebarSectionType {
         icon: <LucideMessageCirclePlus className="size-4 flex-none" />,
         href: paths.dashboard.chats(),
         renderActions: () => [
-          <ShortcutKbdList key="shortcut" commandId="new-chat" />,
+          <ShortcutKbdList
+            key="shortcut"
+            commandId="new-chat"
+            className="bg-gray-100 dark:bg-neutral-950"
+          />,
+          <ChatOpenOffcanvasButton
+            key="open-offcanvas-new-chat"
+            className="size-5 rounded-md text-gray-600 hover:bg-gray-100 focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
+          />,
         ],
         children: [],
       },
@@ -103,6 +112,11 @@ function composeSidebarItemFromChat({
     icon: <LucideMessageCircle className="size-4 flex-none" />,
     href: paths.dashboard.chat(chat.id),
     renderActions: (isHovered: boolean) => [
+      <ChatOpenOffcanvasButton
+        key={`open-offcanvas-chat-${id}`}
+        chat={chat}
+        className="size-5 rounded-md text-gray-600 hover:bg-gray-100 focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
+      />,
       <ChatConfigDropdown
         key={`config-chat-${id}`}
         chat={chat}
