@@ -24,12 +24,13 @@ If no input is given, stop and ask for it. DO NOT guess a default.
 
 - Skip checks for code these changes do not touch.
 - Merge checks that overlap.
-- Put the riskiest cases first.
+- Rate each case's risk as `High`, `Medium`, or `Low`.
+- Order rows by risk, descending: `High`, then `Medium`, then `Low`.
 - Keep steps short and in numbered order.
 
 ## Output
 
 A single Markdown table with these columns:
 
-| #   | Test case | Steps | Expected result |
-| --- | --------- | ----- | --------------- |
+| #   | Risk | Test case | Steps | Expected result |
+| --- | ---- | --------- | ----- | --------------- |
