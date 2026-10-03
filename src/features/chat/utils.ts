@@ -34,7 +34,11 @@ export function getChatTitle(text: string) {
   const [line = ""] = text.split("\n");
   const cleanedLine = line.replace(/\s+/g, " ").trim();
 
-  return truncate(cleanedLine, { length: TITLE_MAX_LENGTH, omission: "" });
+  return truncate(cleanedLine, {
+    length: TITLE_MAX_LENGTH,
+    omission: "",
+    separator: " ",
+  });
 }
 
 type ChatCounts = {

@@ -67,13 +67,39 @@ describe("useOverlay", () => {
     expect(mockOpen).toHaveBeenCalledTimes(1);
   });
 
+  it("should skip opening an overlay that is already open", async () => {
+    mockClassListContains.mockImplementation(
+      (token: string) => token === "open"
+    );
+
+    const { result } = renderHook(() => useOverlay());
+    const promise = result.current.open("modal");
+    await flushDelay();
+    await promise;
+
+    expect(mockOpen).not.toHaveBeenCalled();
+  });
+
   it("should close the overlay instance", async () => {
+    mockClassListContains.mockImplementation(
+      (token: string) => token === "open"
+    );
+
     const { result } = renderHook(() => useOverlay());
     const promise = result.current.close("modal");
     await flushDelay();
     await promise;
 
     expect(mockClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("should skip closing an overlay that is already closed", async () => {
+    const { result } = renderHook(() => useOverlay());
+    const promise = result.current.close("modal");
+    await flushDelay();
+    await promise;
+
+    expect(mockClose).not.toHaveBeenCalled();
   });
 
   it("should toggle open overlay to close", async () => {
@@ -88,6 +114,44 @@ describe("useOverlay", () => {
 
     expect(mockClose).toHaveBeenCalledTimes(1);
     expect(mockOpen).not.toHaveBeenCalled();
+  });
+
+  it("should remove the layout class when closing a layout overlay", async () => {
+    mockClassListContains.mockImplementation(
+      (token: string) => token === "open"
+    );
+    mockGetInstance.mockReturnValue({
+      element: { ...overlayElement, isLayoutAffect: true },
+    });
+    document.body.classList.add("hs-overlay-body-open");
+
+    const { result } = renderHook(() => useOverlay());
+    const promise = result.current.toggle("sidebar");
+    await flushDelay();
+    await promise;
+
+    expect(mockClose).toHaveBeenCalledTimes(1);
+    expect(document.body.classList.contains("hs-overlay-body-open")).toBe(
+      false
+    );
+  });
+
+  it("should keep the layout class when closing a regular overlay", async () => {
+    mockClassListContains.mockImplementation(
+      (token: string) => token === "open"
+    );
+    document.body.classList.add("hs-overlay-body-open");
+
+    const { result } = renderHook(() => useOverlay());
+    const promise = result.current.close("modal");
+    await flushDelay();
+    await promise;
+
+    expect(mockClose).toHaveBeenCalledTimes(1);
+    expect(document.body.classList.contains("hs-overlay-body-open")).toBe(
+      true
+    );
+    document.body.classList.remove("hs-overlay-body-open");
   });
 
   it("should toggle closed overlay to open", async () => {

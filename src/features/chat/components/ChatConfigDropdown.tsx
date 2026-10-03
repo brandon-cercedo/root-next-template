@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import Dropdown, { DropdownPlacement } from "@/components/ui/Dropdown";
 import ChatArchiveButton from "@/features/chat/components/buttons/ChatArchiveButton";
 import ChatFavoriteButton from "@/features/chat/components/buttons/ChatFavoriteButton";
+import ChatOpenOffcanvasButton from "@/features/chat/components/buttons/ChatOpenOffcanvasButton";
 import { useDropdown } from "@/hooks/use-dropdown";
 import { paths } from "@/lib/config/paths";
 import { mergeClsx } from "@/lib/utils/styles";
@@ -43,6 +44,11 @@ function Content({ chat }: { chat: ChatSession }) {
           <LucideLink className="size-4 flex-none" />
           Copy link
         </button>
+        <ChatOpenOffcanvasButton
+          chat={chat}
+          label="Move to sidebar"
+          className="flex size-auto w-full items-center justify-normal gap-x-3 rounded-lg px-2 py-1.5 text-[13px] leading-5 text-gray-800 hover:bg-gray-100 focus:bg-gray-100 focus:outline-hidden dark:text-neutral-200 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"
+        />
       </div>
       <div className="w-full space-y-0.5 p-1">
         <ChatArchiveButton
@@ -80,6 +86,10 @@ export default function ChatConfigDropdown({
     void run();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isHovered]);
+
+  if (chat.isArchived) {
+    return null;
+  }
 
   return (
     <Dropdown

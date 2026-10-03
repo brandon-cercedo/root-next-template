@@ -23,16 +23,37 @@ import ChatCreatedAt from "./ChatCreatedAt";
 import ChatInput from "./ChatInput";
 import ChatMessages from "./ChatMessages";
 
+type VariantStyles = {
+  inputMotion: string;
+  inputContainer?: string;
+};
+
+const VARIANT_STYLES: Record<ChatSectionVariant, VariantStyles> = {
+  page: {
+    inputMotion: "bottom-4",
+  },
+  sidebar: {
+    inputMotion: "bottom-0",
+    inputContainer: "shadow-none focus-within:shadow-none",
+  },
+};
+
+type ChatSectionVariant = "page" | "sidebar";
+
 type ChatSectionProps = {
   user: User;
   chat?: ChatSession;
+  variant?: ChatSectionVariant;
   className?: string;
+  onCreate?: (id: string) => void;
 };
 
 export default function ChatSection({
   user,
   chat,
+  variant = "page",
   className,
+  onCreate,
 }: ChatSectionProps) {
   const chatId = chat?.id;
   const isArchived = Boolean(chat?.isArchived);
@@ -66,6 +87,7 @@ export default function ChatSection({
   });
   const isNew = !isCreated;
   const error = saveError ?? agentError?.message;
+  const styles = VARIANT_STYLES[variant];
 
   const isClientDebug = Boolean(values?.["client-debug"]);
   if (isClientDebug) {
@@ -122,8 +144,13 @@ export default function ChatSection({
     }
 
     setIsCreated(true);
-    await sendMessage(message);
-    router.push(paths.dashboard.chat(id));
+    if (onCreate) {
+      onCreate(id);
+      await sendMessage(message);
+    } else {
+      router.push(paths.dashboard.chat(id));
+      await sendMessage(message);
+    }
   }
 
   return (
@@ -160,11 +187,12 @@ export default function ChatSection({
             stiffness: 380,
             damping: 32,
           }}
-          className="sticky bottom-4 z-10 w-full"
+          className={mergeClsx("sticky z-10 w-full", styles.inputMotion)}
         >
           <ChatInput
             status={status}
             disabled={isLoading || isArchived}
+            containerClassName={styles.inputContainer}
             onSend={handleSend}
             onStop={stop}
           />

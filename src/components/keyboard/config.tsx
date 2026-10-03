@@ -6,6 +6,7 @@ import {
   Monitor,
   Moon,
   PanelLeft,
+  PanelRight,
   PartyPopper,
   Sun,
   ToggleLeft,
@@ -18,6 +19,7 @@ import type { ReactNode } from "react";
 export const COMMAND_GROUPS = [
   "Theme",
   "Navigation",
+  "Agent",
   "Actions",
   "Admin",
 ] as const;
@@ -34,6 +36,7 @@ export const COMMAND_IDS = [
   "toggle-sidebar",
   "go-home",
   "new-chat",
+  "toggle-chat-offcanvas",
   "log-out",
   "confetti",
   "open-flag-toolbar",
@@ -57,6 +60,7 @@ export type BaseKeyboardCommand = {
   keywords?: string[];
   shortcut?: Shortcut;
   inPalette?: boolean;
+  inEditable?: boolean; // also run the shortcut inside editable targets
   icon?: ReactNode;
 };
 
@@ -78,6 +82,7 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
       labels: { mac: ["⌘", "K"], windows: ["Ctrl", "K"] },
     },
     inPalette: false,
+    inEditable: true,
   },
   {
     id: "open-palette",
@@ -169,7 +174,7 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
   {
     id: "new-chat",
     label: "New chat",
-    group: "Navigation",
+    group: "Agent",
     keywords: ["chat", "conversation", "message", "start"],
     shortcut: {
       chord: "$mod+Shift+o",
@@ -178,8 +183,23 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
         windows: ["Ctrl", "Shift", "O"],
       },
     },
+    inEditable: true,
     icon: (
       <MessageCirclePlus className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
+  },
+  {
+    id: "toggle-chat-offcanvas",
+    label: "Toggle chat sidebar",
+    group: "Agent",
+    keywords: ["chat", "panel", "sidebar"],
+    shortcut: {
+      chord: "$mod+j",
+      labels: { mac: ["⌘", "J"], windows: ["Ctrl", "J"] },
+    },
+    inEditable: true,
+    icon: (
+      <PanelRight className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
     ),
   },
   {

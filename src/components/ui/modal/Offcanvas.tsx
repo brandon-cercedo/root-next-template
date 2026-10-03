@@ -2,7 +2,7 @@
 
 import { mergeClsx } from "@/lib/utils/styles";
 
-import Modal, { OverlayBackdrop } from "./Modal";
+import Modal, { OverlayBackdrop, OverlayOptions } from "./Modal";
 
 type OffcanvasProps = {
   id: string;
@@ -10,8 +10,11 @@ type OffcanvasProps = {
   children: React.ReactNode;
   className?: string;
   containerClassName?: string;
+  rootClassName?: string;
   overlayBackdrop?: OverlayBackdrop;
+  overlayOptions?: OverlayOptions;
   isKeyActionsEnabled?: boolean;
+  isEscapeCloseEnabled?: boolean;
 };
 
 export default function Offcanvas({
@@ -20,8 +23,11 @@ export default function Offcanvas({
   children,
   className,
   containerClassName,
+  rootClassName,
   overlayBackdrop,
+  overlayOptions,
   isKeyActionsEnabled = true,
+  isEscapeCloseEnabled = true,
 }: OffcanvasProps) {
   return (
     <Modal
@@ -32,12 +38,15 @@ export default function Offcanvas({
         className
       )}
       containerClassName={mergeClsx(
-        "absolute end-3 top-3 bottom-3 m-0 w-full max-w-xs translate-x-full transform opacity-100 transition-all duration-300 hs-overlay-open:mt-0 hs-overlay-open:translate-x-0 hs-overlay-open:opacity-100 hs-overlay-open:duration-300",
+        "absolute inset-e-3 top-3 bottom-3 m-0 w-full max-w-xs translate-x-full transform opacity-100 transition-all duration-300 hs-overlay-open:mt-0 hs-overlay-open:translate-x-0 hs-overlay-open:opacity-100 hs-overlay-open:duration-300",
         containerClassName
       )}
+      rootClassName={rootClassName}
       size="auto"
       overlayBackdrop={overlayBackdrop}
+      overlayOptions={overlayOptions}
       isKeyActionsEnabled={isKeyActionsEnabled}
+      isEscapeCloseEnabled={isEscapeCloseEnabled}
     >
       {children}
     </Modal>

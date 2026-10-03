@@ -7,6 +7,7 @@ import { BreadcrumbItemType } from "@/components/layout/breadcrumb/BreadcrumbIte
 import DashboardPageContainer from "@/components/layout/DashboardPageContainer";
 import Navbar from "@/components/layout/Navbar";
 import ChatFavoriteButton from "@/features/chat/components/buttons/ChatFavoriteButton";
+import ChatOpenOffcanvasButton from "@/features/chat/components/buttons/ChatOpenOffcanvasButton";
 import ChatArchivedBanner from "@/features/chat/components/ChatArchivedBanner";
 import ChatConfigDropdown from "@/features/chat/components/ChatConfigDropdown";
 import ChatSection from "@/features/chat/components/ChatSection";
@@ -40,31 +41,34 @@ type ChatViewProps = {
 
 export default function ChatView({ chat }: ChatViewProps) {
   const { user } = useUser();
-  const isArchived = Boolean(chat?.isArchived);
 
   return (
     <Fragment>
       <Navbar breadcrumbItems={getChatBreadcrumbItems(chat)}>
-        {chat && (
-          <ul className="flex items-center gap-x-3">
-            <li className="relative flex items-center gap-1.5 text-gray-500 dark:text-neutral-200">
-              <ChatStatsTooltip chat={chat} />
-              {!isArchived && (
-                <Fragment>
-                  <ChatFavoriteButton
-                    chat={chat}
-                    className="size-6 rounded-lg leading-4 text-gray-500 hover:bg-gray-200 hover:text-gray-800 focus:bg-gray-200 focus:text-gray-800 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-400 dark:focus:bg-neutral-800 dark:focus:text-neutral-400"
-                  />
-                  <ChatConfigDropdown
-                    chat={chat}
-                    className="size-6 rounded-lg leading-4 text-gray-500 hover:bg-gray-200 hover:text-gray-800 focus:bg-gray-200 focus:text-gray-800 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-400 dark:focus:bg-neutral-800 dark:focus:text-neutral-400"
-                    placement="bottom-right"
-                  />
-                </Fragment>
-              )}
-            </li>
-          </ul>
-        )}
+        <ul className="flex items-center gap-x-3">
+          <li className="relative flex items-center gap-1.5 text-gray-500 dark:text-neutral-200">
+            {chat && (
+              <Fragment>
+                <ChatStatsTooltip chat={chat} />
+                <ChatFavoriteButton
+                  chat={chat}
+                  className="size-6 rounded-lg leading-4 text-gray-500 hover:bg-gray-200 hover:text-gray-800 focus:bg-gray-200 focus:text-gray-800 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-400 dark:focus:bg-neutral-800 dark:focus:text-neutral-400"
+                />
+              </Fragment>
+            )}
+            <ChatOpenOffcanvasButton
+              chat={chat}
+              className="size-6 rounded-lg leading-4 text-gray-500 hover:bg-gray-200 hover:text-gray-800 focus:bg-gray-200 focus:text-gray-800 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-400 dark:focus:bg-neutral-800 dark:focus:text-neutral-400"
+            />
+            {chat && (
+              <ChatConfigDropdown
+                chat={chat}
+                className="size-6 rounded-lg leading-4 text-gray-500 hover:bg-gray-200 hover:text-gray-800 focus:bg-gray-200 focus:text-gray-800 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-400 dark:focus:bg-neutral-800 dark:focus:text-neutral-400"
+                placement="bottom-right"
+              />
+            )}
+          </li>
+        </ul>
       </Navbar>
       {chat && <ChatArchivedBanner chat={chat} user={user} />}
       <DashboardPageContainer className="py-0">

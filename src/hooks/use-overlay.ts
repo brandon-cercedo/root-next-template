@@ -8,6 +8,20 @@ import { fixHTMLSelector } from "@/lib/utils/html";
 const OVERLAY_MAX_ATTEMPTS = 20;
 const OVERLAY_DELAY = 100;
 
+/**
+ * @note about closing sidebar issue:
+ * - The sidebar is shown by a `<body>` class (`hs-overlay-body-open`), not
+ *   by its own classes.
+ * - Preline removes that class only when every overlay is closed.
+ * - So an open overlay keeps the sidebar on screen, even though it is marked closed.
+ */
+function handleClose(instance: HSOverlay) {
+  instance.close();
+  if (instance.isLayoutAffect) {
+    document.body.classList.remove("hs-overlay-body-open");
+  }
+}
+
 async function getOverlayInstance(id: string) {
   if (typeof window === "undefined") {
     console.error("window is not available");
@@ -75,9 +89,14 @@ export function useOverlay() {
         return;
       }
 
+      const isInstanceOpen = await isOpen(instance);
+      if (isInstanceOpen) {
+        return;
+      }
+
       instance.open();
     },
-    [getInstance]
+    [getInstance, isOpen]
   );
 
   const close = useCallback(
@@ -87,9 +106,14 @@ export function useOverlay() {
         return;
       }
 
-      instance.close();
+      const isInstanceOpen = await isOpen(instance);
+      if (!isInstanceOpen) {
+        return;
+      }
+
+      handleClose(instance);
     },
-    [getInstance]
+    [getInstance, isOpen]
   );
 
   const toggle = useCallback(
@@ -101,7 +125,7 @@ export function useOverlay() {
 
       const isInstanceOpen = await isOpen(instance);
       if (isInstanceOpen) {
-        instance.close();
+        handleClose(instance);
         return;
       }
 

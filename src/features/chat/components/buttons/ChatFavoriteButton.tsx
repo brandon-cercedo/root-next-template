@@ -23,6 +23,10 @@ export default function ChatFavoriteButton({
 }: ChatFavoriteButtonProps) {
   const [isLoading, startTransition] = useTransition();
 
+  if (chat.isArchived) {
+    return null;
+  }
+
   const handleToggleFavorite = () => {
     const nextValue = !chat.isFavourite;
     startTransition(async () => {
@@ -47,6 +51,7 @@ export default function ChatFavoriteButton({
       )}
       onClick={handleToggleFavorite}
       disabled={isLoading}
+      aria-label={label ? undefined : "Toggle favorite"}
     >
       {isLoading ? (
         <SpinnerIcon size="sm" />

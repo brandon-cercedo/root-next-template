@@ -29,11 +29,14 @@ shortcuts help panel in a Preline `Offcanvas`:
 | `/`                    | Open palette (non-editable targets only) |
 | `⌘⇧,` / `Ctrl+Shift+,` | Toggle resolved light / dark theme       |
 | `⌘B` / `Ctrl+B`        | Toggle sidebar overlay                   |
+| `⌘⇧O` / `Ctrl+Shift+O` | New chat                                 |
+| `⌘J` / `Ctrl+J`        | Toggle chat sidebar                      |
 | `⌘⇧.` / `Ctrl+Shift+.` | Confetti                                 |
 | `⌘⇧/` / `Ctrl+Shift+/` | Open flag toolbar (admin)                |
 | `⌘/` / `Ctrl+/`        | Open keyboard shortcuts help panel       |
 
-Only `⌘K` / `Ctrl+K` runs inside editable targets; other chords and `/` do not.
+Only `⌘K`, `⌘⇧O` (new chat), and `⌘J` run inside editable targets; other
+chords and `/` do not.
 Esc closes the palette and help panel via Preline (not `tinykeys`).
 Shortcut labels show Mac or Windows, not both, via `getIsMac`.
 
@@ -61,7 +64,8 @@ Some relevant details:
 
 - **Registry:** `src/components/keyboard/config.tsx` lists ids, labels, groups,
   optional chords, keywords, and optional palette `icon` nodes. Chord-only
-  commands skip the palette via `inPalette: false`. `getKeyboardCommands`
+  commands skip the palette via `inPalette: false`. Commands with
+  `inEditable: true` also run inside editable targets. `getKeyboardCommands`
   attaches `run` in `KeyboardProvider`.
 
 ## Considerations

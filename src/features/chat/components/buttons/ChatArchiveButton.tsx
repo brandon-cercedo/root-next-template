@@ -53,7 +53,7 @@ export default function ChatArchiveButton({
     <button
       type="button"
       className={mergeClsx(
-        "inline-flex size-6 flex-none items-center justify-center gap-x-1 rounded-lg text-[13px] leading-4 text-gray-500 hover:bg-gray-200 focus:bg-gray-200 focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800",
+        "inline-flex size-6 flex-none items-center justify-center gap-1 rounded-lg text-[13px] leading-4 text-gray-500 hover:bg-gray-200 focus:bg-gray-200 focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-200 dark:focus:bg-neutral-800",
         className
       )}
       onClick={handleClick}

@@ -53,7 +53,8 @@ Merge order: P0 → P1. After P0 lands on `main`, retarget P1's PR to
 - [x] Shared `ConfirmationModalProvider` + `useConfirmationModal` +
       `ConfirmationModal`; `ChatDeleteButton` and `ChatDeleteAllButton`
       confirm through it (replaces `ChatDeleteModal`;
-      `ChatSessionProvider` and `OverlayAction` kept for now)
+      `ChatSessionProvider` and `OverlayAction` kept for now, later
+      replaced/removed in RNT-40)
 - [x] Helper, action, service, hook and API tests; `pnpm test:all`
 
 ---
@@ -165,7 +166,7 @@ lookup when `chat.isArchived`. The disabled input alone is not enough.
   returns `{ options, openConfirmation, handleConfirm, handleCancel }`;
   the modal closes after the handler resolves. Replaces
   `ChatDeleteModal`; `ChatSessionProvider` and `OverlayAction` are kept
-  for now.
+  for now (see RNT-40).
 - **`ChatArchivedBanner.tsx`** (mirror `PageTrashBanner`): takes
   `{ chat, user }` because chats do not load an `owner`; `user` comes
   from `useUser()` in `ChatView`. Button classes are written inline.

@@ -49,11 +49,7 @@ const KeyboardContext = createContext<KeyboardContextType | undefined>(
   undefined
 );
 
-function isShortcutEvent(event: KeyboardEvent, shortcut?: ShortcutCommand) {
-  if (!shortcut) {
-    return false;
-  }
-
+function isShortcutEvent(event: KeyboardEvent, shortcut: ShortcutCommand) {
   const chord = shortcut.shortcut.chord;
   const press = parseKeybinding(chord)[0];
   return press && matchKeybindingPress(event, press);
@@ -82,6 +78,10 @@ export function KeyboardProvider({ children }: { children: ReactNode }) {
     void toggle(OVERLAY_IDS.SIDEBAR);
   };
 
+  const toggleChatOffcanvas = () => {
+    void toggle(OVERLAY_IDS.CHAT_OFFCANVAS);
+  };
+
   const openHelp = () => {
     void open(OVERLAY_IDS.KEYBOARD_HELP);
   };
@@ -101,6 +101,7 @@ export function KeyboardProvider({ children }: { children: ReactNode }) {
     "theme-dark": () => setTheme("dark"),
     "theme-system": () => setTheme("system"),
     "toggle-sidebar": toggleSidebar,
+    "toggle-chat-offcanvas": toggleChatOffcanvas,
     "open-keyboard-help": openHelp,
     "go-home": () => router.push(paths.dashboard.home()),
     "new-chat": () => router.push(paths.dashboard.chats()),
@@ -124,8 +125,9 @@ export function KeyboardProvider({ children }: { children: ReactNode }) {
     () => new Map(shortcuts.map((command) => [command.id, command])),
     [shortcuts]
   );
-  const togglePaletteShortcut = shortcutsById.get("toggle-palette");
-  const newChatShortcut = shortcutsById.get("new-chat");
+  const shortcutsInEditable = shortcuts.filter(
+    (shortcut) => shortcut.inEditable
+  );
 
   // Keep the latest commandsById for long-lived Chat callbacks.
   const commandsByIdRef = useRef(commandsById);
@@ -172,10 +174,10 @@ export function KeyboardProvider({ children }: { children: ReactNode }) {
 
     const unsubscribe = tinykeys(window, keybindings, {
       ignore: (event) => {
-        if (
-          isShortcutEvent(event, togglePaletteShortcut) ||
-          isShortcutEvent(event, newChatShortcut)
-        ) {
+        const isAllowedEvent = shortcutsInEditable.some((shortcut) =>
+          isShortcutEvent(event, shortcut)
+        );
+        if (isAllowedEvent) {
           return false;
         }
         return defaultKeybindingsHandlerIgnore(event);

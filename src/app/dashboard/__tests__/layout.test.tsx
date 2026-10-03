@@ -19,6 +19,7 @@ vi.mock("@/actions/db/user", () => ({
 vi.mock("next/navigation", () => ({
   redirect: (url: string) => redirect(url),
   useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => paths.dashboard.home(),
 }));
 
 vi.mock("@/components/theme/ThemeSelector", () => ({
@@ -29,13 +30,14 @@ vi.mock("@/features/home/components/LoginConfetti", () => ({
   default: () => <div data-testid="login-confetti" />,
 }));
 
-vi.mock("@/features/chat/components/ChatArchivedDropdown", () => ({
-  default: () => null,
-}));
+const emptyComponentModule = vi.hoisted(() => () => ({ default: () => null }));
 
-vi.mock("@/features/chat/components/ChatConfigDropdown", () => ({
-  default: () => null,
-}));
+vi.mock(
+  "@/features/chat/components/ChatArchivedDropdown",
+  emptyComponentModule
+);
+vi.mock("@/features/chat/components/ChatConfigDropdown", emptyComponentModule);
+vi.mock("@/features/chat/components/ChatOffcanvas", emptyComponentModule);
 
 vi.mock("@/components/flags/FlagToolbar", async () => {
   const { isAdmin } = await import("@/lib/utils/db/user");
@@ -192,7 +194,7 @@ describe("DashboardLayout", () => {
     expect(outerFrame?.className).toContain("lg:hs-overlay-layout-open:ps-60");
 
     const innerPanel = outerFrame?.querySelector(
-      ".rounded-lg.border.overflow-hidden"
+      ".rounded-xl.border.overflow-hidden"
     );
     expect(innerPanel).not.toBeNull();
     expect(innerPanel?.className).toContain("h-[calc(100dvh-62px)]");
@@ -256,7 +258,7 @@ describe("DashboardLayout", () => {
     const { container } = await renderLayout(<p>Home child content</p>);
 
     const innerPanel = container.querySelector(
-      ".rounded-lg.border.overflow-hidden"
+      ".rounded-xl.border.overflow-hidden"
     );
     expect(innerPanel).not.toBeNull();
     expect(
