@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FullUser } from "@/actions/db/user";
 import AppLogo from "@/components/brand/AppLogo";
 import { OVERLAY_IDS } from "@/components/constants";
+import { OVERLAY_BACKDROP_CLASS } from "@/components/ui/modal/Modal";
 import { paths } from "@/lib/config/paths";
 
 import SidebarContent, { SidebarSectionType } from "./SidebarContent";
@@ -41,7 +42,10 @@ export default function Sidebar({ user, sections }: SidebarProps) {
       role="dialog"
       tabIndex={-1}
       aria-label="Sidebar"
-      data-hs-overlay-options={JSON.stringify({ isClosePrev: false })}
+      data-hs-overlay-options={JSON.stringify({
+        isClosePrev: false,
+        backdropClasses: OVERLAY_BACKDROP_CLASS,
+      })}
     >
       <div className="relative flex h-full max-h-full flex-col justify-between gap-3 py-3">
         <div className="flex size-full min-h-0 flex-col">
