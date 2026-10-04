@@ -10,10 +10,12 @@ import { mergeClsx } from "@/lib/utils/styles";
 import ModalCloseButton from "./ModalCloseButton";
 import ModalTrigger from "./ModalTrigger";
 
+export const OVERLAY_BACKDROP_CLASS =
+  "hs-overlay-backdrop transition duration fixed inset-0 bg-black/25 dark:bg-black/40";
+
 function fixOverlayOptions(options?: OverlayOptions) {
   return {
-    backdropClasses:
-      "hs-overlay-backdrop transition duration fixed inset-0 bg-black/25 dark:bg-black/40",
+    backdropClasses: OVERLAY_BACKDROP_CLASS,
     ...options,
   };
 }
