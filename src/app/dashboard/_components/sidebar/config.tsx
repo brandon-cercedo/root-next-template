@@ -2,7 +2,6 @@ import {
   LucideHome,
   LucideMessageCircle,
   LucideMessageCirclePlus,
-  LucideSettings,
 } from "lucide-react";
 
 import { FullUser } from "@/actions/db/user";
@@ -65,23 +64,23 @@ function getTopSection(chats: ChatSession[]): SidebarSectionType {
   return section;
 }
 
-function getBottomSection(): SidebarSectionType {
-  const section: SidebarSectionType = {
-    label: "System",
-    actions: [],
-    items: [],
-  };
-
-  section.items.push({
-    id: "settings",
-    label: "Settings",
-    icon: <LucideSettings className="size-4 flex-none" />,
-    renderActions: () => [],
-    children: [],
-  });
-
-  return section;
-}
+// function getBottomSection(): SidebarSectionType {
+//   const section: SidebarSectionType = {
+//     label: "System",
+//     actions: [],
+//     items: [],
+//   };
+//
+//   section.items.push({
+//     id: "settings",
+//     label: "Settings",
+//     icon: <LucideSettings className="size-4 flex-none" />,
+//     renderActions: () => [],
+//     children: [],
+//   });
+//
+//   return section;
+// }
 
 function getFavoritesSection(chats: ChatSession[]): SidebarSectionType {
   const favoriteChats = chats.filter((chat) => chat.isFavourite);
@@ -145,14 +144,14 @@ export function getSidebarSections({
   const activeChats = filterArchivedChatSessions(user.chatSessions);
 
   const topSection = getTopSection(user.chatSessions);
-  const bottomSection = getBottomSection();
+  // const bottomSection = getBottomSection();
   const favoritesSection = getFavoritesSection(activeChats);
   const chatsSection = getChatsSection(activeChats);
 
   sections.push(topSection);
   sections.push(favoritesSection);
   sections.push(chatsSection);
-  sections.push(bottomSection);
+  // sections.push(bottomSection);
 
   return sections;
 }
