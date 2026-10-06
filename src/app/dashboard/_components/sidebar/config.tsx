@@ -3,7 +3,6 @@ import {
   LucideMessageCircle,
   LucideMessageCirclePlus,
 } from "lucide-react";
-// import { LucideSettings } from "lucide-react";
 
 import { FullUser } from "@/actions/db/user";
 import ShortcutKbdList from "@/components/keyboard/ShortcutKbdList";
