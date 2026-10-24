@@ -30,7 +30,7 @@ A base template to build `Next.js` applications.
 
 ### ❗ Prerequisites
 
-- [Node.js v24.16.0](https://nodejs.org/en)
+- [Node.js v24.22.1](https://nodejs.org/en)
 - [nvm (Node Version Manager)](https://github.com/nvm-sh/nvm)
 - [pnpm v10.34.3](https://pnpm.io/)
 
