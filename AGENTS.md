@@ -152,7 +152,7 @@ if (isValid) {
 }
 ```
 
-- Only use `mergeClsx` or `clsx` for conditional or dynamic class names. DO NOT use it to split long static class strings across lines.
+- Follow [DESIGN.md](DESIGN.md) when building or styling UI.
 
 ## Programming Principles
 
