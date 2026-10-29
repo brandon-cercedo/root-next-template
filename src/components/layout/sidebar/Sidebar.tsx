@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { FullUser } from "@/actions/db/user";
 import AppLogo from "@/components/brand/AppLogo";
+import Pet from "@/components/brand/Pet";
 import { OVERLAY_IDS } from "@/components/constants";
 import { OVERLAY_BACKDROP_CLASS } from "@/components/ui/modal/Modal";
 import { paths } from "@/lib/config/paths";
@@ -24,6 +25,7 @@ function SidebarHeader() {
 function SidebarFooter({ user }: { user: FullUser }) {
   return (
     <footer className="flex flex-col gap-1 px-2">
+      <Pet style="paper" />
       <UserMenu user={user} />
     </footer>
   );
