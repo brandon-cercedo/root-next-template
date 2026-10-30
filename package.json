@@ -24,6 +24,8 @@
     "prisma:reset": "pnpm env:load -- prisma migrate reset",
     "do": "pnpm env:load -- tsx",
     "skills:install": "pnpx skills experimental_install",
+    "graph:install": "graphify install --project --platform agents",
+    "graph:build": "graphify update . --force",
     "commitlint": "commitlint --edit",
     "precommit": "lint-staged",
     "prepare": "husky",

@@ -45,3 +45,4 @@ next-env.d.ts
 /prisma/types/generated
 /prisma/utils/fake-data.ts
 scripts/helpers/
+graphify-out/

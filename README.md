@@ -51,19 +51,13 @@ A base template to build `Next.js` applications.
     pnpm i
     ```
 
-4. (Optional) Install agent skills:
-
-    ```bash
-    pnpm skills:install
-    ```
-
-5. Start the development server:
+4. Start the development server:
 
     ```bash
     pnpm dev
     ```
 
-6. Open <http://localhost:3000> in your browser.
+5. Open <http://localhost:3000> in your browser.
 
 You are ready to build your application! 🎉
 
@@ -86,6 +80,34 @@ You are ready to build your application! 🎉
 | `pnpm format:check`   | Check formatting                        |
 | `pnpm type:check`     | Check type definitions                  |
 | `pnpm skills:install` | Install agent skills                    |
+| `pnpm graph:install`  | Install the graphify agent skill        |
+| `pnpm graph:build`    | Build or update the code-only graph     |
+
+### 🤖 Agent Skills
+
+1. Install skills from [skills.sh](https://skills.sh):
+
+    ```bash
+    pnpm skills:install
+    ```
+
+2. Set up the [graphify](https://github.com/Graphify-Labs/graphify) skill to
+   query a code-only graph of the project (no LLM tokens):
+
+    - Install the CLI tool:
+
+        ```bash
+        uv tool install --python 3.14.10 "graphifyy[sql]==0.9.97"
+        ```
+
+    - Install the skill and build the graph:
+
+        ```bash
+        pnpm graph:install
+        pnpm graph:build
+        ```
+
+    - Run `pnpm graph:build` again before querying the graph.
 
 ## ⚠️ License
 

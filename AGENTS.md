@@ -25,13 +25,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Scripts
 
-| Task      | Command                                                                  |
-| --------- | ------------------------------------------------------------------------ |
-| Dev       | `pnpm dev`                                                               |
-| Lint      | `pnpm lint` / `pnpm lint:fix`                                            |
-| Test      | `pnpm test` / `pnpm test:watch` / `pnpm test:coverage` / `pnpm test:all` |
-| Format    | `pnpm format` / `pnpm format:check`                                      |
-| Typecheck | `pnpm type:check`                                                        |
+| Task       | Command                                                                  |
+| ---------- | ------------------------------------------------------------------------ |
+| Dev        | `pnpm dev`                                                               |
+| Lint       | `pnpm lint` / `pnpm lint:fix`                                            |
+| Test       | `pnpm test` / `pnpm test:watch` / `pnpm test:coverage` / `pnpm test:all` |
+| Format     | `pnpm format` / `pnpm format:check`                                      |
+| Typecheck  | `pnpm type:check`                                                        |
+| Code graph | `pnpm graph:build`                                                       |
 
 ## Goals
 
