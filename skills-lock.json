@@ -5,7 +5,7 @@
       "source": "vercel-labs/agent-browser",
       "sourceType": "github",
       "skillPath": "skills/agent-browser/SKILL.md",
-      "computedHash": "80161e6836b3b40f4e83730a290deb40ac14d877d38c97ad5f6d71be37ce74c3"
+      "computedHash": "79add54dd6de82a262a88c94744d7decde000159c1d7f67c78eb9d4e523d54bb"
     },
     "api-design-principles": {
       "source": "wshobson/agents",
@@ -13,53 +13,59 @@
       "skillPath": "plugins/backend-development/skills/api-design-principles/SKILL.md",
       "computedHash": "19715a3a3ff7bf7b1e2ab1cb631ebe810d5b050ed6b3ab0c358e39e5e2e6d33a"
     },
-    "brainstorming": {
-      "source": "obra/superpowers",
-      "sourceType": "github",
-      "skillPath": "skills/brainstorming/SKILL.md",
-      "computedHash": "759eaa3b4b3d06d9e1c98c24bcd58eeb4d2faf724b3239f81e8559aa41e28fdd"
-    },
     "clean-code-principles": {
       "source": "asyrafhussin/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/clean-code-principles/SKILL.md",
       "computedHash": "4c22dca6110d58f1454523dc3f192ef20d91f538233da9132b407edd041a4762"
     },
-    "frontend-design": {
-      "source": "anthropics/skills",
+    "code-review-and-quality": {
+      "source": "addyosmani/agent-skills",
       "sourceType": "github",
-      "skillPath": "skills/frontend-design/SKILL.md",
-      "computedHash": "89496d5dd00f4810205f351759594fc2742bf8eea85a2f2b2d1de59f4bd91576"
+      "skillPath": "skills/code-review-and-quality/SKILL.md",
+      "computedHash": "0667c7af98996c0bec4fb0eb444680bdbf1da1d6a3cfdf5dbe8cbd350d9d2752"
+    },
+    "code-simplification": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/code-simplification/SKILL.md",
+      "computedHash": "e4c1f0c12274be9981e1301bfbb9b3112b63e2209413071728b132c9b4ee2f5b"
+    },
+    "debugging-and-error-recovery": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/debugging-and-error-recovery/SKILL.md",
+      "computedHash": "b6888f4fa9b5d683b6ac912a881c57e2ba521e5b1099d9340413538efb23cb84"
+    },
+    "idea-refine": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/idea-refine/SKILL.md",
+      "computedHash": "f4400771e231aeaa6d954cc41ea5845b71d96d8f4d1df5e312849cd75bff97dd"
     },
     "impeccable": {
       "source": "pbakaus/impeccable",
       "sourceType": "github",
       "skillPath": ".agents/skills/impeccable/SKILL.md",
-      "computedHash": "ba5d6e38f26d2e945237bcd0024aa2ff9b1f81f07970fafaa36c09244d2abeaf"
+      "computedHash": "43cbaccaaa6d60becd67d63577da8f7053cb5f0262c772e892f15e7242cada21"
     },
-    "interface-design": {
-      "source": "dammyjay93/interface-design",
+    "interview-me": {
+      "source": "addyosmani/agent-skills",
       "sourceType": "github",
-      "skillPath": ".claude/skills/interface-design/SKILL.md",
-      "computedHash": "340cc79a1558f09371aa3eb689952a8b777c1d7362c24226e99693606a80828e"
+      "skillPath": "skills/interview-me/SKILL.md",
+      "computedHash": "4229002dd862e6e037c8a01c3e31d9af097465c58b2c3611912edb2af005f303"
     },
-    "postgresql-table-design": {
-      "source": "wshobson/agents",
+    "performance-optimization": {
+      "source": "addyosmani/agent-skills",
       "sourceType": "github",
-      "skillPath": "plugins/database-design/skills/postgresql-table-design/SKILL.md",
-      "computedHash": "c87d5cac33fbddc757fbb4b38a0098cff7dcf79201d40ddff2af76ec2724c5a1"
+      "skillPath": "skills/performance-optimization/SKILL.md",
+      "computedHash": "276aec00aaabae98f4bd6d565745378b498e0d11688315f32179587746b93805"
     },
-    "systematic-debugging": {
-      "source": "obra/superpowers",
+    "security-and-hardening": {
+      "source": "addyosmani/agent-skills",
       "sourceType": "github",
-      "skillPath": "skills/systematic-debugging/SKILL.md",
-      "computedHash": "276fb0aadb002ab930cc2a56de89e16995a2e3e70b33587652bf0a5fb123148d"
-    },
-    "task-observer": {
-      "source": "rebelytics/one-skill-to-rule-them-all",
-      "sourceType": "github",
-      "skillPath": "SKILL.md",
-      "computedHash": "41f778e30a10a144e0c3df34ff3eff5389339961c616fa7a240891e5c937ff31"
+      "skillPath": "skills/security-and-hardening/SKILL.md",
+      "computedHash": "dbab1f4697ece5cab24a90911ae052320d8f8b191324df7f836aa42344699b89"
     },
     "vercel-react-best-practices": {
       "source": "vercel-labs/agent-skills",
