@@ -3,7 +3,11 @@
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef } from "react";
 
+import type { HSOverlay, ICollectionItem } from "preline/non-auto";
+
 type PrelineModule = typeof import("preline/non-auto");
+type OverlayClass = PrelineModule["HSOverlay"];
+type OverlayItem = ICollectionItem<HSOverlay>;
 
 const PRELINE_CLASS_PREFIX = "hs-";
 const PRELINE_DATA_ATTRIBUTES = ["data-hs-select"];
@@ -62,6 +66,63 @@ function shouldInit(mutations: MutationRecord[]) {
   });
 }
 
+function applyOpenedBreakpoint(overlayClass: OverlayClass, item: OverlayItem) {
+  const { el, openedBreakpoint } = item.element;
+  if (!openedBreakpoint) {
+    return;
+  }
+
+  const isOpened = el.classList.contains("opened");
+  const isAboveBreakpoint = document.body.clientWidth >= openedBreakpoint;
+  if (isAboveBreakpoint && !isOpened) {
+    overlayClass.setOpened(openedBreakpoint, item);
+    return;
+  }
+
+  if (!isAboveBreakpoint && isOpened) {
+    item.element.close(true);
+  }
+}
+
+function shouldAutoClose(instance: HSOverlay) {
+  const width = document.body.clientWidth;
+  const breakpoint = instance.autoClose ?? 0;
+  if (instance.autoCloseEqualityType === "less-than") {
+    return width <= breakpoint;
+  }
+
+  return width >= breakpoint;
+}
+
+function applyAutoClose(instance: HSOverlay) {
+  if (!instance.autoClose) {
+    return;
+  }
+
+  const isOpened = instance.el.classList.contains("opened");
+  if (shouldAutoClose(instance) && isOpened) {
+    instance.close(true);
+    return;
+  }
+
+  if (instance.isLayoutAffect && isOpened) {
+    document.body.classList.add("hs-overlay-body-open");
+  }
+}
+
+function getOverlayItems(overlayClass: OverlayClass) {
+  const elements = document.querySelectorAll<HTMLElement>(".hs-overlay");
+  return Array.from(elements)
+    .map((element) => overlayClass.getInstance(element, true))
+    .filter((item): item is OverlayItem => Boolean(item));
+}
+
+function syncOverlays(overlayClass: OverlayClass) {
+  const items = getOverlayItems(overlayClass);
+  items.forEach((item) => applyAutoClose(item.element));
+  items.forEach((item) => applyOpenedBreakpoint(overlayClass, item));
+}
+
 /**
  * Manage Preline initialization and re-initialization.
  *
@@ -88,10 +149,22 @@ export function usePreline() {
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    let resizeTimeoutId: ReturnType<typeof setTimeout> | undefined;
 
     const handleInit = () => {
       clearTimeout(timeoutId);
       timeoutId = init();
+    };
+
+    const handleResize = () => {
+      clearTimeout(resizeTimeoutId);
+      resizeTimeoutId = setTimeout(() => {
+        const overlayClass = preline.current?.HSOverlay;
+        if (!overlayClass) {
+          return;
+        }
+        syncOverlays(overlayClass);
+      }, 150);
     };
 
     const observer = new MutationObserver((mutations) => {
@@ -104,9 +177,13 @@ export function usePreline() {
       subtree: true,
     });
 
+    window.addEventListener("resize", handleResize);
+
     return () => {
       observer.disconnect();
+      window.removeEventListener("resize", handleResize);
       clearTimeout(timeoutId);
+      clearTimeout(resizeTimeoutId);
     };
   }, [init]);
 

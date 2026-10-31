@@ -23,8 +23,9 @@ and when new plugin roots are added after first mount.
 | Client-only dynamic import     | Preline needs `window`; SSR would break or hydrate poorly          |
 | Root-layout `PrelineScript`    | One init path for the whole app; pages stay free of boilerplate    |
 | `usePreline` + pathname effect | App Router does not remount the layout; route changes need re-init |
-| MutationObserver               | Registers nested `hs-*` nodes after first mount (tooltips, flags)  |
+| `MutationObserver`             | Registers nested `hs-*` nodes after first mount (tooltips, flags)  |
 | Delayed `autoInit` (~100ms)    | Give the new route DOM time to paint before scanning               |
+| `resize` listener              | `preline/non-auto` drops the overlay `resize` handler in `auto.ts` |
 
 ## Flow
 
@@ -41,6 +42,7 @@ flowchart TD
   Hook -->|first visit / route change| Import["import('preline/non-auto')"]
   Import --> PathInit["autoInit after delay"]
   Hook -->|added hs-* node| Observer["autoInit after delay"]
+  Hook -->|window resize| Resize["sync --auto-close / --opened"]
   CSS["globals.css"] --> Variants["preline/variants.css"]
   CSS --> Source["@source preline/dist/*.js"]
   CSS --> Forms["@tailwindcss/forms"]
@@ -53,6 +55,8 @@ Some relevant details:
 - **Lookups:** `useOverlay` / `useDropdown` call `HSOverlay.getInstance` /
   `HSDropdown.getInstance` on the imported class, not `window`. They retry
   while a portal or conditional overlay is still mounting.
+- **Resize:** `usePreline` restores only `--auto-close` and `--opened`,
+  mirroring overlay `auto.ts`.
 
 ## Considerations
 
