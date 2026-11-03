@@ -143,4 +143,32 @@ describe("createChatTools", () => {
     expect(description).toMatch(/never show or mention ids/i);
     expect(description).not.toContain("spoofed");
   });
+
+  it("should register showPet as a client tool", async () => {
+    const { createChatTools } =
+      await import("@/features/chat/services/tools/create-chat-tools");
+    const tools = createChatTools({
+      userId: "session-user-1",
+      keyboardCommandIds: [],
+    });
+
+    expect(tools.showPet).toBeDefined();
+    expect(tools.showPet.execute).toBeUndefined();
+    expect(tools.showPet.description).toMatch(/greetings/i);
+    expect(tools.showPet.description).toContain("The default pet is a fox.");
+  });
+
+  it("should list the showPet customization options", async () => {
+    const { createChatTools } =
+      await import("@/features/chat/services/tools/create-chat-tools");
+    const tools = createChatTools({
+      userId: "session-user-1",
+      keyboardCommandIds: [],
+    });
+
+    const description = tools.showPet.description ?? "";
+    expect(description).toContain("- pet: fox, owl");
+    expect(description).toContain("- style: default, riso, paper, pixel");
+    expect(description).toContain("- size: 32 to 160 px");
+  });
 });

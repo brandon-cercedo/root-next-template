@@ -72,6 +72,14 @@ export function useAgent({ id, initialMessages }: UseAgentOptions) {
     }
   };
 
+  const showPet = (toolCall: AgentToolCall, chat: AgentChat) => {
+    chat.addToolOutput({
+      tool: toolCall.toolName,
+      toolCallId: toolCall.toolCallId,
+      output: { success: true },
+    });
+  };
+
   const createInstance = () => {
     const chat: AgentChat = new Chat({
       id,
@@ -92,6 +100,10 @@ export function useAgent({ id, initialMessages }: UseAgentOptions) {
 
         if (toolCall.toolName === "runKeyboardCommand") {
           runKeyboardCommand(toolCall, chat);
+        }
+
+        if (toolCall.toolName === "showPet") {
+          showPet(toolCall, chat);
         }
       },
     });

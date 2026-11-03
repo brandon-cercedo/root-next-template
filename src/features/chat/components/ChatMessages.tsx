@@ -3,8 +3,13 @@
 import { type ChatStatus } from "ai";
 import clsx from "clsx";
 
+import Pet from "@/components/pet/Pet";
 import ClampedContainer from "@/components/ui/ClampedContainer";
-import { getMessageText } from "@/features/chat/utils";
+import {
+  ShowPetInput,
+  ShowPetInputSchema,
+} from "@/features/chat/schema/tools";
+import { getMessagePetParts, getMessageText } from "@/features/chat/utils";
 import { useFlag } from "@/hooks/use-flag";
 
 import LoadingMessage from "./LoadingMessage";
@@ -27,6 +32,40 @@ function MessageSteps({ message }: { message: ChatUIMessage }) {
       <pre className="overflow-x-auto text-xs text-gray-700 dark:text-neutral-300">
         {JSON.stringify(nonTextParts, null, 2)}
       </pre>
+    </div>
+  );
+}
+
+type MessagePetsProps = {
+  message: ChatUIMessage;
+  isDebug: boolean;
+};
+
+function MessagePets({ message, isDebug }: MessagePetsProps) {
+  const parts = getMessagePetParts(message);
+
+  const pets: (ShowPetInput & { id: string })[] = parts.flatMap((part) => {
+    const parsed = ShowPetInputSchema.safeParse(part.input);
+    if (parsed.success) {
+      return [{ id: part.toolCallId, ...parsed.data }];
+    }
+    if (isDebug) {
+      console.error(
+        `[MessagePets] Invalid showPet input for toolCallId: ${part.toolCallId}`,
+        parsed.error
+      );
+    }
+    return [];
+  });
+  if (pets.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="flex flex-wrap gap-3">
+      {pets.map((pet) => (
+        <Pet key={pet.id} pet={pet.pet} style={pet.style} size={pet.size} />
+      ))}
     </div>
   );
 }
@@ -69,6 +108,7 @@ function ChatMessage({
 
       {!isUser && (
         <div className="w-full space-y-3 text-sm text-gray-800 dark:text-neutral-200">
+          <MessagePets message={message} isDebug={isDebug} />
           <MessageMarkdown isAnimating={isAnimating}>{text}</MessageMarkdown>
         </div>
       )}

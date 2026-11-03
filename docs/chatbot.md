@@ -6,7 +6,7 @@ High-level overview of the dashboard Q&A chatbot in this template.
 
 Streaming chat on `/dashboard/chats` (and `/dashboard/chats/[id]`) for
 **JavaScript, TypeScript, Node.js, and Next.js**, plus **App/DB**
-answers and **UI keyboard commands** via tools:
+answers, **UI keyboard commands**, and an in-chat **pet** via tools:
 
 - OpenAI via `@ai-sdk/openai` and the Vercel AI SDK (no AI Gateway).
 - Sessions persist in `ChatSession` (save the user message before each
@@ -16,10 +16,10 @@ answers and **UI keyboard commands** via tools:
 
 ### Defaults
 
-| Constant             | Value                                                        |
-| -------------------- | ------------------------------------------------------------ |
-| `CHAT_MODEL`         | `gpt-4o-mini`                                                |
-| `CHAT_SYSTEM_PROMPT` | JS/TS/Node/Next + App/DB + UI commands; concise; refuse else |
+| Constant             | Value                                                              |
+| -------------------- | ------------------------------------------------------------------ |
+| `CHAT_MODEL`         | `gpt-4o-mini`                                                      |
+| `CHAT_SYSTEM_PROMPT` | JS/TS/Node/Next + App/DB + UI commands + pet; concise; refuse else |
 
 ### Tools
 
@@ -27,6 +27,7 @@ answers and **UI keyboard commands** via tools:
 | -------------------- | ------ | ----------------------------------------------------- |
 | `getCurrentUser`     | Server | Prisma profile for closed-over session `userId`       |
 | `runKeyboardCommand` | Client | Schema only on server; `onToolCall` runs via keyboard |
+| `showPet`            | Client | Schema only on server; renders `<Pet />` in the reply |
 
 ## Design choices
 
@@ -48,7 +49,7 @@ answers and **UI keyboard commands** via tools:
 Chat mounts from:
 
 1. routes `/dashboard/chats` and `/dashboard/chats/[id]` → `ChatView` →
-  `ChatSection` → `useAgent` → `/api/chat`.
+   `ChatSection` → `useAgent` → `/api/chat`.
 2. `ChatOffcanvas` → `ChatSection variant="sidebar"` from the dashboard layout.
 
 - ChatSession persistence
@@ -101,10 +102,13 @@ flowchart TD
   Owner --> Stream["streamText + createChatTools"]
   Stream -->|server execute| GetUser["getCurrentUser Prisma"]
   Stream -->|no execute| KbSchema["runKeyboardCommand schema"]
+  Stream -->|no execute| PetSchema["showPet schema"]
   Stream --> UI["createUIMessageStreamResponse"]
   UI --> UseChat
   UseChat -->|onToolCall| KbRun["commandsByIdRef.run"]
   KbRun -->|addToolOutput| UseChat
+  UseChat -->|onToolCall| PetAck["showPet success"]
+  PetAck -->|addToolOutput| UseChat
   UseChat -->|sendAutomaticallyWhen| Transport
   UseChat --> Messages["ChatMessages + ChatInput"]
 ```
@@ -119,7 +123,8 @@ Some relevant details:
   is updated to `error` or `aborted` in `toUIMessageStream.onEnd`.
 - **`useAgent`:** creates `Chat` instance; sends the pre-composed user
   message (metadata `timestamp`); skips dynamic tools; sends `keyboardCommandIds`
-  and `chatId`; runs `runKeyboardCommand` via `commandsByIdRef`.
+  and `chatId`; runs `runKeyboardCommand` via `commandsByIdRef`; acknowledges
+  `showPet` with `{ success: true }`.
 - **Streams across pages:** `ChatInstancesProvider` keeps each `Chat` by id; so
   moving between `/dashboard` pages doesn't stop a response; reopening the chat
   reuses the live instance.
@@ -128,8 +133,8 @@ Some relevant details:
 - **Agent loop:** `stopWhen: stepCountIs(5)`, `maxRetries: 2`,
   `temperature: 0.2`, `repairToolCall` (re-ask; no `Output.object`).
 - **Input:** Enter sends; Shift+Enter inserts a newline.
-- **`client-debug`:** Logs section state and shows non-text **Steps**
-  under assistant bubbles.
+- **`client-debug`:** Logs section state, shows non-text **Steps**
+  under assistant bubbles, and logs `showPet` parts with invalid input.
 - **`server-debug`:** Logs chat input and `streamText` `onEnd` output in
   the API route.
 - **`user-message-markdown`:** When on, user bubbles render via
@@ -141,7 +146,7 @@ Some relevant details:
   message on send, then reply in `onEnd`.
 - **Archive:**
   - Archived chats (`isArchived` + `archivedAt`) are
-  read-only: the input is disabled and `POST /api/chat` returns `403`.
+    read-only: the input is disabled and `POST /api/chat` returns `403`.
   - Page shows `ChatArchivedBanner`.
   - Sidebar only shows the Archived dropdown.
   - Chat sidebar shows `ChatArchivedBanner variant="sidebar"`.
@@ -194,55 +199,61 @@ flowchart TD
 9. **Assistant text streams back** (Client) —
    `createUIMessageStreamResponse` → `ChatMessages`
 
-### Client tool (`runKeyboardCommand`)
+### Client tool (`runKeyboardCommand`, `showPet`)
 
-No server `execute` — only `inputSchema` (`commandId`). The model
-call is streamed to the client; `useAgent` runs it via `useKeyboard`,
-then `addToolOutput` + auto-POST continues the loop.
+No server `execute` — only `inputSchema`. The model call is streamed to
+the client; `useAgent` handles it in `onToolCall`, then `addToolOutput` +
+auto-POST continues the loop.
 
 ```mermaid
 flowchart TD
-  user["User asks for a UI action"]
+  user["User asks for a UI action or the pet"]
   post["POST /api/chat"]
   auth["Auth + request parse"]
   tools["createChatTools registers schema only"]
   stream["Model produces tool call"]
   validate["Validate tool-call input"]
   streamOut["Stream tool call to client (no execute)"]
+  render["Renders MessagePets"]
   onToolCall["useAgent onToolCall"]
-  run["commandsById.get(commandId).run()"]
+  handle1["runKeyboardCommand: commandsById.get(commandId).run()"]
+  handle2["showPet: nothing to run"]
   output["addToolOutput"]
   auto["sendAutomaticallyWhen fires"]
   continue["Model continues with tool result"]
 
   user --> post --> auth --> tools --> stream --> validate
-  validate --> streamOut --> onToolCall --> run --> output --> auto
-  auto --> continue
+  validate --> streamOut --> onToolCall
+  streamOut --> render
+  onToolCall --> handle1 --> output
+  onToolCall --> handle2 --> output
+  output --> auto --> continue
   auto -.->|auto-continue| post
 ```
 
 **Step-by-step:**
 
-1. **User asks for a UI action** (Client) — e.g. “switch to dark
-   mode” via `useAgent`
+1. **User asks for a UI action or the pet** (Client) — e.g. “switch to
+   dark mode” or “hi” via `useAgent`
 2. **POST /api/chat** (Client) — `DefaultChatTransport` sends UI
    messages
 3. **Auth + request parse** (Server) — `getUserId()`, then
    `ChatRequestSchema`, then `getChatSession`
 4. **createChatTools registers schema only** (Server) —
-   `runKeyboardCommand` has `inputSchema`, no `execute`
-5. **Model produces tool call** (Model) — Args: `{ commandId }`
-   from the request-scoped enum
-6. **Validate tool-call input** (Server) — dynamic
-   `inputSchema` checks `commandId`
+   `runKeyboardCommand` and `showPet` have `inputSchema`, no `execute`
+5. **Model produces tool call** (Model) — Args: `{ commandId }` from
+   the request-scoped enum, or `{ pet?, style?, size? }`
+6. **Validate tool-call input** (Server) — dynamic `inputSchema` checks
+   `commandId`; `ShowPetInputSchema` checks the pet options
 7. **Stream tool call to client (no execute)** (Server) —
    `createUIMessageStreamResponse` carries the pending tool call
-8. **useAgent onToolCall** (Client) — Skip dynamic tools; handle
-   `runKeyboardCommand` only
-9. **commandsById.get(commandId).run()** (Client) — Browser UI
-   side effect via `useKeyboard` registry
+8. **useAgent onToolCall** (Client) — Skip dynamic tools; dispatch by
+   `toolName`
+9. **Handle the tool call** (Client) — `runKeyboardCommand` runs
+   `commandsById.get(commandId).run()` via `useKeyboard`; `showPet` has
+   nothing to run, since `MessagePets` renders the pet from the part.
 10. **addToolOutput** (Client) — `{ success: true, commandId }` or
-    `output-error` + `errorText`
+    `output-error` + `errorText`; `showPet` sends `{ success: true }`
 11. **sendAutomaticallyWhen fires** (Client) —
     `lastAssistantMessageIsCompleteWithToolCalls` → new POST
 12. **Model continues with tool result** (Model) — May answer in
@@ -254,5 +265,9 @@ flowchart TD
   - Keep request shape in `ChatRequestSchema` and metadata on
     `ChatUIMessage`.
   - Add more tools under `schema/tools.ts` + `createChatTools`.
+  - Add a pet by adding its sprites for every style in
+    `public/mascots/<pet>-<style>-{directions,reactions}.webp`, then
+    its name to `PET_KINDS` in `src/components/pet/config.ts`. The schema
+    and tool description pick it up.
   - Debug fixtures live under `scripts/seed/data/` (for example
     `chat-session.ts`, `chat-request.json`).

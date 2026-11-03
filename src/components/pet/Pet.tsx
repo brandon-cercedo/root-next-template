@@ -2,9 +2,7 @@
 
 import { Mascot } from "page-mascot";
 
-export type PetKind = "fox";
-
-export type PetStyle = "default" | "riso" | "paper" | "pixel";
+import { DEFAULT_PET_KIND, type PetKind, type PetStyle } from "./config";
 
 type PetProps = {
   pet?: PetKind;
@@ -19,7 +17,7 @@ type PetProps = {
  * @see {@link https://koboyo.com/page-mascot | page-mascot} for characters, styles and customization.
  */
 export default function Pet({
-  pet = "fox",
+  pet = DEFAULT_PET_KIND,
   size = 64,
   style = "default",
   className,
