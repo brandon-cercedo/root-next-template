@@ -4,8 +4,8 @@ import Link from "next/link";
 
 import { FullUser } from "@/actions/db/user";
 import AppLogo from "@/components/brand/AppLogo";
-import Pet from "@/components/brand/Pet";
 import { OVERLAY_IDS } from "@/components/constants";
+import Pet from "@/components/pet/Pet";
 import { OVERLAY_BACKDROP_CLASS } from "@/components/ui/modal/Modal";
 import { paths } from "@/lib/config/paths";
 

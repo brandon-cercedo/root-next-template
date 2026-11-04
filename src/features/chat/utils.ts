@@ -1,4 +1,4 @@
-import { generateId, type UIMessage } from "ai";
+import { generateId, isToolUIPart, type UIMessage } from "ai";
 import { truncate } from "lodash";
 
 import { TITLE_MAX_LENGTH } from "@/features/chat/schema/chat";
@@ -28,6 +28,15 @@ export function getMessageText(message: UIMessage) {
     .filter((part) => part.type === "text")
     .map((part) => part.text)
     .join("");
+}
+
+export function getMessagePetParts(message: UIMessage) {
+  return message.parts.filter(isToolUIPart).filter((part) => {
+    return (
+      part.type === "tool-showPet" &&
+      ["input-available", "output-available"].includes(part.state)
+    );
+  });
 }
 
 export function getChatTitle(text: string) {

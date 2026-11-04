@@ -97,6 +97,64 @@ export const SEED_CHAT_SESSIONS: { sessions: SeedChatSession[] } = {
           parts: [
             {
               type: "text",
+              text: "Hi",
+            },
+          ],
+          id: "waSS0QpcsEayx23D",
+          role: "user",
+          metadata: {
+            timestamp: "2026-09-15T22:08:20.032Z",
+          },
+        },
+        {
+          id: "EH3Y9AShESv5LGcg",
+          metadata: {
+            timestamp: "2026-09-15T22:08:25.129Z",
+            durationMs: 5097,
+          },
+          role: "assistant",
+          parts: [
+            {
+              type: "step-start",
+            },
+            {
+              type: "tool-showPet",
+              toolCallId: "call_9F5KtZ9t1JVQ4Nhk1tMpHyo5",
+              state: "output-available",
+              input: {
+                size: 64,
+                style: "default",
+              },
+              output: {
+                success: true,
+              },
+              callProviderMetadata: {
+                openai: {
+                  itemId:
+                    "fc_0cf0b31ac3ea0540006ae53136fdc087d197d9ba96ab023d7f",
+                },
+              },
+            },
+            {
+              type: "step-start",
+            },
+            {
+              type: "text",
+              text: "Hello! How can I assist you today?",
+              providerMetadata: {
+                openai: {
+                  itemId:
+                    "msg_060ea79bc911a893006ae53138a3d487d1b359243fbe653238",
+                },
+              },
+              state: "done",
+            },
+          ],
+        },
+        {
+          parts: [
+            {
+              type: "text",
               text: "Summarize my signed-in profile.",
             },
           ],

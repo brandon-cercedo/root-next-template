@@ -6,6 +6,7 @@ import {
   getChatStats,
   getChatTitle,
   getLastMessageAt,
+  getMessagePetParts,
 } from "@/features/chat/utils";
 import { fakeChatSessionComplete } from "@/prisma/utils/fake-data";
 
@@ -172,5 +173,91 @@ describe("getChatStats", () => {
       fastestDurationMs: 0,
       slowestDurationMs: 0,
     });
+  });
+});
+
+describe("getMessagePetParts", () => {
+  type MessagePart = ChatUIMessage["parts"][number];
+
+  function assistantMessage(parts: MessagePart[]): ChatUIMessage {
+    return { ...message("assistant"), parts };
+  }
+
+  const inputPart: MessagePart = {
+    type: "tool-showPet",
+    toolCallId: "call-1",
+    state: "input-available",
+    input: { style: "pixel" },
+  };
+  const outputPart: MessagePart = {
+    type: "tool-showPet",
+    toolCallId: "call-2",
+    state: "output-available",
+    input: {},
+    output: { success: true },
+  };
+  const approval = { id: "approval-1" };
+
+  it("should return showPet parts with available input in order", () => {
+    const chatMessage = assistantMessage([
+      outputPart,
+      { type: "text", text: "Hi!" },
+      inputPart,
+    ]);
+
+    expect(getMessagePetParts(chatMessage)).toEqual([outputPart, inputPart]);
+  });
+
+  it.each<MessagePart>([
+    {
+      type: "tool-showPet",
+      toolCallId: "call-3",
+      state: "input-streaming",
+      input: {},
+    },
+    {
+      type: "tool-showPet",
+      toolCallId: "call-3",
+      state: "approval-requested",
+      input: {},
+      approval,
+    },
+    {
+      type: "tool-showPet",
+      toolCallId: "call-3",
+      state: "approval-responded",
+      input: {},
+      approval: { ...approval, approved: true },
+    },
+    {
+      type: "tool-showPet",
+      toolCallId: "call-3",
+      state: "output-error",
+      input: {},
+      errorText: "Failed",
+    },
+    {
+      type: "tool-showPet",
+      toolCallId: "call-3",
+      state: "output-denied",
+      input: {},
+      approval: { ...approval, approved: false },
+    },
+  ])("should skip showPet parts in the $state state", (part) => {
+    const chatMessage = assistantMessage([part, inputPart]);
+
+    expect(getMessagePetParts(chatMessage)).toEqual([inputPart]);
+  });
+
+  it("should skip parts from other tools with available input", () => {
+    const keyboardPart: MessagePart = {
+      type: "tool-runKeyboardCommand",
+      toolCallId: "call-4",
+      state: "input-available",
+      input: { commandId: "theme-dark" },
+    };
+    const chatMessage = assistantMessage([keyboardPart, inputPart]);
+
+    expect(getMessagePetParts(chatMessage)).toEqual([inputPart]);
   });
 });
