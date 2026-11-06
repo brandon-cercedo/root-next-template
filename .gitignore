@@ -41,8 +41,10 @@ yarn-error.log*
 next-env.d.ts
 
 # project specific
-.agents/skills/
-/prisma/types/generated
+/.agents/skills/
+/.claude/
+/.cursor/
+/prisma/types/generated/
 /prisma/utils/fake-data.ts
-scripts/helpers/
-graphify-out/
+/scripts/helpers/
+/graphify-out/
