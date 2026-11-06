@@ -103,14 +103,14 @@ export default function FlagToolbarContent({
   }, [values]);
 
   const filteredFlags = useMemo(() => {
-    const validSearchText = searchText.trim().toLowerCase();
-    if (!validSearchText) {
+    const query = searchText.trim().toLowerCase();
+    if (!query) {
       return FLAG_DECLARATIONS;
     }
 
     return FLAG_DECLARATIONS.filter((declaration) => {
       const targetText = `${declaration.key} ${declaration.description}`;
-      return targetText.toLowerCase().includes(validSearchText);
+      return targetText.toLowerCase().includes(query);
     });
   }, [searchText]);
 

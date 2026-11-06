@@ -52,12 +52,12 @@ function Content({ chats }: { chats: ChatSession[] }) {
   const archivedChats = chats.filter((chat) => chat.isArchived);
 
   const filteredChats = useMemo(() => {
-    const validSearchText = searchText.trim().toLowerCase();
-    if (!validSearchText) {
+    const query = searchText.trim().toLowerCase();
+    if (!query) {
       return archivedChats;
     }
     return archivedChats.filter((chat) =>
-      chat.title.toLowerCase().includes(validSearchText)
+      chat.title.toLowerCase().includes(query)
     );
   }, [archivedChats, searchText]);
 

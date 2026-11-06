@@ -17,9 +17,9 @@ import { isMac } from "@/lib/utils/html";
 import type { ReactNode } from "react";
 
 export const COMMAND_GROUPS = [
+  "Agent",
   "Theme",
   "Navigation",
-  "Agent",
   "Actions",
   "Admin",
 ] as const;
@@ -45,7 +45,7 @@ export const COMMAND_IDS = [
 
 export type CommandId = (typeof COMMAND_IDS)[number];
 
-type Shortcut = {
+export type Shortcut = {
   chord: string; // e.g. "$mod+k"
   labels: {
     mac: string[]; // e.g. ["⌘", "K"]
