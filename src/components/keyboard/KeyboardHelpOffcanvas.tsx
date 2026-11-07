@@ -44,15 +44,15 @@ function Content({ commands }: ContentProps) {
   const [searchText, setSearchText] = useState("");
 
   const filteredCommands = useMemo(() => {
-    const validSearchText = searchText.trim().toLowerCase();
-    if (!validSearchText) {
+    const query = searchText.trim().toLowerCase();
+    if (!query) {
       return commands;
     }
 
     return commands.filter((command) => {
       const keywords = command.keywords?.join(" ") ?? "";
       const targetText = `${command.label} ${command.group} ${keywords}`;
-      return targetText.toLowerCase().includes(validSearchText);
+      return targetText.toLowerCase().includes(query);
     });
   }, [commands, searchText]);
 

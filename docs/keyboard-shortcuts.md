@@ -1,17 +1,15 @@
 # Keyboard shortcuts
 
-High-level overview of dashboard keyboard shortcuts and the command palette.
+High-level overview of dashboard keyboard shortcuts and the keyboard
+shortcuts help panel.
+For the `⌘K` palette, see [command-palette.md](command-palette.md).
 
 ## Overview
 
-Dashboard-only shortcuts powered by `tinykeys`, plus a action search built
-with `cmdk` inside the existing Preline `Modal` overlay, and a keyboard
-shortcuts help panel in a Preline `Offcanvas`:
+Dashboard-only shortcuts powered by `tinykeys`, plus a keyboard shortcuts
+help panel in a Preline `Offcanvas`:
 
 - Global chords bind on `window` via `KeyboardProvider`.
-- `⌘K` / `Ctrl+K` toggles the command palette (always active, including
-  inside inputs).
-- `/` opens the palette when focus is not in an editable field.
 - `⌘/` / `Ctrl+/` opens the keyboard shortcuts help panel.
 
 ## Design choices
@@ -19,7 +17,6 @@ shortcuts help panel in a Preline `Offcanvas`:
 | Choice              | Reason                                             |
 | ------------------- | -------------------------------------------------- |
 | `tinykeys` + `$mod` | Cross-platform ⌘ / Ctrl without custom key parsing |
-| Preline `Modal`     | Reuses existing overlay stack and z-index behavior |
 
 ## Bindings
 
@@ -43,20 +40,19 @@ Shortcut labels show Mac or Windows, not both, via `getIsMac`.
 ## Flow
 
 `KeyboardProvider` wraps dashboard children inside `DashboardProviders` on the
-dashboard layout. It binds shortcuts, renders `CommandPalette` and
-`KeyboardHelpOffcanvas`, and executes shared actions for both chords and
-palette selections.
+dashboard layout. It binds shortcuts and builds the commands that chords and
+palette rows share. The layout renders `DashboardCommandPalette` and
+`KeyboardHelpOffcanvas` inside it.
 
 ```mermaid
 flowchart TD
   Layout["src/app/dashboard/layout.tsx"] --> Provider["KeyboardProvider"]
   Provider --> Tinykeys["tinykeys on window"]
-  Provider --> Palette["CommandPalette"]
+  Provider --> Palette["DashboardCommandPalette"]
   Provider --> Help["KeyboardHelpOffcanvas"]
   Tinykeys --> Overlay["useOverlay toggle/open"]
-  Palette --> Cmdk["cmdk Command in Modal"]
+  Tinykeys --> Actions["theme / sidebar / nav / confetti"]
   Help --> Offcanvas["Offcanvas panel"]
-  Cmdk --> Actions["theme / sidebar / nav / confetti"]
   Overlay --> Preline["Preline HSOverlay"]
 ```
 
@@ -67,6 +63,10 @@ Some relevant details:
   commands skip the palette via `inPalette: false`. Commands with
   `inEditable: true` also run inside editable targets. `getKeyboardCommands`
   attaches `run` in `KeyboardProvider`.
+- **Groups:** `COMMAND_GROUPS` sets the group order for both the help panel
+  and the palette.
+- **Help panel:** `KeyboardHelpOffcanvas` lists the commands that have a chord,
+  by group, with a case-insensitive search on label, group, and keywords.
 
 ## Considerations
 

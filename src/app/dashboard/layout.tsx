@@ -2,10 +2,10 @@ import { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { FullUser, getFullUser } from "@/actions/db/user";
+import DashboardCommandPalette from "@/app/dashboard/_components/command-palette/DashboardCommandPalette";
 import DashboardSidebar from "@/app/dashboard/_components/sidebar/DashboardSidebar";
 import FlagsBadge from "@/components/flags/FlagsBadge";
 import FlagToolbar from "@/components/flags/FlagToolbar";
-import CommandPalette from "@/components/keyboard/CommandPalette";
 import KeyboardHelpOffcanvas from "@/components/keyboard/KeyboardHelpOffcanvas";
 import ConfirmationModal from "@/components/ui/modal/ConfirmationModal";
 import ChatOffcanvas from "@/features/chat/components/ChatOffcanvas";
@@ -43,7 +43,7 @@ async function DashboardProviders({
             <ChatInstancesProvider>
               <ChatSessionProvider>
                 {children}
-                <CommandPalette />
+                <DashboardCommandPalette />
                 <KeyboardHelpOffcanvas />
                 <ConfirmationModal />
                 <ChatOffcanvas />
