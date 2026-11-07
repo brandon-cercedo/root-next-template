@@ -193,7 +193,7 @@ export type CommandPaletteGroup = {
 type CommandPaletteProps = {
   groups: CommandPaletteGroup[];
   searchText?: string;
-  shouldFilter?: boolean;
+  shouldFilter?: boolean; // Toggle cmdk's built-in filtering/sorting.
   loop?: boolean;
   onSearch?: (searchText: string) => void;
 };
