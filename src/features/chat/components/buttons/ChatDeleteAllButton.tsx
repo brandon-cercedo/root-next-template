@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import pluralize from "pluralize";
 import { Fragment } from "react/jsx-runtime";
 import { toast } from "sonner";
@@ -22,9 +22,8 @@ export default function ChatDeleteAllButton({
   className,
 }: ChatDeleteAllButtonProps) {
   const router = useRouter();
-  const pathname = usePathname();
   const { openConfirmation } = useConfirmationModal();
-  const { chatId, closeChat } = useChatSession();
+  const { chatId, pageChat, closeChat } = useChatSession();
 
   const label = pluralize("chat", chats.length);
 
@@ -44,9 +43,7 @@ export default function ChatDeleteAllButton({
       closeChat(offcanvasChat.id);
     }
 
-    const isChatPage = chats.some(
-      (chat) => pathname === paths.dashboard.chat(chat.id)
-    );
+    const isChatPage = chats.some((chat) => chat.id === pageChat?.id);
     if (isChatPage) {
       router.push(paths.dashboard.chats());
     }
