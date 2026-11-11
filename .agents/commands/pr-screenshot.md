@@ -30,7 +30,7 @@ If none is available, stop and tell the user.
      - Actions: clicks or input that show the requested state.
    - If you can't tell how to reach a state, ask the user.
 2. **Capture** each shot:
-   - Viewport: 1280×800 unless the user asks otherwise.
+   - Viewport: 1440×900 unless the user asks otherwise.
    - Wait for loading and animations to finish.
    - Save to the scratchpad, review it, retake if wrong.
    - Close the browser when done; some tools can't reopen the profile.
