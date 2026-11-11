@@ -43,10 +43,16 @@ Merge order: P0 → P1. After P0 lands on `main`, retarget P1's PR to
 
 ### P1
 
-- [ ] Chat command IDs in `COMMAND_IDS`
-- [ ] Feature hook that builds the opened chat's commands
-- [ ] `useCommandPaletteSearch` adds them to the `Agent` group
-- [ ] Tests for the command set per state and the delete flow
+- [x] `inAgent` flag; 6 chat commands in
+      `COMMAND_IDS` and `BASE_KEYBOARD_COMMANDS`
+- [x] Generic `KeyboardProvider` (`commands` prop, no `openHelp`)
+- [x] `DashboardKeyboardProvider`: today's actions + admin and chat
+      page actions
+- [x] `pageChat` state in `useChatSession`, set by `ChatView`
+- [x] Provider order in the dashboard layout
+- [x] Agent filter in `use-agent.ts` and `create-chat-tools.ts`
+- [x] Tests
+- [x] `pnpm test:all` before the PR
 
 ---
 
@@ -84,7 +90,8 @@ flowchart LR
 - `src/components/keyboard/CommandPalette.tsx`:
   - Types: `CommandPaletteItem` (`id: string`, `value`, `label`,
     `keywords?`, `icon?`, `shortcut?`, `renderSuffixes?`, `run`) and
-    `CommandPaletteGroup` (`id`, `heading`, `limit?`, `items`).
+    `CommandPaletteGroup` (`id`, `heading`, `subHeading?`, `limit?`,
+    `items`).
     `KeyboardCommand` plus `value` fits `CommandPaletteItem`, so
     `CommandId` stays strict for the agent tool.
   - Props: `groups`, `searchText`, `onSearch`, `shouldFilter` (default
@@ -137,44 +144,107 @@ flowchart LR
 
 ## P1 — Actions for the opened chat (RNT-103)
 
-In the `Agent` group, shown only while a chat is open on its own page.
+```mermaid
+flowchart LR
+  View["ChatView"] -->|setPageChat| Session["ChatSessionProvider: pageChat"]
+  Session --> Dash["DashboardKeyboardProvider: base + admin + chat actions"]
+  Dash -->|commands| Keyboard["KeyboardProvider (generic)"]
+  Keyboard --> Palette["CommandPalette / key bindings"]
+  Keyboard --> Agent["use-agent: inAgent filter"]
+  Agent -->|keyboardCommandIds| API["create-chat-tools: inAgent filter"]
+```
 
+### Behavior
+
+- Chat actions show in the `Agent` group, before _New chat_, only while
+  a chat is open on its own page.
+- **Any chat:** _Move to sidebar_ (`PanelRight`), like
+  `ChatOpenOffcanvasButton`: `openChat(pageChat.id)` opens the side panel
+  and redirects to `/dashboard/chats`.
 - **Active chat:** _Add to favorites_ (`LucideStar`) or _Remove from
   favorites_ (`LucideStarOff`), plus _Archive chat_ (`LucideArchive`).
 - **Archived chat:** _Restore chat_ (`LucideRotateCcw`), plus _Delete
   chat_ (`LucideTrash2`).
+- The `Agent` heading shows the opened chat's title next to it as a sub
+  heading, truncated when long.
+- They run from the client (the palette now, key bindings later), never
+  from the agent.
+- Toasts copy the chat buttons, including Archive's "Undo". _Delete
+  chat_ opens the confirm modal with `ChatDeleteButton`'s copy; confirm
+  deletes, closes the side panel chat and redirects to
+  `/dashboard/chats`.
 
-### Changes
+### Shared
 
-- `src/components/keyboard/config.tsx`: add `favorite-chat`,
-  `unfavorite-chat`, `archive-chat`, `restore-chat`, `delete-chat` to
-  `COMMAND_IDS`. They stay out of `BASE_KEYBOARD_COMMANDS` and
-  `KeyboardProvider`, so the agent's `runKeyboardCommand` tool can't
-  trigger them.
-- Chat feature hook (e.g. `useOpenedChatCommands`) returns
-  `KeyboardCommand[]` for the opened chat:
-  - Open chat: `chatSessions.find(c => pathname === paths.dashboard.chat(c.id))`.
-  - With no open chat, it returns `[]`.
-  - Handlers copy the existing button toasts and call
-    `toggleFavoriteChatSession`, `toggleArchivedChatSession` and
-    `handleDeleteChatSession`.
-  - _Delete chat_ opens `useConfirmationModal` with `ChatDeleteButton`'s
-    title, message and label. Confirm deletes, shows the toast, runs
-    `closeChat(id)`, then `router.push(paths.dashboard.chats())`. No
-    shared delete hook.
-- `useCommandPaletteSearch` adds them to the `Agent` group.
+- `src/components/keyboard/config.tsx`:
+  - `inAgent?: boolean` on `BaseKeyboardCommand` (default `true`, like
+    `inPalette`).
+  - The 6 chat IDs in `COMMAND_IDS`, and their commands in
+    `BASE_KEYBOARD_COMMANDS` before `new-chat`, with `inAgent: false`.
+    One command list, no dashboard/marketing split.
+  - Exempt from `max-lines`; the list keeps growing.
+- `src/lib/keyboard.ts`: `getShortcutKeys`, `getKeyboardCommands` and
+  `getShortcutCommands`, moved out of `config.tsx`.
+- `src/hooks/use-keyboard.tsx`: `KeyboardProvider` takes a `commands`
+  prop and owns only the maps, the ref and the key bindings. The action
+  handlers and `openHelp` are gone; `UserMenu` runs the
+  `open-keyboard-help` command.
+
+### Feature (`src/features/chat`)
+
+- `hooks/use-chat-session.tsx`: `pageChat` and `setPageChat`, kept apart
+  from `chatId`/`openChat`/`closeChat` (the side panel). `openChat`
+  checks `pageChat?.id` instead of the pathname, so the provider no
+  longer uses `usePathname` and navigation doesn't re-render it.
+- `hooks/use-agent.ts`: sends only commands with `inAgent !== false`.
+- `services/tools/create-chat-tools.ts`: checks `inAgent` again, since
+  client input can't be trusted.
+
+### App (`src/app/dashboard`)
+
+- `_components/keyboard/hooks/use-dashboard-keyboard.tsx`:
+  - `DashboardKeyboardProvider` holds the dashboard actions moved from
+    `use-keyboard.tsx`, plus `getAdminActions` (flag toolbar) and
+    `getPageChatActions` (from `pageChat`). It builds the commands with
+    `getKeyboardCommands` and renders `KeyboardProvider`.
+  - `useDashboardKeyboard()` returns `useKeyboard()`.
+- `chats/_components/ChatView.tsx`: sets `pageChat` in a layout effect
+  that tracks only `chat`, and clears it on unmount. Before paint, so a
+  click can't read an empty `pageChat`.
+- `layout.tsx`: `ChatSessionProvider` → `DashboardKeyboardProvider` →
+  `ChatInstancesProvider`.
+- `use-command-palette-search.tsx`: the chat commands arrive through
+  `useKeyboard().commands`. The hook sets the `Agent` group's
+  `subHeading` to `pageChat?.title`.
 
 ### Tests
 
-- Hook: command set per state (none off a chat page,
-  favourite/unfavourite, archived), and the delete confirmation that
-  deletes, closes and redirects.
-- `useCommandPaletteSearch`: chat commands land in the `Agent` group.
+- `keyboard/hooks/__tests__/use-dashboard-keyboard.test.tsx`: throws
+  outside the provider, dashboard actions, admin flag toolbar, chat
+  commands per state (none, active, favourite, archived), _Move to
+  sidebar_ calls `openChat`, and order before _New chat_.
+- `command-palette/hooks/__tests__/use-command-palette-search.test.tsx`:
+  the opened chat title is the `Agent` sub heading, and only there.
+- `features/chat/hooks/__tests__/use-chat-session.test.tsx`: the
+  current-page redirect in `openChat` is driven by `setPageChat`.
+- `src/lib/__tests__/keyboard.test.ts`: the helpers, and the chat
+  commands have `inAgent: false`.
+- `use-keyboard.test.tsx`: commands passed in directly, key bindings and
+  the palette guard.
+- `services/__tests__/tools.test.ts`: chat commands are left out of the
+  agent catalog.
 
 ### Verification
 
-- Browser: the favourite label flips after revalidate, archiving turns
-  on the banner, and _Restore chat_ works. _Delete chat_ opens the
-  confirm popup cleanly after the palette closes (watch for a Preline
-  modal-to-modal glitch) and redirects. No chat actions show on
-  `/dashboard` or `/dashboard/chats`.
+- `pnpm test:all`.
+- Browser:
+  - The chat actions show only on `/dashboard/chats/[id]`.
+  - The `Agent` heading shows the chat title, truncated when long.
+  - The favorite label flips after the chat refreshes.
+  - _Move to sidebar_ opens the chat in the side panel and leaves its
+    page.
+  - Archiving shows the banner, and _Restore chat_ works.
+  - _Delete chat_ confirms and redirects.
+  - The agent can't list or run the chat commands.
+- A chat can't be open on its own page and in the side panel at the same
+  time: `openChat` redirects to `/dashboard/chats`.

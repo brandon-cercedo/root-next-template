@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { FullUser, getFullUser } from "@/actions/db/user";
 import DashboardCommandPalette from "@/app/dashboard/_components/command-palette/DashboardCommandPalette";
+import { DashboardKeyboardProvider } from "@/app/dashboard/_components/keyboard/hooks/use-dashboard-keyboard";
 import DashboardSidebar from "@/app/dashboard/_components/sidebar/DashboardSidebar";
 import FlagsBadge from "@/components/flags/FlagsBadge";
 import FlagToolbar from "@/components/flags/FlagToolbar";
@@ -14,7 +15,6 @@ import LoginConfetti from "@/features/home/components/LoginConfetti";
 import { ChatInstancesProvider } from "@/hooks/use-chat-instances";
 import { ConfirmationModalProvider } from "@/hooks/use-confirmation-modal";
 import { FlagProvider } from "@/hooks/use-flag";
-import { KeyboardProvider } from "@/hooks/use-keyboard";
 import { UserProvider } from "@/hooks/use-user";
 import { paths } from "@/lib/config/paths";
 import { isAdmin } from "@/lib/utils/db/user";
@@ -39,17 +39,17 @@ async function DashboardProviders({
     <ConfirmationModalProvider>
       <UserProvider user={user}>
         <FlagProvider values={values} overrides={overrides}>
-          <KeyboardProvider>
-            <ChatInstancesProvider>
-              <ChatSessionProvider>
+          <ChatSessionProvider>
+            <DashboardKeyboardProvider>
+              <ChatInstancesProvider>
                 {children}
                 <DashboardCommandPalette />
                 <KeyboardHelpOffcanvas />
                 <ConfirmationModal />
                 <ChatOffcanvas />
-              </ChatSessionProvider>
-            </ChatInstancesProvider>
-          </KeyboardProvider>
+              </ChatInstancesProvider>
+            </DashboardKeyboardProvider>
+          </ChatSessionProvider>
         </FlagProvider>
       </UserProvider>
     </ConfirmationModalProvider>

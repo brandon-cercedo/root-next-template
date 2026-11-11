@@ -92,6 +92,27 @@ describe("createChatTools", () => {
     expect(tools).not.toHaveProperty("runKeyboardCommand");
   });
 
+  it("should leave chat commands out of the catalog", async () => {
+    const { createChatTools } =
+      await import("@/features/chat/services/tools/create-chat-tools");
+    const tools = createChatTools({
+      userId: "session-user-1",
+      keyboardCommandIds: [
+        "theme-dark",
+        "move-chat-to-sidebar",
+        "favorite-chat",
+        "delete-chat",
+      ],
+    });
+
+    const description = tools.runKeyboardCommand?.description ?? "";
+
+    expect(description).toContain('"theme-dark"');
+    expect(description).not.toContain("move-chat-to-sidebar");
+    expect(description).not.toContain("favorite-chat");
+    expect(description).not.toContain("delete-chat");
+  });
+
   it("should register runKeyboardCommand for allowlisted ids", async () => {
     const { createChatTools } =
       await import("@/features/chat/services/tools/create-chat-tools");

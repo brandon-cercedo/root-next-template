@@ -1,7 +1,13 @@
+/* eslint-disable max-lines -- the command list keeps growing */
 import {
   Home,
   Keyboard,
   LogOut,
+  LucideArchive,
+  LucideRotateCcw,
+  LucideStar,
+  LucideStarOff,
+  LucideTrash2,
   MessageCirclePlus,
   Monitor,
   Moon,
@@ -11,8 +17,6 @@ import {
   Sun,
   ToggleLeft,
 } from "lucide-react";
-
-import { isMac } from "@/lib/utils/html";
 
 import type { ReactNode } from "react";
 
@@ -41,6 +45,12 @@ export const COMMAND_IDS = [
   "confetti",
   "open-flag-toolbar",
   "open-keyboard-help",
+  "move-chat-to-sidebar",
+  "favorite-chat",
+  "unfavorite-chat",
+  "archive-chat",
+  "restore-chat",
+  "delete-chat",
 ] as const;
 
 export type CommandId = (typeof COMMAND_IDS)[number];
@@ -60,6 +70,7 @@ export type BaseKeyboardCommand = {
   keywords?: string[];
   shortcut?: Shortcut;
   inPalette?: boolean;
+  inAgent?: boolean;
   inEditable?: boolean; // also run the shortcut inside editable targets
   icon?: ReactNode;
 };
@@ -67,10 +78,6 @@ export type BaseKeyboardCommand = {
 export type KeyboardCommand = BaseKeyboardCommand & {
   run: () => void;
 };
-
-export function getShortcutKeys({ labels }: Shortcut) {
-  return isMac() ? labels.mac : labels.windows;
-}
 
 export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
   {
@@ -172,6 +179,66 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
     ),
   },
   {
+    id: "move-chat-to-sidebar",
+    label: "Move to sidebar",
+    group: "Agent",
+    keywords: ["chat", "panel", "offcanvas"],
+    inAgent: false,
+    icon: (
+      <PanelRight className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
+  },
+  {
+    id: "favorite-chat",
+    label: "Add to favorites",
+    group: "Agent",
+    keywords: ["chat", "star"],
+    inAgent: false,
+    icon: (
+      <LucideStar className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
+  },
+  {
+    id: "unfavorite-chat",
+    label: "Remove from favorites",
+    group: "Agent",
+    keywords: ["chat", "star"],
+    inAgent: false,
+    icon: (
+      <LucideStarOff className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
+  },
+  {
+    id: "archive-chat",
+    label: "Archive chat",
+    group: "Agent",
+    keywords: ["chat"],
+    inAgent: false,
+    icon: (
+      <LucideArchive className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
+  },
+  {
+    id: "restore-chat",
+    label: "Restore chat",
+    group: "Agent",
+    keywords: ["chat", "unarchive"],
+    inAgent: false,
+    icon: (
+      <LucideRotateCcw className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
+  },
+  {
+    id: "delete-chat",
+    label: "Delete chat",
+    group: "Agent",
+    keywords: ["chat", "remove"],
+    inAgent: false,
+    icon: (
+      <LucideTrash2 className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
+    ),
+  },
+  {
     id: "new-chat",
     label: "New chat",
     group: "Agent",
@@ -247,29 +314,6 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
 
 export type CommandActions = Partial<Record<CommandId, () => void>>;
 
-export function getKeyboardCommands(actions: CommandActions) {
-  return BASE_KEYBOARD_COMMANDS.reduce<KeyboardCommand[]>((acc, item) => {
-    const run = actions[item.id];
-    if (!run) {
-      return acc;
-    }
-
-    const command: KeyboardCommand = {
-      ...item,
-      run,
-    };
-    acc.push(command);
-
-    return acc;
-  }, []);
-}
-
 export type ShortcutCommand = KeyboardCommand & {
   shortcut: Shortcut;
 };
-
-export function getShortcutCommands(commands: KeyboardCommand[]) {
-  return commands.filter((command): command is ShortcutCommand =>
-    Boolean(command.shortcut)
-  );
-}

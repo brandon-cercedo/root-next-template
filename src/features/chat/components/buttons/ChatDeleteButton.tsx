@@ -1,7 +1,7 @@
 "use client";
 
 import { LucideTrash2 } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Fragment } from "react/jsx-runtime";
 import { toast } from "sonner";
 
@@ -24,9 +24,8 @@ export default function ChatDeleteButton({
   label,
 }: ChatDeleteButtonProps) {
   const router = useRouter();
-  const pathname = usePathname();
   const { openConfirmation } = useConfirmationModal();
-  const { closeChat } = useChatSession();
+  const { pageChat, closeChat } = useChatSession();
 
   const handleDelete = async () => {
     const result = await handleDeleteChatSession({ id: chat.id });
@@ -39,7 +38,7 @@ export default function ChatDeleteButton({
 
     toast("Chat deleted permanently");
     closeChat(chat.id);
-    if (pathname === paths.dashboard.chat(chat.id)) {
+    if (pageChat?.id === chat.id) {
       router.push(paths.dashboard.chats());
     }
   };

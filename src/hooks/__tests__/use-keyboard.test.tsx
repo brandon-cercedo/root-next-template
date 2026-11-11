@@ -1,15 +1,13 @@
 import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { OVERLAY_IDS } from "@/components/constants";
+import {
+  BASE_KEYBOARD_COMMANDS,
+  KeyboardCommand,
+} from "@/components/keyboard/config";
 import { KeyboardProvider, useKeyboard } from "@/hooks/use-keyboard";
 
-const mockOpenOverlay = vi.hoisted(() => vi.fn());
-const mockToggleOverlay = vi.hoisted(() => vi.fn());
 const mockIsOverlayOpen = vi.hoisted(() => vi.fn());
-const mockOpenDropdown = vi.hoisted(() => vi.fn());
-const mockSetTheme = vi.hoisted(() => vi.fn());
-const mockPush = vi.hoisted(() => vi.fn());
 const mockTinykeys = vi.hoisted(() =>
   vi.fn<(...args: unknown[]) => () => void>(() => vi.fn())
 );
@@ -17,45 +15,9 @@ const mockDefaultIgnore = vi.hoisted(() => vi.fn());
 
 vi.mock("@/hooks/use-overlay", () => ({
   useOverlay: () => ({
-    open: mockOpenOverlay,
-    toggle: mockToggleOverlay,
     isOpen: mockIsOverlayOpen,
   }),
 }));
-
-vi.mock("@/hooks/use-dropdown", () => ({
-  useDropdown: () => ({
-    open: mockOpenDropdown,
-  }),
-}));
-
-vi.mock("@/hooks/use-theme", () => ({
-  useTheme: () => ({
-    theme: "light",
-    setTheme: mockSetTheme,
-    color: "light",
-  }),
-}));
-
-vi.mock("@/hooks/use-user", () => ({
-  useUser: () => ({
-    user: { email: "user@example.com" },
-  }),
-}));
-
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({
-    push: mockPush,
-  }),
-}));
-
-vi.mock("@/lib/utils/db/user", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/utils/db/user")>();
-  return {
-    ...actual,
-    isAdmin: () => false,
-  };
-});
 
 vi.mock("tinykeys", () => ({
   defaultKeybindingsHandlerIgnore: mockDefaultIgnore,
@@ -65,8 +27,13 @@ vi.mock("tinykeys", () => ({
     event.key === press,
 }));
 
+const commands: KeyboardCommand[] = BASE_KEYBOARD_COMMANDS.map((command) => ({
+  ...command,
+  run: vi.fn(),
+}));
+
 function Wrapper({ children }: { children: React.ReactNode }) {
-  return <KeyboardProvider>{children}</KeyboardProvider>;
+  return <KeyboardProvider commands={commands}>{children}</KeyboardProvider>;
 }
 
 function getTinykeysIgnore() {
@@ -76,19 +43,21 @@ function getTinykeysIgnore() {
   return options.ignore;
 }
 
+function getKeybinding(chord: string) {
+  const keybindings = mockTinykeys.mock.lastCall?.[1] as Record<
+    string,
+    (event: KeyboardEvent) => Promise<void>
+  >;
+  return keybindings[chord];
+}
+
 describe("useKeyboard", () => {
   beforeEach(() => {
-    mockOpenOverlay.mockReset();
-    mockToggleOverlay.mockReset();
     mockIsOverlayOpen.mockReset();
-    mockOpenDropdown.mockReset();
-    mockSetTheme.mockReset();
-    mockPush.mockReset();
     mockTinykeys.mockClear();
     mockDefaultIgnore.mockReset();
-    mockOpenOverlay.mockResolvedValue(undefined);
-    mockToggleOverlay.mockResolvedValue(undefined);
     mockIsOverlayOpen.mockResolvedValue(false);
+    commands.forEach((command) => vi.mocked(command.run).mockReset());
   });
 
   it("should throw when used outside KeyboardProvider", () => {
@@ -97,33 +66,46 @@ describe("useKeyboard", () => {
     );
   });
 
-  it("should return commands, commandsById, commandsByIdRef, shortcuts, and openHelp", () => {
+  it("should return the given commands, maps and shortcuts", () => {
     const { result } = renderHook(() => useKeyboard(), {
       wrapper: Wrapper,
     });
 
-    expect(result.current.commands.length).toBeGreaterThan(0);
-    expect(result.current.commandsById.size).toBe(
-      result.current.commands.length
-    );
+    expect(result.current.commands).toBe(commands);
+    expect(result.current.commandsById.size).toBe(commands.length);
     expect(result.current.commandsByIdRef.current).toBe(
       result.current.commandsById
     );
     expect(result.current.shortcuts.length).toBeGreaterThan(0);
-    expect(typeof result.current.openHelp).toBe("function");
+    expect(result.current.shortcuts.every((command) => command.shortcut)).toBe(
+      true
+    );
   });
 
-  it("should toggle the chat offcanvas with the toggle-chat-offcanvas command", () => {
-    const { result } = renderHook(() => useKeyboard(), {
-      wrapper: Wrapper,
-    });
+  it("should run a shortcut command when the palette is closed", async () => {
+    renderHook(() => useKeyboard(), { wrapper: Wrapper });
+    const event = { preventDefault: vi.fn() } as unknown as KeyboardEvent;
 
-    const command = result.current.shortcutsById.get("toggle-chat-offcanvas");
-    expect(command?.shortcut.chord).toBe("$mod+j");
+    await getKeybinding("$mod+j")(event);
 
-    command?.run();
+    const command = commands.find(
+      (item) => item.id === "toggle-chat-offcanvas"
+    );
+    expect(command?.run).toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
+  });
 
-    expect(mockToggleOverlay).toHaveBeenCalledWith(OVERLAY_IDS.CHAT_OFFCANVAS);
+  it("should skip other shortcuts while the palette is open", async () => {
+    mockIsOverlayOpen.mockResolvedValue(true);
+    renderHook(() => useKeyboard(), { wrapper: Wrapper });
+    const event = { preventDefault: vi.fn() } as unknown as KeyboardEvent;
+
+    await getKeybinding("$mod+j")(event);
+
+    const command = commands.find(
+      (item) => item.id === "toggle-chat-offcanvas"
+    );
+    expect(command?.run).not.toHaveBeenCalled();
   });
 
   it.each(["$mod+k", "$mod+Shift+o", "$mod+j"])(
