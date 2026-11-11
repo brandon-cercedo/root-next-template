@@ -8,7 +8,6 @@ import { OVERLAY_IDS } from "@/components/constants";
 import {
   COMMAND_GROUPS,
   CommandGroup,
-  getShortcutKeys,
   ShortcutCommand,
 } from "@/components/keyboard/config";
 import SearchInput from "@/components/ui/forms/SearchInput";
@@ -16,6 +15,7 @@ import MessageWithImage from "@/components/ui/MessageWithImage";
 import Offcanvas from "@/components/ui/modal/Offcanvas";
 import { useKeyboard } from "@/hooks/use-keyboard";
 import { useModal } from "@/hooks/use-modal";
+import { getShortcutKeys } from "@/lib/keyboard";
 
 import KbdList from "./Kbd";
 

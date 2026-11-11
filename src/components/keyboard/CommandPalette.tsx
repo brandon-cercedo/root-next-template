@@ -5,13 +5,15 @@ import { LucideSearchX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { OVERLAY_IDS } from "@/components/constants";
-import { getShortcutKeys, Shortcut } from "@/components/keyboard/config";
+import { Shortcut } from "@/components/keyboard/config";
 import { useKeyboard } from "@/hooks/use-keyboard";
 import { useModal } from "@/hooks/use-modal";
 import { useOverlay } from "@/hooks/use-overlay";
+import { getShortcutKeys } from "@/lib/keyboard";
 
 import MessageWithImage from "../ui/MessageWithImage";
 import Modal from "../ui/modal/Modal";
+import TruncatedText from "../ui/TruncatedText";
 
 import KbdList from "./Kbd";
 
@@ -70,6 +72,24 @@ function CommandItem({ item }: { item: CommandPaletteItem }) {
   );
 }
 
+function CommandGroupHeading({ group }: CommandGroupProps) {
+  if (!group.subHeading) {
+    return group.heading;
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      {group.heading}
+      <span className="text-[11px] font-normal">•</span>
+      <TruncatedText
+        text={group.subHeading}
+        chars={80}
+        className="text-[11px] font-normal text-gray-600 normal-case dark:text-neutral-400"
+      />
+    </div>
+  );
+}
+
 type CommandGroupProps = {
   group: CommandPaletteGroup;
 };
@@ -92,7 +112,7 @@ function CommandGroup({ group }: CommandGroupProps) {
   return (
     <Command.Group
       key={group.id}
-      heading={group.heading}
+      heading={<CommandGroupHeading group={group} />}
       className="flex flex-col **:[[cmdk-group-heading]]:p-2 **:[[cmdk-group-heading]]:text-[10px] **:[[cmdk-group-heading]]:leading-5 **:[[cmdk-group-heading]]:font-medium **:[[cmdk-group-heading]]:text-gray-500 **:[[cmdk-group-heading]]:uppercase dark:**:[[cmdk-group-heading]]:text-neutral-500 **:[[cmdk-group-items]]:space-y-0.5"
     >
       {items.map((item) => (
@@ -186,6 +206,7 @@ function Content({
 export type CommandPaletteGroup = {
   id: string;
   heading: string;
+  subHeading?: string;
   limit?: number;
   items: CommandPaletteItem[];
 };

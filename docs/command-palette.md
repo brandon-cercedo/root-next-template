@@ -13,6 +13,7 @@ A `cmdk` palette inside the existing Preline `Modal` overlay:
   inside inputs).
 - `/` opens the palette when focus is not in an editable field.
 - `Chats` comes first, then one group per `COMMAND_GROUPS` entry.
+- `Agent` includes chat's actions on chat's own page.
 - The arrow keys wrap from the last row to the first and back.
 
 ## Design choices
@@ -52,8 +53,9 @@ Some relevant details:
       name. Sorted by `isArchived` (active before archived), then by
       `lastMessageAt` (newest first).
     - The group shows 7 rows, plus a "Show N more" row when there are more.
-  - **Keyboard commands:** filtered using cmdk's `defaultFilter` on `label`,
-    `keywords`, and `group`.
+  - **Keyboard commands:**
+    - Filtered using cmdk's `defaultFilter` on `label`, `keywords`, and `group`.
+    - `useChatSession().pageChat?.title` is set as `subHeading` for `Agent` group.
 
 ## Considerations
 

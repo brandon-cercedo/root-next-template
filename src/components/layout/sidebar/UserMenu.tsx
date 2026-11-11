@@ -9,7 +9,6 @@ import { Fragment } from "react";
 
 import { FullUser } from "@/actions/db/user";
 import AppLogoIcon from "@/components/brand/AppLogoIcon";
-import { getShortcutKeys } from "@/components/keyboard/config";
 import KbdList from "@/components/keyboard/Kbd";
 import { ThemeSelectorDynamic } from "@/components/theme/ThemeSelector";
 import Dropdown from "@/components/ui/Dropdown";
@@ -17,6 +16,7 @@ import ImageWithFallback from "@/components/ui/ImageWithFallback";
 import TruncatedText from "@/components/ui/TruncatedText";
 import { useKeyboard } from "@/hooks/use-keyboard";
 import { paths } from "@/lib/config/paths";
+import { getShortcutKeys } from "@/lib/keyboard";
 import { composeUserDisplayName } from "@/lib/utils/db/user";
 
 function Content({
@@ -26,7 +26,7 @@ function Content({
   displayName: string;
   email: string;
 }) {
-  const { openHelp, shortcutsById } = useKeyboard();
+  const { shortcutsById } = useKeyboard();
   const helpCommand = shortcutsById.get("open-keyboard-help");
 
   return (
@@ -45,7 +45,7 @@ function Content({
         <button
           type="button"
           className="flex w-full items-center justify-between gap-x-3 rounded-lg px-2 py-1.5 text-[13px] leading-5 text-gray-800 hover:bg-gray-100 focus:bg-gray-100 focus:outline-hidden dark:text-neutral-200 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"
-          onClick={openHelp}
+          onClick={() => helpCommand?.run()}
         >
           <span className="flex items-center gap-x-3">
             <LucideKeyboard className="size-4 flex-none" />

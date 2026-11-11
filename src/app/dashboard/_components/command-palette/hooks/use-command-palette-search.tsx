@@ -10,6 +10,7 @@ import {
   CommandPaletteItem,
 } from "@/components/keyboard/CommandPalette";
 import { COMMAND_GROUPS, KeyboardCommand } from "@/components/keyboard/config";
+import { useChatSession } from "@/features/chat/hooks/use-chat-session";
 import { useKeyboard } from "@/hooks/use-keyboard";
 import { Theme, useTheme } from "@/hooks/use-theme";
 import { useUser } from "@/hooks/use-user";
@@ -142,6 +143,7 @@ export function useCommandPaletteSearch({
   const { commands } = useKeyboard();
   const { theme } = useTheme();
   const { user } = useUser();
+  const { pageChat } = useChatSession();
   const router = useRouter();
 
   const getChatsGroup = ({
@@ -180,10 +182,12 @@ export function useCommandPaletteSearch({
     commands,
     searchText,
     theme,
+    pageChat,
   }: {
     commands: KeyboardCommand[];
     searchText: string;
     theme?: Theme;
+    pageChat?: ChatSession;
   }): CommandPaletteGroup[] => {
     const paletteCommands = commands.filter(
       (command) => command.inPalette !== false
@@ -196,6 +200,7 @@ export function useCommandPaletteSearch({
     return COMMAND_GROUPS.map((group) => ({
       id: group,
       heading: group,
+      subHeading: group === "Agent" ? pageChat?.title : undefined,
       items: filteredCommands
         .filter((command) => command.group === group)
         .map((command) => {
@@ -223,6 +228,7 @@ export function useCommandPaletteSearch({
     commands,
     searchText,
     theme,
+    pageChat,
   });
   const chatsGroup = getChatsGroup({
     chats: user.chatSessions,

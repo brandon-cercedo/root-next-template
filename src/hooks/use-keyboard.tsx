@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import {
   createContext,
   ReactNode,
@@ -18,22 +17,14 @@ import {
   tinykeys,
 } from "tinykeys";
 
-import { DROPDOWN_IDS, OVERLAY_IDS } from "@/components/constants";
+import { OVERLAY_IDS } from "@/components/constants";
 import {
-  CommandActions,
   CommandId,
-  getKeyboardCommands,
-  getShortcutCommands,
   KeyboardCommand,
   ShortcutCommand,
 } from "@/components/keyboard/config";
-import { useDropdown } from "@/hooks/use-dropdown";
 import { useOverlay } from "@/hooks/use-overlay";
-import { useTheme } from "@/hooks/use-theme";
-import { useUser } from "@/hooks/use-user";
-import { confettiSchoolPride } from "@/lib/confetti";
-import { paths } from "@/lib/config/paths";
-import { isAdmin } from "@/lib/utils/db/user";
+import { getShortcutCommands } from "@/lib/keyboard";
 import { isEditableTarget } from "@/lib/utils/html";
 
 type KeyboardContextType = {
@@ -42,7 +33,6 @@ type KeyboardContextType = {
   commandsByIdRef: RefObject<Map<CommandId, KeyboardCommand>>;
   shortcuts: ShortcutCommand[];
   shortcutsById: Map<CommandId, ShortcutCommand>;
-  openHelp: () => void;
 };
 
 const KeyboardContext = createContext<KeyboardContextType | undefined>(
@@ -55,67 +45,21 @@ function isShortcutEvent(event: KeyboardEvent, shortcut: ShortcutCommand) {
   return press && matchKeybindingPress(event, press);
 }
 
+type KeyboardProviderProps = {
+  commands: KeyboardCommand[];
+  children: ReactNode;
+};
+
 /**
  * @note By default, tinykeys ignores keyboard events from [contenteditable],
  * input, textarea, and select unless they are the event.currentTarget.
  */
-export function KeyboardProvider({ children }: { children: ReactNode }) {
-  const { open, toggle, isOpen } = useOverlay();
-  const { open: openDropdown } = useDropdown();
-  const { setTheme, color } = useTheme();
-  const { user } = useUser();
-  const router = useRouter();
+export function KeyboardProvider({
+  commands,
+  children,
+}: KeyboardProviderProps) {
+  const { isOpen } = useOverlay();
 
-  const openPalette = () => {
-    void open(OVERLAY_IDS.COMMAND_PALETTE);
-  };
-
-  const togglePalette = () => {
-    void toggle(OVERLAY_IDS.COMMAND_PALETTE);
-  };
-
-  const toggleSidebar = () => {
-    void toggle(OVERLAY_IDS.SIDEBAR);
-  };
-
-  const toggleChatOffcanvas = () => {
-    void toggle(OVERLAY_IDS.CHAT_OFFCANVAS);
-  };
-
-  const openHelp = () => {
-    void open(OVERLAY_IDS.KEYBOARD_HELP);
-  };
-
-  const toggleTheme = () => {
-    if (!color) {
-      return;
-    }
-    setTheme(color === "dark" ? "light" : "dark");
-  };
-
-  const actions: CommandActions = {
-    "toggle-palette": togglePalette,
-    "open-palette": openPalette,
-    "toggle-theme": toggleTheme,
-    "theme-light": () => setTheme("light"),
-    "theme-dark": () => setTheme("dark"),
-    "theme-system": () => setTheme("system"),
-    "toggle-sidebar": toggleSidebar,
-    "toggle-chat-offcanvas": toggleChatOffcanvas,
-    "open-keyboard-help": openHelp,
-    "go-home": () => router.push(paths.dashboard.home()),
-    "new-chat": () => router.push(paths.dashboard.chats()),
-    "log-out": () => router.push(paths.auth.signOut()),
-    confetti: confettiSchoolPride,
-    ...(isAdmin(user)
-      ? {
-          "open-flag-toolbar": () => {
-            void openDropdown(DROPDOWN_IDS.FLAG_TOOLBAR);
-          },
-        }
-      : {}),
-  };
-  const commands = getKeyboardCommands(actions);
   const commandsById = useMemo(
     () => new Map(commands.map((command) => [command.id, command])),
     [commands]
@@ -198,7 +142,6 @@ export function KeyboardProvider({ children }: { children: ReactNode }) {
         commandsByIdRef,
         shortcuts,
         shortcutsById,
-        openHelp,
       }}
     >
       {children}

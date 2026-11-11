@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { v7 as uuidv7 } from "uuid";
 
@@ -11,12 +11,17 @@ import { paths } from "@/lib/config/paths";
 import { ChatSession } from "@/prisma/types/generated/browser";
 
 type ChatSessionContextType = {
+  // Side panel (offcanvas)
   chatId?: string;
   key: string;
   setChatId: (id?: string) => void;
   getChat: () => ChatSession | undefined;
   openChat: (id?: string) => void;
   closeChat: (id?: string) => void;
+
+  // Chat page (/dashboard/chats/[id])
+  pageChat?: ChatSession;
+  setPageChat: (chat?: ChatSession) => void;
 };
 
 const ChatSessionContext = createContext<ChatSessionContextType | undefined>(
@@ -30,11 +35,11 @@ const ChatSessionContext = createContext<ChatSessionContextType | undefined>(
  */
 export function ChatSessionProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const pathname = usePathname();
   const { user } = useUser();
   const { open, close } = useOverlay();
   const [chatId, setChatId] = useState<string | undefined>();
   const [key, setKey] = useState(() => uuidv7());
+  const [pageChat, setPageChat] = useState<ChatSession>();
 
   const getChat = () => {
     return user.chatSessions.find((session) => session.id === chatId);
@@ -53,7 +58,7 @@ export function ChatSessionProvider({ children }: { children: ReactNode }) {
     }
 
     // Handle existing chat
-    const isChatPage = pathname === paths.dashboard.chat(id);
+    const isChatPage = pageChat?.id === id;
     if (isChatPage) {
       router.push(paths.dashboard.chats());
     }
@@ -78,6 +83,8 @@ export function ChatSessionProvider({ children }: { children: ReactNode }) {
         getChat,
         openChat,
         closeChat,
+        pageChat,
+        setPageChat,
       }}
     >
       {children}

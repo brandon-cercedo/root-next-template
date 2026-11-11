@@ -87,7 +87,9 @@ export function useAgent({ id, initialMessages }: UseAgentOptions) {
       transport: new DefaultChatTransport({
         api: paths.api.chat(),
         body: () => ({
-          keyboardCommandIds: Array.from(commandsByIdRef.current.keys()),
+          keyboardCommandIds: Array.from(commandsByIdRef.current.values())
+            .filter((command) => command.inAgent !== false)
+            .map((command) => command.id),
           chatId: id,
         }),
       }),

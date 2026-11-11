@@ -1,7 +1,7 @@
 "use client";
 
 import { LucideMessageCircle, LucideMessageCirclePlus } from "lucide-react";
-import { Fragment } from "react";
+import { Fragment, useLayoutEffect } from "react";
 
 import { BreadcrumbItemType } from "@/components/layout/breadcrumb/BreadcrumbItems";
 import DashboardPageContainer from "@/components/layout/DashboardPageContainer";
@@ -12,6 +12,7 @@ import ChatArchivedBanner from "@/features/chat/components/ChatArchivedBanner";
 import ChatConfigDropdown from "@/features/chat/components/ChatConfigDropdown";
 import ChatSection from "@/features/chat/components/ChatSection";
 import ChatStatsTooltip from "@/features/chat/components/ChatStatsTooltip";
+import { useChatSession } from "@/features/chat/hooks/use-chat-session";
 import { useUser } from "@/hooks/use-user";
 import { ChatSession } from "@/prisma/types/generated/browser";
 
@@ -41,6 +42,16 @@ type ChatViewProps = {
 
 export default function ChatView({ chat }: ChatViewProps) {
   const { user } = useUser();
+  const { setPageChat } = useChatSession();
+
+  // Sync before paint, so consumers never read a stale pageChat.
+  useLayoutEffect(() => {
+    setPageChat(chat);
+    return () => {
+      setPageChat(undefined);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chat]);
 
   return (
     <Fragment>

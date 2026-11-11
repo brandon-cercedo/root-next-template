@@ -1,8 +1,9 @@
 "use client";
 
-import { CommandId, getShortcutKeys } from "@/components/keyboard/config";
+import { CommandId } from "@/components/keyboard/config";
 import Tooltip, { TooltipPlacement } from "@/components/ui/Tooltip";
 import { useKeyboard } from "@/hooks/use-keyboard";
+import { getShortcutKeys } from "@/lib/keyboard";
 
 import KbdList from "./Kbd";
 

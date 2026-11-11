@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { Check, LucideArchive, LucideMessageCircle } from "lucide-react";
 import { isValidElement } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useCommandPaletteSearch } from "@/app/dashboard/_components/command-palette/hooks/use-command-palette-search";
 import { paths } from "@/lib/config/paths";
@@ -43,9 +43,14 @@ const archivedChat = {
 };
 
 const mockPush = vi.hoisted(() => vi.fn());
+const mockUseChatSession = vi.hoisted(() => vi.fn());
 
 vi.mock("@/hooks/use-keyboard", () => ({
   useKeyboard: () => ({ commands }),
+}));
+
+vi.mock("@/features/chat/hooks/use-chat-session", () => ({
+  useChatSession: mockUseChatSession,
 }));
 
 vi.mock("@/hooks/use-theme", () => ({
@@ -80,6 +85,10 @@ function getIconType(icon: unknown) {
 }
 
 describe("useCommandPaletteSearch", () => {
+  beforeEach(() => {
+    mockUseChatSession.mockReturnValue({});
+  });
+
   it("should list Chats first, then the command groups in order", () => {
     const { groups } = getGroups();
 
@@ -159,5 +168,16 @@ describe("useCommandPaletteSearch", () => {
 
     expect(light?.renderSuffixes?.().map(getIconType)).toEqual([Check]);
     expect(dark?.renderSuffixes).toBeUndefined();
+  });
+
+  it("should leave the Agent sub heading empty without an opened chat", () => {
+    expect(getGroup({ id: "Agent" })?.subHeading).toBeUndefined();
+  });
+
+  it("should show the opened chat title only as the Agent sub heading", () => {
+    mockUseChatSession.mockReturnValue({ pageChat: activeChat });
+
+    expect(getGroup({ id: "Agent" })?.subHeading).toBe("React hooks");
+    expect(getGroup({ id: "Theme" })?.subHeading).toBeUndefined();
   });
 });

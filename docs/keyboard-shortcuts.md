@@ -39,30 +39,33 @@ Shortcut labels show Mac or Windows, not both, via `getIsMac`.
 
 ## Flow
 
-`KeyboardProvider` wraps dashboard children inside `DashboardProviders` on the
-dashboard layout. It binds shortcuts and builds the commands that chords and
-palette rows share. The layout renders `DashboardCommandPalette` and
+`DashboardKeyboardProvider` (app layer) builds the dashboard actions and
+renders the generic `KeyboardProvider` (shared) with the resulting
+`commands`. `KeyboardProvider` binds the chords and shares the commands with
+palette rows and the agent. The layout renders `DashboardCommandPalette` and
 `KeyboardHelpOffcanvas` inside it.
 
 ```mermaid
 flowchart TD
-  Layout["src/app/dashboard/layout.tsx"] --> Provider["KeyboardProvider"]
+  Layout["src/app/dashboard/layout.tsx"] --> Session["ChatSessionProvider: pageChat"]
+  Session --> Dash["DashboardKeyboardProvider: keyboard + admin + chat page actions"]
+  Dash -->|commands| Provider["KeyboardProvider"]
   Provider --> Tinykeys["tinykeys on window"]
   Provider --> Palette["DashboardCommandPalette"]
   Provider --> Help["KeyboardHelpOffcanvas"]
-  Tinykeys --> Overlay["useOverlay toggle/open"]
-  Tinykeys --> Actions["theme / sidebar / nav / confetti"]
+  Provider --> Agent["useAgent: inAgent filter"]
+  Tinykeys --> Actions["command.run()"]
   Help --> Offcanvas["Offcanvas panel"]
-  Overlay --> Preline["Preline HSOverlay"]
 ```
 
 Some relevant details:
 
-- **Registry:** `src/components/keyboard/config.tsx` lists ids, labels, groups,
-  optional chords, keywords, and optional palette `icon` nodes. Chord-only
-  commands skip the palette via `inPalette: false`. Commands with
-  `inEditable: true` also run inside editable targets. `getKeyboardCommands`
-  attaches `run` in `KeyboardProvider`.
+- **Registry:**
+  - `src/components/keyboard/config.tsx` lists ids, labels, groups,
+  optional chords, keywords, and optional palette `icon` nodes.
+  - Chord-only commands skip the palette via `inPalette: false`.
+  - Commands with `inEditable: true` also run inside editable targets.
+  - Commands with `inAgent: false` are hidden from the agent context.
 - **Groups:** `COMMAND_GROUPS` sets the group order for both the help panel
   and the palette.
 - **Help panel:** `KeyboardHelpOffcanvas` lists the commands that have a chord,

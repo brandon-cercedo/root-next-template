@@ -23,9 +23,10 @@ import { getCurrentUserProfile } from "@/features/chat/services/user";
 function createRunKeyboardCommandTool(
   keyboardCommandIds: Partial<CommandId[]>
 ) {
-  const commands = BASE_KEYBOARD_COMMANDS.filter((command) => {
-    return keyboardCommandIds.includes(command.id);
-  });
+  const commands = BASE_KEYBOARD_COMMANDS.filter(
+    (command) =>
+      command.inAgent !== false && keyboardCommandIds.includes(command.id)
+  );
   if (commands.length === 0) {
     return undefined;
   }

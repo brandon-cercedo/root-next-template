@@ -39,6 +39,8 @@ vi.mock(
 vi.mock("@/features/chat/components/ChatConfigDropdown", emptyComponentModule);
 vi.mock("@/features/chat/components/ChatOffcanvas", emptyComponentModule);
 
+vi.mock("@/features/chat/actions", () => ({}));
+
 vi.mock("@/components/flags/FlagToolbar", async () => {
   const { isAdmin } = await import("@/lib/utils/db/user");
   return {

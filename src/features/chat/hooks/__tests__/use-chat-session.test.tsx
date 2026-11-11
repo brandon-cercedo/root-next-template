@@ -14,7 +14,6 @@ const chat = fakeChatSessionComplete();
 const mockOpenOverlay = vi.hoisted(() => vi.fn());
 const mockCloseOverlay = vi.hoisted(() => vi.fn());
 const mockPush = vi.hoisted(() => vi.fn());
-const mockPathname = vi.hoisted(() => vi.fn());
 
 vi.mock("@/hooks/use-overlay", () => ({
   useOverlay: () => ({
@@ -29,7 +28,6 @@ vi.mock("@/hooks/use-user", () => ({
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
-  usePathname: () => mockPathname(),
 }));
 
 function Wrapper({ children }: { children: React.ReactNode }) {
@@ -45,10 +43,8 @@ describe("useChatSession", () => {
     mockOpenOverlay.mockReset();
     mockCloseOverlay.mockReset();
     mockPush.mockReset();
-    mockPathname.mockReset();
     mockOpenOverlay.mockResolvedValue(undefined);
     mockCloseOverlay.mockResolvedValue(undefined);
-    mockPathname.mockReturnValue(paths.dashboard.home());
   });
 
   it("should throw when used outside ChatSessionProvider", () => {
@@ -104,9 +100,11 @@ describe("useChatSession", () => {
   });
 
   it("should redirect to new chat when opening the chat of the current page", () => {
-    mockPathname.mockReturnValue(paths.dashboard.chat("chat-1"));
     const { result } = renderChatSession();
 
+    act(() => {
+      result.current.setPageChat({ ...chat, id: "chat-1" });
+    });
     act(() => {
       result.current.openChat("chat-1");
     });
@@ -116,9 +114,11 @@ describe("useChatSession", () => {
   });
 
   it("should stay on the page when opening another chat", () => {
-    mockPathname.mockReturnValue(paths.dashboard.chat("chat-2"));
     const { result } = renderChatSession();
 
+    act(() => {
+      result.current.setPageChat({ ...chat, id: "chat-2" });
+    });
     act(() => {
       result.current.openChat("chat-1");
     });
@@ -128,7 +128,6 @@ describe("useChatSession", () => {
   });
 
   it("should stay on the page when opening a new chat", () => {
-    mockPathname.mockReturnValue(paths.dashboard.chats());
     const { result } = renderChatSession();
 
     act(() => {
