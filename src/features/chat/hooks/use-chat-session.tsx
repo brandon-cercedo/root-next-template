@@ -15,7 +15,9 @@ type ChatSessionContextType = {
   chatId?: string;
   key: string;
   setChatId: (id?: string) => void;
+  setIsOffcanvasOpen: (isOpen: boolean) => void;
   getChat: () => ChatSession | undefined;
+  isOpen: (id: string) => boolean;
   openChat: (id?: string) => void;
   closeChat: (id?: string) => void;
 
@@ -40,9 +42,22 @@ export function ChatSessionProvider({ children }: { children: ReactNode }) {
   const [chatId, setChatId] = useState<string | undefined>();
   const [key, setKey] = useState(() => uuidv7());
   const [pageChat, setPageChat] = useState<ChatSession>();
+  const [isOffcanvasOpen, setIsOffcanvasOpen] = useState(false);
 
   const getChat = () => {
     return user.chatSessions.find((session) => session.id === chatId);
+  };
+
+  /**
+   * Checks if a chat is open in either the chat page or the offcanvas.
+   *
+   * @note `chatId` outlives a closed offcanvas, so its visibility is checked
+   * too.
+   */
+  const isOpen = (id: string) => {
+    const isPageOpen = pageChat?.id === id;
+    const isOffcanvasChat = isOffcanvasOpen && chatId === id;
+    return isPageOpen || isOffcanvasChat;
   };
 
   const openChat = (id?: string) => {
@@ -80,7 +95,9 @@ export function ChatSessionProvider({ children }: { children: ReactNode }) {
         chatId,
         key,
         setChatId,
+        setIsOffcanvasOpen,
         getChat,
+        isOpen,
         openChat,
         closeChat,
         pageChat,

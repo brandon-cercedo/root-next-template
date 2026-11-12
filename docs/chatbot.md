@@ -128,6 +128,9 @@ Some relevant details:
 - **Streams across pages:** `ChatInstancesProvider` keeps each `Chat` by id; so
   moving between `/dashboard` pages doesn't stop a response; reopening the chat
   reuses the live instance.
+- **Reading instances:** `ChatInstancesProvider` keeps a private `Map` (`store`)
+  and a read-only copy in state (`instances`). Components should read
+  `instances`, so they re-render.
 - **Leave-site prompt:** shown while any chat is `submitted` or `streaming` by
   the `beforeunload` listener in `ChatInstancesProvider`.
 - **Agent loop:** `stopWhen: stepCountIs(5)`, `maxRetries: 2`,

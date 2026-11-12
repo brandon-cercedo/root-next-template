@@ -9,17 +9,16 @@ import {
   type ReactNode,
 } from "react";
 
+import { isChatWorking } from "@/lib/utils/db/chat";
+
 import type { ChatUIMessage } from "@/types/chat";
 import type { Chat } from "@ai-sdk/react";
 
 type ChatInstance = Chat<ChatUIMessage>;
-
-function isActiveInstance(instance: ChatInstance) {
-  return ["submitted", "streaming"].includes(instance.status);
-}
+type ChatInstances = ReadonlyMap<string, ChatInstance>;
 
 type ChatInstancesContextType = {
-  instances: Map<string, ChatInstance>;
+  instances: ChatInstances;
   getOrCreateInstance: (options: {
     id: string;
     create: () => ChatInstance;
@@ -31,37 +30,61 @@ const ChatInstancesContext = createContext<
   ChatInstancesContextType | undefined
 >(undefined);
 
+/**
+ * Keeps one `ChatInstance` per chat id and shares it with the whole UI.
+ *
+ * @note `store`: the real list of chats.
+ * - It is private.
+ * - It is changed in place, so a created chat is ready for any other caller in
+ *   that same render.
+ * - Changing it does not re-render anything, so components never read it.
+ *
+ * @note `instances`: a read-only copy of `store` kept in state.
+ * - Components should read this one. When it changes, they re-render.
+ *
+ * @note `enqueue`: copies `store` into `instances` in a microtask
+ * - Chats are created while a child is rendering, and React does not allow the
+ *   provider to update in the middle of that render.
+ * - Call it after every change to `store`.
+ */
 export function ChatInstancesProvider({ children }: { children: ReactNode }) {
-  const [instances] = useState(() => new Map<string, ChatInstance>());
+  const [store] = useState(() => new Map<string, ChatInstance>());
+  const [instances, setInstances] = useState<ChatInstances>(() => new Map());
+
+  const enqueue = useCallback(() => {
+    queueMicrotask(() => setInstances(new Map(store)));
+  }, [store]);
 
   const getOrCreateInstance = useCallback(
     ({ id, create }: { id: string; create: () => ChatInstance }) => {
-      const instance = instances.get(id);
+      const instance = store.get(id);
       if (instance) {
         return instance;
       }
 
       const newInstance = create();
-      instances.set(id, newInstance);
+      store.set(id, newInstance);
+      enqueue();
 
       return newInstance;
     },
-    [instances]
+    [store, enqueue]
   );
 
   const deleteInstance = useCallback(
     (id: string) => {
-      instances.delete(id);
+      store.delete(id);
+      enqueue();
     },
-    [instances]
+    [store, enqueue]
   );
 
   useEffect(() => {
     const run = (event: BeforeUnloadEvent) => {
-      const hasActiveInstance = Array.from(instances.values()).some(
-        isActiveInstance
+      const hasWorkingInstance = Array.from(store.values()).some((instance) =>
+        isChatWorking(instance.status)
       );
-      if (!hasActiveInstance) {
+      if (!hasWorkingInstance) {
         return;
       }
       event.preventDefault();
@@ -69,7 +92,7 @@ export function ChatInstancesProvider({ children }: { children: ReactNode }) {
 
     window.addEventListener("beforeunload", run);
     return () => window.removeEventListener("beforeunload", run);
-  }, [instances]);
+  }, [store]);
 
   return (
     <ChatInstancesContext.Provider

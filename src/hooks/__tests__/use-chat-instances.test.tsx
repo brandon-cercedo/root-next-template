@@ -1,5 +1,5 @@
-import { renderHook } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { act, renderHook } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   ChatInstancesProvider,
@@ -30,18 +30,14 @@ describe("useChatInstances", () => {
       wrapper: Wrapper,
     });
     const firstChat = createFakeChat();
+    const create = vi.fn(() => firstChat);
 
-    const first = result.current.getOrCreateInstance({
-      id: "a",
-      create: () => firstChat,
-    });
-    const second = result.current.getOrCreateInstance({
-      id: "a",
-      create: () => createFakeChat(),
-    });
+    const first = result.current.getOrCreateInstance({ id: "a", create });
+    const second = result.current.getOrCreateInstance({ id: "a", create });
 
     expect(first).toBe(firstChat);
     expect(second).toBe(firstChat);
+    expect(create).toHaveBeenCalledTimes(1);
   });
 
   it("should delete an instance by id", () => {
@@ -63,6 +59,47 @@ describe("useChatInstances", () => {
     });
 
     expect(recreated).toBe(secondChat);
+  });
+
+  describe("instances", () => {
+    it("should start empty", () => {
+      const { result } = renderHook(() => useChatInstances(), {
+        wrapper: Wrapper,
+      });
+
+      expect(result.current.instances.size).toBe(0);
+    });
+
+    it("should update after getOrCreateInstance", async () => {
+      const { result } = renderHook(() => useChatInstances(), {
+        wrapper: Wrapper,
+      });
+      const chat = createFakeChat();
+
+      await act(async () => {
+        result.current.getOrCreateInstance({ id: "a", create: () => chat });
+      });
+
+      expect(result.current.instances.get("a")).toBe(chat);
+    });
+
+    it("should update after deleteInstance", async () => {
+      const { result } = renderHook(() => useChatInstances(), {
+        wrapper: Wrapper,
+      });
+
+      await act(async () => {
+        result.current.getOrCreateInstance({
+          id: "a",
+          create: () => createFakeChat(),
+        });
+      });
+      await act(async () => {
+        result.current.deleteInstance("a");
+      });
+
+      expect(result.current.instances.has("a")).toBe(false);
+    });
   });
 
   describe("beforeunload", () => {

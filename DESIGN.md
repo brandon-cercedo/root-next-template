@@ -39,12 +39,17 @@ content sits inside a rounded, bordered panel on top of it (Linear style).
 
 ### Text
 
-| Role      | Classes                               |
-| --------- | ------------------------------------- |
-| Primary   | `text-gray-800 dark:text-neutral-200` |
-| Secondary | `text-gray-600 dark:text-neutral-400` |
-| Muted     | `text-gray-500 dark:text-neutral-500` |
-| Heading   | `text-gray-800 dark:text-white`       |
+| Role      | Classes                                |
+| --------- | -------------------------------------- |
+| Primary   | `text-gray-800 dark:text-neutral-200`  |
+| Secondary | `text-gray-600 dark:text-neutral-400`  |
+| Muted     | `text-gray-500 dark:text-neutral-500`  |
+| Heading   | `text-gray-800 dark:text-white`        |
+| Blue      | `text-blue-600 dark:text-blue-500`     |
+| Indigo    | `text-indigo-600 dark:text-indigo-500` |
+| Yellow    | `text-yellow-500 dark:text-yellow-500` |
+| Red       | `text-red-600 dark:text-red-400`       |
+| Gray      | `text-gray-500 dark:text-neutral-400`  |
 
 ### Borders and dividers
 
