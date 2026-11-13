@@ -26,7 +26,9 @@ colors:
   warning: "oklch(79.5% 0.184 86.047)" # yellow-500
   danger: "oklch(63.7% 0.237 25.331)" # red-500
   danger-hover: "oklch(57.7% 0.245 27.325)" # red-600
+  dark-danger-text: "oklch(70.4% 0.191 22.216)" # red-400
   debug: "oklch(51.1% 0.262 276.966)" # indigo-600
+  dark-debug: "oklch(58.5% 0.233 277.117)" # indigo-500
 ---
 
 # Design
