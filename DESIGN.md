@@ -1,3 +1,36 @@
+---
+name: root1
+description: Calm, dense, keyboard-first app UI on Preline + Tailwind v4.
+colors:
+  # Light mode (gray-* scale)
+  app-bg: "oklch(96.7% 0.003 264.542)" # gray-100
+  surface: "#ffffff" # white
+  surface-subtle: "oklch(98.5% 0.002 247.839)" # gray-50
+  border: "oklch(92.8% 0.006 264.531)" # gray-200
+  text-primary: "oklch(27.8% 0.033 256.848)" # gray-800
+  text-secondary: "oklch(44.6% 0.03 256.802)" # gray-600
+  text-muted: "oklch(55.1% 0.027 264.364)" # gray-500
+  # Dark mode (neutral-* scale)
+  dark-app-bg: "oklch(14.5% 0 0)" # neutral-950
+  dark-surface: "oklch(20.5% 0 0)" # neutral-900
+  dark-surface-raised: "oklch(26.9% 0 0)" # neutral-800
+  dark-border: "oklch(37.1% 0 0)" # neutral-700
+  dark-text-primary: "oklch(92.2% 0 0)" # neutral-200
+  dark-text-secondary: "oklch(70.8% 0 0)" # neutral-400
+  dark-text-muted: "oklch(55.6% 0 0)" # neutral-500
+  # Accents and variants
+  primary: "oklch(54.6% 0.245 262.881)" # blue-600
+  primary-hover: "oklch(48.8% 0.243 264.376)" # blue-700
+  dark-info: "oklch(62.3% 0.214 259.815)" # blue-500
+  success: "oklch(70.4% 0.14 182.503)" # teal-500
+  warning: "oklch(79.5% 0.184 86.047)" # yellow-500
+  danger: "oklch(63.7% 0.237 25.331)" # red-500
+  danger-hover: "oklch(57.7% 0.245 27.325)" # red-600
+  dark-danger-text: "oklch(70.4% 0.191 22.216)" # red-400
+  debug: "oklch(51.1% 0.262 276.966)" # indigo-600
+  dark-debug: "oklch(58.5% 0.233 277.117)" # indigo-500
+---
+
 # Design
 
 Visual and UI conventions for this template. Read this before building or
@@ -22,7 +55,7 @@ restyling UI so new screens look like the rest of the app.
   `prefers-color-scheme` in CSS.
 - Light mode uses the `gray-*` scale; dark mode uses the `neutral-*` scale.
 
-## Color
+## Colors
 
 ### Background
 
@@ -151,6 +184,8 @@ Dropdowns rendered inside the sidebar use `z-60` so they stay above it.
 
 - Reuse the shared UI in `src/components/ui` before writing new markup.
 - If nothing fits, copy the styles of the closest shared component.
+  - **Dropdowns:** match the wrapper, group, label, row and divider styles in
+    `src/features/chat/components/ChatConfigDropdown.tsx`.
 
 ## Layout
 
