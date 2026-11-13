@@ -1,7 +1,7 @@
 "use client";
 
 import { defaultFilter } from "cmdk";
-import { Check, LucideArchive, LucideMessageCircle } from "lucide-react";
+import { Check } from "lucide-react";
 import moment from "moment";
 import { useRouter } from "next/navigation";
 
@@ -10,6 +10,7 @@ import {
   CommandPaletteItem,
 } from "@/components/keyboard/CommandPalette";
 import { COMMAND_GROUPS, KeyboardCommand } from "@/components/keyboard/config";
+import ChatIcon from "@/features/chat/components/ChatIcon";
 import { useChatSession } from "@/features/chat/hooks/use-chat-session";
 import { useKeyboard } from "@/hooks/use-keyboard";
 import { Theme, useTheme } from "@/hooks/use-theme";
@@ -164,11 +165,7 @@ export function useCommandPaletteSearch({
           id: chat.id,
           value: chat.id,
           label: chat.title,
-          icon: chat.isArchived ? (
-            <LucideArchive className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-          ) : (
-            <LucideMessageCircle className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-          ),
+          icon: <ChatIcon chat={chat} />,
           run: () => router.push(paths.dashboard.chat(chat.id)),
         };
         return data;

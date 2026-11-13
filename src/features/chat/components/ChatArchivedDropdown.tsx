@@ -11,6 +11,7 @@ import TruncatedText from "@/components/ui/TruncatedText";
 import ChatDeleteAllButton from "@/features/chat/components/buttons/ChatDeleteAllButton";
 import ChatDeleteButton from "@/features/chat/components/buttons/ChatDeleteButton";
 import ChatRestoreButton from "@/features/chat/components/buttons/ChatRestoreButton";
+import ChatIcon from "@/features/chat/components/ChatIcon";
 import { paths } from "@/lib/config/paths";
 import { humanizeDate } from "@/lib/utils/date";
 import { ChatSession } from "@/prisma/types/generated/browser";
@@ -25,7 +26,7 @@ function ChatArchivedItem({ chat }: { chat: ChatSession }) {
         href={paths.dashboard.chat(chat.id)}
         className="flex w-full gap-x-3"
       >
-        <LucideArchive className="mt-1 size-4 flex-none" />
+        <ChatIcon chat={chat} className="mt-1" />
         <div className="flex flex-col">
           <TruncatedText text={chat.title} chars={44} />
           {chat.archivedAt && (

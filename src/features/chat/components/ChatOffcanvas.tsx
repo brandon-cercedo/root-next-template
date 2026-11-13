@@ -9,9 +9,12 @@ import Offcanvas from "@/components/ui/modal/Offcanvas";
 import TruncatedText from "@/components/ui/TruncatedText";
 import ChatFullScreenButton from "@/features/chat/components/buttons/ChatFullScreenButton";
 import ChatConfigDropdown from "@/features/chat/components/ChatConfigDropdown";
+import ChatIcon from "@/features/chat/components/ChatIcon";
 import ChatSection from "@/features/chat/components/ChatSection";
 import ChatStatsTooltip from "@/features/chat/components/ChatStatsTooltip";
 import { useChatSession } from "@/features/chat/hooks/use-chat-session";
+import { useModal } from "@/hooks/use-modal";
+import { useOverlayEvents } from "@/hooks/use-overlay-events";
 import { useUser } from "@/hooks/use-user";
 import { ChatSession } from "@/prisma/types/generated/browser";
 
@@ -21,12 +24,15 @@ function Header({ chat }: { chat?: ChatSession }) {
   return (
     <div className="space-y-0.5 px-3 py-2">
       <div className="flex items-center justify-between gap-2">
-        <TruncatedText
-          text={chat?.title ?? "New chat"}
-          chars={34}
-          className="text-sm leading-5 font-medium text-gray-800 dark:text-gray-200"
-          placement="bottom-left"
-        />
+        <div className="flex items-center gap-2 text-gray-800 dark:text-gray-200">
+          <ChatIcon chat={chat} className="size-3.5" />
+          <TruncatedText
+            text={chat?.title ?? "New chat"}
+            chars={32}
+            className="text-sm leading-5 font-medium"
+            placement="bottom-left"
+          />
+        </div>
         <div className="flex items-center gap-1.5">
           {chat && (
             <Fragment>
@@ -55,8 +61,16 @@ function Header({ chat }: { chat?: ChatSession }) {
 
 function Content() {
   const { user } = useUser();
-  const { key, getChat, setChatId } = useChatSession();
+  const { id, isMounted } = useModal();
+  const { key, getChat, setChatId, setIsOffcanvasOpen } = useChatSession();
   const chat = getChat();
+
+  useOverlayEvents({
+    id,
+    isMounted,
+    onOpen: () => setIsOffcanvasOpen(true),
+    onClose: () => setIsOffcanvasOpen(false),
+  });
 
   return (
     <Fragment>

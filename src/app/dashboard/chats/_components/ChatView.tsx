@@ -1,6 +1,5 @@
 "use client";
 
-import { LucideMessageCircle, LucideMessageCirclePlus } from "lucide-react";
 import { Fragment, useLayoutEffect } from "react";
 
 import { BreadcrumbItemType } from "@/components/layout/breadcrumb/BreadcrumbItems";
@@ -10,30 +9,21 @@ import ChatFavoriteButton from "@/features/chat/components/buttons/ChatFavoriteB
 import ChatOpenOffcanvasButton from "@/features/chat/components/buttons/ChatOpenOffcanvasButton";
 import ChatArchivedBanner from "@/features/chat/components/ChatArchivedBanner";
 import ChatConfigDropdown from "@/features/chat/components/ChatConfigDropdown";
+import ChatIcon from "@/features/chat/components/ChatIcon";
 import ChatSection from "@/features/chat/components/ChatSection";
 import ChatStatsTooltip from "@/features/chat/components/ChatStatsTooltip";
 import { useChatSession } from "@/features/chat/hooks/use-chat-session";
 import { useUser } from "@/hooks/use-user";
 import { ChatSession } from "@/prisma/types/generated/browser";
 
-function getChatBreadcrumbItems(chat?: ChatSession) {
-  const items: BreadcrumbItemType[] = [];
-
-  if (chat) {
-    items.push({
-      id: chat.id,
-      label: chat.title,
-      icon: <LucideMessageCircle className="size-3.5 flex-none" />,
-    });
-  } else {
-    items.push({
-      id: "chats",
-      label: "New chat",
-      icon: <LucideMessageCirclePlus className="size-3.5 flex-none" />,
-    });
-  }
-
-  return items;
+function getChatBreadcrumbItems(chat?: ChatSession): BreadcrumbItemType[] {
+  return [
+    {
+      id: chat?.id ?? "chats",
+      label: chat?.title ?? "New chat",
+      icon: <ChatIcon chat={chat} className="size-3.5" />,
+    },
+  ];
 }
 
 type ChatViewProps = {

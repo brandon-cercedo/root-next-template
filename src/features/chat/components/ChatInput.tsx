@@ -3,6 +3,7 @@ import { LucideArrowUp, LucideSquare } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import TextareaAutoHeight from "@/components/ui/forms/TextareaAutoHeight";
+import { isChatWorking } from "@/lib/utils/db/chat";
 import { mergeClsx } from "@/lib/utils/styles";
 
 /**
@@ -51,7 +52,7 @@ export default function ChatInput({
   const [input, setInput] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const isWorking = status === "submitted" || status === "streaming";
+  const isWorking = isChatWorking(status);
   const shouldSend = input.trim().length > 0 && !isWorking && !disabled;
 
   // Watch wraps caused by the input narrowing rather than by typing.

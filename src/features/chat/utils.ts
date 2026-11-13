@@ -1,7 +1,8 @@
-import { generateId, isToolUIPart, type UIMessage } from "ai";
+import { generateId, isToolUIPart, type ChatStatus, type UIMessage } from "ai";
 import { truncate } from "lodash";
 
 import { TITLE_MAX_LENGTH } from "@/features/chat/schema/chat";
+import { isChatWorking } from "@/lib/utils/db/chat";
 
 import type { ChatSession } from "@/prisma/types/generated/browser";
 import type { ChatUIMessage } from "@/types/chat";
@@ -95,4 +96,52 @@ export function getChatStats(chat: { messages: ChatUIMessage[] }) {
 
 export function filterArchivedChatSessions(chats: ChatSession[]) {
   return chats.filter((chat) => !chat.isArchived);
+}
+
+export type ChatIconStatus =
+  | "new"
+  | "archived"
+  | "working"
+  | "error"
+  | "aborted"
+  | "unread"
+  | "ready";
+
+/**
+ * @note `isSessionStatus`: check if status is taken from session or live chat.
+ * - The SDK has no `aborted` status.
+ * - A fresh instance starts as `ready`, so an idle live chat should prioritize
+ *   the session status: `error` or `aborted`.
+ */
+export function getChatIconStatus({
+  chat,
+  liveStatus,
+  isRead = true,
+}: {
+  chat?: Pick<ChatSession, "isArchived" | "status">;
+  liveStatus?: ChatStatus;
+  isRead?: boolean;
+}): ChatIconStatus {
+  if (!chat) {
+    return "new";
+  }
+
+  if (chat.isArchived) {
+    return "archived";
+  }
+
+  const isSessionStatus =
+    !liveStatus ||
+    (liveStatus === "ready" && ["error", "aborted"].includes(chat.status));
+  const status = isSessionStatus ? chat.status : liveStatus;
+
+  if (isChatWorking(status)) {
+    return "working";
+  }
+
+  if (status === "ready" && !isRead) {
+    return "unread";
+  }
+
+  return status;
 }

@@ -3,6 +3,8 @@
 import { type ChatStatus } from "ai";
 import { LucideBot } from "lucide-react";
 
+import { isChatWorking } from "@/lib/utils/db/chat";
+
 const LABELS: Partial<Record<ChatStatus, string>> = {
   submitted: "Thinking...",
   streaming: "Working...",
@@ -13,7 +15,7 @@ type LoadingMessageProps = {
 };
 
 export default function LoadingMessage({ status }: LoadingMessageProps) {
-  if (!["submitted", "streaming"].includes(status)) {
+  if (!isChatWorking(status)) {
     return null;
   }
 

@@ -1,8 +1,4 @@
-import {
-  LucideHome,
-  LucideMessageCircle,
-  LucideMessageCirclePlus,
-} from "lucide-react";
+import { LucideHome, LucideMessageCirclePlus } from "lucide-react";
 
 import { FullUser } from "@/actions/db/user";
 import ShortcutKbdList from "@/components/keyboard/ShortcutKbdList";
@@ -11,6 +7,7 @@ import { SidebarItemType } from "@/components/layout/sidebar/SidebarItem";
 import ChatOpenOffcanvasButton from "@/features/chat/components/buttons/ChatOpenOffcanvasButton";
 import ChatArchivedDropdown from "@/features/chat/components/ChatArchivedDropdown";
 import ChatConfigDropdown from "@/features/chat/components/ChatConfigDropdown";
+import ChatIcon from "@/features/chat/components/ChatIcon";
 import { filterArchivedChatSessions } from "@/features/chat/utils";
 import { paths } from "@/lib/config/paths";
 import { ChatSession } from "@/prisma/types/client";
@@ -108,7 +105,7 @@ function composeSidebarItemFromChat({
   return {
     id,
     label: chat.title,
-    icon: <LucideMessageCircle className="size-4 flex-none" />,
+    icon: <ChatIcon chat={chat} />,
     href: paths.dashboard.chat(chat.id),
     renderActions: (isHovered: boolean) => [
       <ChatOpenOffcanvasButton

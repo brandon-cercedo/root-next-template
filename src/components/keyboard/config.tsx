@@ -1,4 +1,3 @@
-/* eslint-disable max-lines -- the command list keeps growing */
 import {
   Home,
   Keyboard,
@@ -120,27 +119,21 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
     label: "Theme: Light",
     group: "Theme",
     keywords: ["appearance", "mode"],
-    icon: (
-      <Sun className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <Sun className="size-4 flex-none" />,
   },
   {
     id: "theme-dark",
     label: "Theme: Dark",
     group: "Theme",
     keywords: ["appearance", "mode"],
-    icon: (
-      <Moon className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <Moon className="size-4 flex-none" />,
   },
   {
     id: "theme-system",
     label: "Theme: System",
     group: "Theme",
     keywords: ["appearance", "mode", "auto"],
-    icon: (
-      <Monitor className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <Monitor className="size-4 flex-none" />,
   },
   {
     id: "toggle-sidebar",
@@ -151,9 +144,7 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
       chord: "$mod+b",
       labels: { mac: ["⌘", "B"], windows: ["Ctrl", "B"] },
     },
-    icon: (
-      <PanelLeft className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <PanelLeft className="size-4 flex-none" />,
   },
   {
     id: "open-keyboard-help",
@@ -165,18 +156,14 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
       labels: { mac: ["⌘", "/"], windows: ["Ctrl", "/"] },
     },
     inPalette: true,
-    icon: (
-      <Keyboard className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <Keyboard className="size-4 flex-none" />,
   },
   {
     id: "go-home",
     label: "Go to Home",
     group: "Navigation",
     keywords: ["dashboard"],
-    icon: (
-      <Home className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <Home className="size-4 flex-none" />,
   },
   {
     id: "move-chat-to-sidebar",
@@ -184,9 +171,7 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
     group: "Agent",
     keywords: ["chat", "panel", "offcanvas"],
     inAgent: false,
-    icon: (
-      <PanelRight className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <PanelRight className="size-4 flex-none" />,
   },
   {
     id: "favorite-chat",
@@ -194,9 +179,7 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
     group: "Agent",
     keywords: ["chat", "star"],
     inAgent: false,
-    icon: (
-      <LucideStar className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <LucideStar className="size-4 flex-none" />,
   },
   {
     id: "unfavorite-chat",
@@ -204,9 +187,7 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
     group: "Agent",
     keywords: ["chat", "star"],
     inAgent: false,
-    icon: (
-      <LucideStarOff className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <LucideStarOff className="size-4 flex-none" />,
   },
   {
     id: "archive-chat",
@@ -214,9 +195,7 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
     group: "Agent",
     keywords: ["chat"],
     inAgent: false,
-    icon: (
-      <LucideArchive className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <LucideArchive className="size-4 flex-none" />,
   },
   {
     id: "restore-chat",
@@ -224,9 +203,7 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
     group: "Agent",
     keywords: ["chat", "unarchive"],
     inAgent: false,
-    icon: (
-      <LucideRotateCcw className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <LucideRotateCcw className="size-4 flex-none" />,
   },
   {
     id: "delete-chat",
@@ -234,9 +211,7 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
     group: "Agent",
     keywords: ["chat", "remove"],
     inAgent: false,
-    icon: (
-      <LucideTrash2 className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <LucideTrash2 className="size-4 flex-none" />,
   },
   {
     id: "new-chat",
@@ -251,9 +226,7 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
       },
     },
     inEditable: true,
-    icon: (
-      <MessageCirclePlus className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <MessageCirclePlus className="size-4 flex-none" />,
   },
   {
     id: "toggle-chat-offcanvas",
@@ -265,18 +238,14 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
       labels: { mac: ["⌘", "J"], windows: ["Ctrl", "J"] },
     },
     inEditable: true,
-    icon: (
-      <PanelRight className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <PanelRight className="size-4 flex-none" />,
   },
   {
     id: "log-out",
     label: "Log out",
     group: "Actions",
     keywords: ["sign out", "exit"],
-    icon: (
-      <LogOut className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <LogOut className="size-4 flex-none" />,
   },
   {
     id: "confetti",
@@ -290,9 +259,7 @@ export const BASE_KEYBOARD_COMMANDS: BaseKeyboardCommand[] = [
         windows: ["Ctrl", "Shift", "."],
       },
     },
-    icon: (
-      <PartyPopper className="size-4 flex-none text-gray-500 dark:text-neutral-400" />
-    ),
+    icon: <PartyPopper className="size-4 flex-none" />,
   },
   {
     id: "open-flag-toolbar",
