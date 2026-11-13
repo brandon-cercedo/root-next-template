@@ -11,6 +11,7 @@ import KeyboardHelpOffcanvas from "@/components/keyboard/KeyboardHelpOffcanvas";
 import ConfirmationModal from "@/components/ui/modal/ConfirmationModal";
 import ChatOffcanvas from "@/features/chat/components/ChatOffcanvas";
 import { ChatSessionProvider } from "@/features/chat/hooks/use-chat-session";
+import { ChatSessionsProvider } from "@/features/chat/hooks/use-chat-sessions";
 import LoginConfetti from "@/features/home/components/LoginConfetti";
 import { ChatInstancesProvider } from "@/hooks/use-chat-instances";
 import { ConfirmationModalProvider } from "@/hooks/use-confirmation-modal";
@@ -39,17 +40,19 @@ async function DashboardProviders({
     <ConfirmationModalProvider>
       <UserProvider user={user}>
         <FlagProvider values={values} overrides={overrides}>
-          <ChatSessionProvider>
-            <DashboardKeyboardProvider>
-              <ChatInstancesProvider>
-                {children}
-                <DashboardCommandPalette />
-                <KeyboardHelpOffcanvas />
-                <ConfirmationModal />
-                <ChatOffcanvas />
-              </ChatInstancesProvider>
-            </DashboardKeyboardProvider>
-          </ChatSessionProvider>
+          <ChatSessionsProvider>
+            <ChatSessionProvider>
+              <DashboardKeyboardProvider>
+                <ChatInstancesProvider>
+                  {children}
+                  <DashboardCommandPalette />
+                  <KeyboardHelpOffcanvas />
+                  <ConfirmationModal />
+                  <ChatOffcanvas />
+                </ChatInstancesProvider>
+              </DashboardKeyboardProvider>
+            </ChatSessionProvider>
+          </ChatSessionsProvider>
         </FlagProvider>
       </UserProvider>
     </ConfirmationModalProvider>

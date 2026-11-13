@@ -1,9 +1,10 @@
 import { renderHook } from "@testing-library/react";
-import { Check, LucideArchive, LucideMessageCircle } from "lucide-react";
+import { Check } from "lucide-react";
 import { isValidElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useCommandPaletteSearch } from "@/app/dashboard/_components/command-palette/hooks/use-command-palette-search";
+import ChatIcon from "@/features/chat/components/ChatIcon";
 import { paths } from "@/lib/config/paths";
 import { fakeChatSessionComplete } from "@/prisma/utils/fake-data";
 
@@ -84,6 +85,10 @@ function getIconType(icon: unknown) {
   return isValidElement(icon) ? icon.type : undefined;
 }
 
+function getIconProps(icon: unknown) {
+  return isValidElement(icon) ? icon.props : undefined;
+}
+
 describe("useCommandPaletteSearch", () => {
   beforeEach(() => {
     mockUseChatSession.mockReturnValue({});
@@ -106,7 +111,10 @@ describe("useCommandPaletteSearch", () => {
     const chats = getGroup({ id: "chats" });
 
     expect(chats?.items.map((item) => item.label)).toEqual(["React hooks"]);
-    expect(getIconType(chats?.items[0]?.icon)).toBe(LucideMessageCircle);
+    expect(getIconType(chats?.items[0]?.icon)).toBe(ChatIcon);
+    expect(getIconProps(chats?.items[0]?.icon)).toEqual({
+      chat: activeChat,
+    });
   });
 
   it("should list archived title matches after active ones", () => {
@@ -116,7 +124,10 @@ describe("useCommandPaletteSearch", () => {
       "React hooks",
       "React archived",
     ]);
-    expect(getIconType(chats?.items[1]?.icon)).toBe(LucideArchive);
+    expect(getIconType(chats?.items[1]?.icon)).toBe(ChatIcon);
+    expect(getIconProps(chats?.items[1]?.icon)).toEqual({
+      chat: archivedChat,
+    });
   });
 
   it("should use each item id as its value", () => {

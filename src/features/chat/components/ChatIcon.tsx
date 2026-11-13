@@ -11,9 +11,10 @@ import {
   LucideMessageCircleX,
   type LucideIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { useChatSession } from "@/features/chat/hooks/use-chat-session";
+import { useChatSessions } from "@/features/chat/hooks/use-chat-sessions";
 import { ChatIconStatus, getChatIconStatus } from "@/features/chat/utils";
 import { useChatInstances } from "@/hooks/use-chat-instances";
 import { isChatWorking } from "@/lib/utils/db/chat";
@@ -27,8 +28,16 @@ const ICONS: Record<
   ChatIconStatus,
   { icon: LucideIcon; label: string; className?: string }
 > = {
-  new: { icon: LucideMessageCirclePlus, label: "New chat" },
-  ready: { icon: LucideMessageCircle, label: "Ready" },
+  new: {
+    icon: LucideMessageCirclePlus,
+    label: "New chat",
+    className: "text-gray-800 dark:text-neutral-200",
+  },
+  ready: {
+    icon: LucideMessageCircle,
+    label: "Ready",
+    className: "text-gray-800 dark:text-neutral-200",
+  },
   unread: {
     icon: LucideMessageCircleCheck,
     label: "New reply",
@@ -61,7 +70,7 @@ type StatusIconProps = {
   className?: string;
 };
 
-export function StatusIcon({ status, className }: StatusIconProps) {
+function StatusIcon({ status, className }: StatusIconProps) {
   const { icon: Icon, label, className: iconClassName } = ICONS[status];
   return (
     <Icon
@@ -82,21 +91,22 @@ type ActiveChatIconProps = {
 function ActiveChatIcon({ chat, instance, className }: ActiveChatIconProps) {
   const { status: liveStatus } = useChat({ chat: instance });
   const { isOpen: isChatOpen } = useChatSession();
-  const [isRead, setIsRead] = useState(true);
+  const { isRead: isChatRead, setIsRead } = useChatSessions();
 
   const isOpen = isChatOpen(chat.id);
   const isWorking = isChatWorking(liveStatus);
+  const isRead = isChatRead(chat.id);
 
   useEffect(() => {
     if (isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsRead(true);
+      setIsRead(chat.id, true);
       return;
     }
     if (isWorking) {
-      setIsRead(false);
+      setIsRead(chat.id, false);
     }
-  }, [isOpen, isWorking]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chat.id, isOpen, isWorking]);
 
   const status = getChatIconStatus({ chat, liveStatus, isRead });
 

@@ -14,8 +14,8 @@ High-level overview of the chat status icon in this template.
 
 | Status     | When                                | Icon                       | Color                                  |
 | ---------- | ----------------------------------- | -------------------------- | -------------------------------------- |
-| `new`      | No `chat`                           | `LucideMessageCirclePlus`  | inherited                              |
-| `ready`    | Idle, and the last reply was read   | `LucideMessageCircle`      | inherited                              |
+| `new`      | No `chat`                           | `LucideMessageCirclePlus`  | `text-gray-800 dark:text-neutral-200`  |
+| `ready`    | Idle, and the last reply was read   | `LucideMessageCircle`      | `text-gray-800 dark:text-neutral-200`  |
 | `unread`   | A reply ended while it was not open | `LucideMessageCircleCheck` | `text-blue-600 dark:text-blue-500`     |
 | `working`  | `submitted` or `streaming`          | `LucideCircleDashed`       | `text-indigo-600 dark:text-indigo-500` |
 | `error`    | The last reply failed               | `LucideMessageCircleX`     | `text-red-600 dark:text-red-400`       |
@@ -28,7 +28,7 @@ High-level overview of the chat status icon in this template.
 | --------------------------------- | ------------------------------------------------------- |
 | Live status first                 | The session row is only updated when a reply ends       |
 | Session wins on `error`/`aborted` | A live chat goes back to `ready`, which would hide them |
-| `isRead` in local state           | A reload should not bring the unread icon back          |
+| Unread ids in `useChatSessions`   | All icons of a chat show the same read state            |
 
 ## Flow
 
@@ -60,13 +60,14 @@ flowchart TD
 Some relevant details:
 
 - **Instances:** `src/hooks/use-chat-instances.tsx` exposes `instances`
-  as state, so the icon re-renders when one is created or deleted.
+  through `useSyncExternalStore`, so the icon re-renders when one is
+  created or deleted.
 - **Aborted:** the AI SDK has no `aborted` status and `stop()` returns to
   `ready`, so the session status wins over a live `ready`.
-- **Read state:** `ChatIcon.tsx` keeps `isRead` state and updates it with an
-  effect:
-  - `false` when a closed chat starts working.
-  - `true` once the chat is open.
+- **Read state:** `useChatSessions` keeps the unread chat ids. An effect in
+  `ChatIcon.tsx` updates them:
+  - `setIsRead(id, false)` when a closed chat starts working.
+  - `setIsRead(id, true)` once the chat is open.
 - **Open chat:** `useChatSession` > `isOpen(id)` matches the chat page; or, the
   visible chat sidebar, tracked with `useOverlayEvents`.
 

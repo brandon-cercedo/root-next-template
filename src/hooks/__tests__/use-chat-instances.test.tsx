@@ -83,6 +83,22 @@ describe("useChatInstances", () => {
       expect(result.current.instances.get("a")).toBe(chat);
     });
 
+    it("should include an instance created during the first render", async () => {
+      const chat = createFakeChat();
+      const { result } = renderHook(
+        () => {
+          const context = useChatInstances();
+          context.getOrCreateInstance({ id: "a", create: () => chat });
+          return context;
+        },
+        { wrapper: Wrapper }
+      );
+
+      await act(async () => {});
+
+      expect(result.current.instances.get("a")).toBe(chat);
+    });
+
     it("should update after deleteInstance", async () => {
       const { result } = renderHook(() => useChatInstances(), {
         wrapper: Wrapper,
