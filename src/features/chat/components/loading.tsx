@@ -1,6 +1,6 @@
 import { LucideBot } from "lucide-react";
 
-export default function LoadingChat() {
+export function LoadingChat() {
   return (
     <div
       role="status"
@@ -23,6 +23,16 @@ export default function LoadingChat() {
           <span className="size-1 animate-[typing-wave_0.9s_ease-in-out_infinite_0.2s] rounded-full bg-blue-600 dark:bg-blue-500" />
         </span>
       </div>
+    </div>
+  );
+}
+
+export function LoadingSuggestedPrompts() {
+  return (
+    <div className="inline-flex h-7.5 w-50 animate-pulse items-center gap-1.5 self-start rounded-full border border-gray-200 px-3 py-1.5 dark:border-neutral-700">
+      <div className="size-3.5 flex-none rounded-full bg-gray-200 dark:bg-neutral-700" />
+      <div className="h-3.5 w-full rounded-full bg-gray-200 dark:bg-neutral-700" />
+      <div className="size-3.5 flex-none rounded-full bg-gray-200 dark:bg-neutral-700" />
     </div>
   );
 }

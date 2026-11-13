@@ -24,7 +24,7 @@ function Content({ chat }: { chat: ChatSession }) {
   return (
     <Fragment>
       <div className="w-full space-y-0.5 p-1">
-        <span className="block px-2 py-1.5 text-[10px] font-medium text-gray-400 uppercase dark:text-neutral-500">
+        <span className="block px-2 py-1.5 text-[10px] font-medium text-gray-500 uppercase dark:text-neutral-500">
           Chat
         </span>
         <ChatFavoriteButton

@@ -22,6 +22,7 @@ import { ChatSession, User } from "@/prisma/types/generated/browser";
 import ChatCreatedAt from "./ChatCreatedAt";
 import ChatInput from "./ChatInput";
 import ChatMessages from "./ChatMessages";
+import { SuggestedPromptsDynamic } from "./SuggestedPrompts";
 
 type VariantStyles = {
   inputMotion: string;
@@ -187,7 +188,13 @@ export default function ChatSection({
             stiffness: 380,
             damping: 32,
           }}
-          className={mergeClsx("sticky z-10 w-full", styles.inputMotion)}
+          className={mergeClsx(
+            "sticky z-10 w-full",
+            {
+              "flex flex-col gap-3": isNew,
+            },
+            styles.inputMotion
+          )}
         >
           <ChatInput
             status={status}
@@ -196,6 +203,14 @@ export default function ChatSection({
             onSend={handleSend}
             onStop={stop}
           />
+          {isNew && (
+            <div className="flex items-center gap-3">
+              <SuggestedPromptsDynamic
+                disabled={isLoading}
+                onSelect={handleSend}
+              />
+            </div>
+          )}
         </motion.div>
       </div>
     </ScrollableContainer.section>
