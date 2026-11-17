@@ -57,7 +57,7 @@ A base template to build `Next.js` applications.
     pnpm dev
     ```
 
-5. Open <http://localhost:3000> in your browser.
+5. Open <http://localhost:3000> in your browser (or the `PORT` set in `.env.local`).
 
 You are ready to build your application! 🎉
 

@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@10.34.3",
   "scripts": {
-    "dev": "next dev",
+    "dev": "p=$(pnpm -s env:get PORT); next dev ${p:+--port $p}",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -17,6 +17,7 @@
     "format:check": "prettier --check --ignore-unknown --config .prettierrc ./src",
     "type:check": "tsc --noEmit",
     "env:load": "dotenv -e .env.local",
+    "env:get": "dotenv -e .env.local -p",
     "migrate": "pnpm env:load -- prisma migrate dev",
     "seed": "pnpm env:load -- prisma db seed",
     "prisma:studio": "pnpm env:load -- prisma studio",

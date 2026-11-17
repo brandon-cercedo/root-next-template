@@ -159,6 +159,11 @@ if (isValid) {
 
 - Follow [DESIGN.md](DESIGN.md) when building or styling UI.
 
+## Testing
+
+- To sign in during browser automation, click [DevelopmentSignIn](src/features/auth/components/DevelopmentSignIn.tsx)
+  on `/auth/signin` instead of typing credentials.
+
 ## Programming Principles
 
 Ensure these programming principles are followed when writing code:

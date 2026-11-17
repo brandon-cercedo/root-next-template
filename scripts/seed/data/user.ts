@@ -1,3 +1,5 @@
+import { envs } from "@/lib/config/envs";
+
 type SeedUser = {
   name: string;
   email: string;
@@ -6,14 +8,22 @@ type SeedUser = {
   rawPassword: string;
 };
 
+function getDevelopmentUser(): SeedUser {
+  if (!envs.SEED_USER_EMAIL || !envs.SEED_USER_PASSWORD) {
+    throw new Error("[getDevelopmentUser] Missing user email or password");
+  }
+
+  return {
+    name: "John Doe",
+    email: envs.SEED_USER_EMAIL,
+    emailVerified: new Date(),
+    rawPassword: envs.SEED_USER_PASSWORD,
+  };
+}
+
 export const SEED_USERS: { users: SeedUser[] } = {
   users: [
-    {
-      name: "John Doe",
-      email: "john.doe@example.com",
-      emailVerified: new Date(),
-      rawPassword: "root@123",
-    },
+    getDevelopmentUser(),
     {
       name: "Brandon Cercedo",
       email: "marloncercedo@gmail.com",

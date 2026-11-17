@@ -11,6 +11,7 @@ const withAuthMock = vi.fn(
         authorized: (params: { token: unknown }) => boolean;
       };
       pages: unknown;
+      cookies: unknown;
     }
   ) => {
     return Object.assign(middleware, { options });
@@ -25,6 +26,7 @@ vi.mock("next-auth/middleware", () => ({
         authorized: (params: { token: unknown }) => boolean;
       };
       pages: unknown;
+      cookies: unknown;
     }
   ) => withAuthMock(middleware, options),
 }));
@@ -36,6 +38,12 @@ vi.mock("@/lib/auth", () => ({
       signOut: paths.auth.signOut(),
       error: paths.auth.error("FailedToSignIn"),
     },
+  },
+}));
+
+vi.mock("@/lib/auth/cookies", () => ({
+  authCookies: {
+    sessionToken: { name: "next-auth.3002.session-token", options: {} },
   },
 }));
 
@@ -71,6 +79,16 @@ describe("proxy", () => {
     expect(authorized({ token: { sub: "user-1" } })).toBe(true);
     expect(authorized({ token: null })).toBe(false);
     expect(authorized({ token: undefined })).toBe(false);
+  });
+
+  it("should read the same session cookie as authOptions", async () => {
+    await import("@/proxy");
+
+    const [_, options] = withAuthMock.mock.calls[0]!;
+
+    expect(options.cookies).toEqual({
+      sessionToken: { name: "next-auth.3002.session-token", options: {} },
+    });
   });
 
   it("should continue the request when authorized", async () => {
