@@ -10,6 +10,7 @@ vi.mock("@/lib/config/envs", () => ({
     GOOGLE_CLIENT_ID: "test-google-client-id",
     GOOGLE_CLIENT_SECRET: "test-google-client-secret",
   },
+  isDevelopment: () => false,
 }));
 
 vi.mock("@next-auth/prisma-adapter", () => ({

@@ -4,8 +4,10 @@ import { Account, NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
+import { DEVELOPMENT_PROVIDER_ID } from "@/lib/auth/constants";
+import { authCookies } from "@/lib/auth/cookies";
 import { CredentialsSchema } from "@/lib/auth/schema";
-import { envs } from "@/lib/config/envs";
+import { envs, isDevelopment } from "@/lib/config/envs";
 import { paths } from "@/lib/config/paths";
 import prisma from "@/lib/prisma-client";
 
@@ -50,11 +52,17 @@ async function handleGoogleSignIn(email: string, account: Account) {
   return true;
 }
 
+/**
+ * @note `Development` credential provider:
+ * - Never registered in production.
+ * - Enable an one-click sign-in for automations.
+ */
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
   },
+  cookies: authCookies,
   pages: {
     signIn: paths.auth.signIn(),
     signOut: paths.auth.signOut(),
@@ -95,6 +103,22 @@ export const authOptions: NextAuthOptions = {
         return user;
       },
     }),
+    ...(isDevelopment()
+      ? [
+          CredentialsProvider({
+            id: DEVELOPMENT_PROVIDER_ID,
+            name: "Development",
+            credentials: {},
+            async authorize() {
+              const email = envs.SEED_USER_EMAIL;
+              if (!email) {
+                return null;
+              }
+              return prisma.user.findUnique({ where: { email } });
+            },
+          }),
+        ]
+      : []),
   ],
   callbacks: {
     // User object is not created yet in this callback.

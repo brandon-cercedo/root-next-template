@@ -6,7 +6,10 @@ High-level overview of auth in this template.
 
 Invite-only auth with **NextAuth v4**:
 
-- Credentials (email/password) and Google OAuth.
+- Providers:
+  - Google OAuth.
+  - Credentials: using email/password.
+  - Credentials: for a development-only one-click sign-in.
 - JWT sessions (no DB session tables).
 - Prisma `User` / `Account` for identity and linked providers.
 
@@ -21,16 +24,18 @@ only works if that email already has a `User` row.
 | JWT                              | Simple sessions without `Session` / `VerificationToken` tables |
 | Invite-only                      | Closed access by default                                       |
 | `UserProvider` over `useSession` | Server loads the DB user; client gets typed context            |
+| Development provider             | Production has no such provider; so nothing can call it        |
+| Port in cookie names             | Repo copies on different ports keep separate sessions          |
 
 ## Flow
 
-Sign-in goes through `/api/auth/[...nextauth]` (`src/lib/auth.ts`) and redirects to the dashboard if successful.
+Sign-in goes through `/api/auth/[...nextauth]` (`src/lib/auth/index.ts`) and redirects to the dashboard if successful.
 
 ```mermaid
 flowchart TD
   Browser --> SignIn["/auth/signin"]
   SignIn --> NextAuthAPI["/api/auth/[...nextauth]"]
-  NextAuthAPI --> AuthConfig["src/lib/auth.ts"]
+  NextAuthAPI --> AuthConfig["src/lib/auth/index.ts"]
   AuthConfig --> Prisma["Prisma User / Account"]
   AuthConfig -->|JWT cookie| Browser
   Browser --> Dashboard["/dashboard/*"]
@@ -48,10 +53,11 @@ Some relevant details:
 
 - **Dashboard routes:** are protected at the edge (`proxy.ts`) and again in the layout.
 - **Credentials:** validate against `User.password` using bcrypt.
+- **Development:** sign in as `SEED_USER_EMAIL`.
 - **Google:** allow only if the user exists, link `Account` if missing,
-otherwise `AccessDenied`.
+  otherwise `AccessDenied`.
 - **Identity in app code:** use `getUser` / `getFullUser` on the server and
-`useUser()` on the client — not `SessionProvider` / `useSession`.
+  `useUser()` on the client — not `SessionProvider` / `useSession`.
 - **Errors:**
   - Bad credentials stay on the sign-in form.
   - Denied Google and NextAuth failures go to `/error?error=…`.

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { withAuth } from "next-auth/middleware";
 
 import { authOptions } from "./lib/auth";
+import { authCookies } from "./lib/auth/cookies";
 
 /**
  * @note `withAuth` augments your `Request` with the user's token.
@@ -18,6 +19,7 @@ export default withAuth(
       },
     },
     pages: authOptions.pages,
+    cookies: { sessionToken: authCookies?.sessionToken },
   }
 );
 

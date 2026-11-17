@@ -6,6 +6,8 @@ import { useState, SubmitEvent } from "react";
 import FormError from "@/components/ui/FormError";
 import { ChromeIcon } from "@/components/ui/icons/ChromeIcon";
 import SpinnerIcon from "@/components/ui/spinners/SpinnerIcon";
+import DevelopmentSignIn from "@/features/auth/components/DevelopmentSignIn";
+import { isDevelopment } from "@/lib/config/envs";
 import { paths } from "@/lib/config/paths";
 
 function CredentialsSignIn() {
@@ -132,6 +134,7 @@ export default function SignInCard() {
         </h1>
       </div>
       <div className="flex w-full flex-col gap-4">
+        {isDevelopment() && <DevelopmentSignIn />}
         <GoogleSignIn />
         <div className="flex items-center text-xs text-gray-400 uppercase before:me-6 before:flex-1 before:border-t before:border-gray-200 after:ms-6 after:flex-1 after:border-t after:border-gray-200 dark:text-neutral-500 dark:before:border-neutral-600 dark:after:border-neutral-600">
           Or
