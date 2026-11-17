@@ -12,9 +12,19 @@ Invite-only auth with **NextAuth v4**:
   - Credentials: for a development-only one-click sign-in.
 - JWT sessions (no DB session tables).
 - Prisma `User` / `Account` for identity and linked providers.
+- Per-port auth cookies in development to allow repo copies stay signed in
+  at the same time (see [Repo copies](repo-copies.md)).
 
 No public registration. Users must already exist (usually via seed). Google
 only works if that email already has a `User` row.
+
+### Cookie names
+
+| Default                   | Development (e.g. port 3001)   |
+| ------------------------- | ------------------------------ |
+| `next-auth.session-token` | `next-auth.3001.session-token` |
+| `next-auth.csrf-token`    | `next-auth.3001.csrf-token`    |
+| `next-auth.callback-url`  | `next-auth.3001.callback-url`  |
 
 ## Design choices
 
@@ -37,7 +47,7 @@ flowchart TD
   SignIn --> NextAuthAPI["/api/auth/[...nextauth]"]
   NextAuthAPI --> AuthConfig["src/lib/auth/index.ts"]
   AuthConfig --> Prisma["Prisma User / Account"]
-  AuthConfig -->|JWT cookie| Browser
+  AuthConfig -->|"JWT cookie + per port in dev"| Browser
   Browser --> Dashboard["/dashboard/*"]
   Dashboard --> Proxy["proxy.ts withAuth"]
   Proxy -->|no JWT| SignIn
@@ -54,6 +64,8 @@ Some relevant details:
 - **Dashboard routes:** are protected at the edge (`proxy.ts`) and again in the layout.
 - **Credentials:** validate against `User.password` using bcrypt.
 - **Development:** sign in as `SEED_USER_EMAIL`.
+- **Cookies:** `authOptions` and `proxy.ts` share the cookie names from
+  `src/lib/auth/cookies.ts`.
 - **Google:** allow only if the user exists, link `Account` if missing,
   otherwise `AccessDenied`.
 - **Identity in app code:** use `getUser` / `getFullUser` on the server and
@@ -68,3 +80,5 @@ Some relevant details:
   - Add users via seed data (see `scripts/seed/data/user.ts`)
   - Extend `FullUser` when you need more dashboard context.
   - Widen `proxy.ts` matcher for more private routes.
+  - Pass any new auth cookie option to `withAuth` in `proxy.ts` too; it
+    doesn't read `authOptions`.
