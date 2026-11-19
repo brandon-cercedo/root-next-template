@@ -7,6 +7,17 @@ declare global {
     };
 
     type ChatUIMessageType = ChatUIMessage;
+
+    type ChatSessionAction = {
+      lastMessageId: string; // last message kept; later ones were deleted
+      timestamp: string; // ISO
+    };
+
+    type ChatSessionActions = {
+      fork?: ChatSessionAction & { parentId: string };
+      edit?: ChatSessionAction;
+      retry?: ChatSessionAction;
+    };
   }
 }
 

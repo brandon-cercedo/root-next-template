@@ -83,6 +83,8 @@ model ChatSession {
   error         String?
   /// [ChatUIMessageType[]]
   messages      Json              @default("[]")
+  /// [ChatSessionActions]
+  actions       Json?
   isFavourite   Boolean           @default(false)
   isArchived    Boolean           @default(false)
   lastMessageAt DateTime          @default(now())
