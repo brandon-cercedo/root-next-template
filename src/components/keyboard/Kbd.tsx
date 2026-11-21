@@ -3,17 +3,17 @@
 import { mergeClsx } from "@/lib/utils/styles";
 
 const KBD_WRAPPER_SIZES = {
-  xs: "gap-x-0.5 text-[11px]",
-  sm: "gap-x-0.5 text-xs",
-  md: "gap-x-1 text-sm",
-  lg: "gap-x-1 text-base",
+  xs: "gap-x-1 text-[11px]",
+  sm: "gap-x-1 text-xs",
+  md: "gap-x-1.5 text-sm",
+  lg: "gap-x-1.5 text-base",
 };
 
 const KBD_CHIP_SIZES = {
-  xs: "size-5 p-0.5 text-[11px]",
-  sm: "size-6 p-1 text-xs",
-  md: "size-7.5 p-1 text-sm",
-  lg: "size-8 p-1 text-base",
+  xs: "h-5 min-w-5 p-0.5 text-[11px]",
+  sm: "h-6 min-w-6 p-1 text-xs",
+  md: "h-7.5 min-w-7.5 p-1 text-sm",
+  lg: "h-8 min-w-8 p-1 text-base",
 };
 
 type KbdSize = keyof typeof KBD_WRAPPER_SIZES;

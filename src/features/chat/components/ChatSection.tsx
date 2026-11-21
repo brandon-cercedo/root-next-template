@@ -12,7 +12,15 @@ import {
   handleUpdateChatMessage,
 } from "@/features/chat/actions";
 import { useAgent } from "@/features/chat/hooks/use-agent";
-import { composeUserMessage, getChatTitle } from "@/features/chat/utils";
+import {
+  ChatVariant,
+  useChatSession,
+} from "@/features/chat/hooks/use-chat-session";
+import {
+  composeUserMessage,
+  getChatTitle,
+  isTargetDraft,
+} from "@/features/chat/utils";
 import GreetingMessage from "@/features/home/components/GreetingMessage";
 import { useFlag } from "@/hooks/use-flag";
 import { paths } from "@/lib/config/paths";
@@ -29,7 +37,7 @@ type VariantStyles = {
   inputContainer?: string;
 };
 
-const VARIANT_STYLES: Record<ChatSectionVariant, VariantStyles> = {
+const VARIANT_STYLES: Record<ChatVariant, VariantStyles> = {
   page: {
     inputMotion: "bottom-4",
   },
@@ -39,12 +47,10 @@ const VARIANT_STYLES: Record<ChatSectionVariant, VariantStyles> = {
   },
 };
 
-type ChatSectionVariant = "page" | "sidebar";
-
 type ChatSectionProps = {
   user: User;
   chat?: ChatSession;
-  variant?: ChatSectionVariant;
+  variant?: ChatVariant;
   className?: string;
   onCreate?: (id: string) => void;
 };
@@ -61,10 +67,12 @@ export default function ChatSection({
 
   const router = useRouter();
   const { values } = useFlag();
+  const { draft, setDraft } = useChatSession();
   const [id, setId] = useState(() => chatId ?? uuidv7());
   const [isCreated, setIsCreated] = useState(() => Boolean(chatId));
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const isValidDraft = isTargetDraft({ draft, chatId, variant });
 
   useEffect(() => {
     if (!chatId) {
@@ -197,6 +205,8 @@ export default function ChatSection({
           )}
         >
           <ChatInput
+            draft={isValidDraft ? draft : undefined}
+            onDraft={() => setDraft(undefined)}
             status={status}
             disabled={isLoading || isArchived}
             containerClassName={styles.inputContainer}

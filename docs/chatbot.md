@@ -59,7 +59,9 @@ flowchart TD
   NewChat["/dashboard/chats"] --> FirstSend["First send"]
   Existing["/dashboard/chats/id"] --> Load["getChatSession"]
   Load --> Seed["useAgent seeds initialMessages if no live Chat"]
-  OpenChat["openChat(id?)"] --> ChatSidebar["ChatOffcanvas"]
+  OpenChat["openChat({ id, variant, mode, text })"] -->|sidebar| ChatSidebar["ChatOffcanvas"]
+  OpenChat -.->|page| ChatPage["router.push chat page"]
+  OpenChat -->|text| Draft["setDraft → ChatSection isTargetDraft → ChatInput draft"]
   ChatSidebar -.->|on chat page| Redirect["router.push /dashboard/chats"]
   ChatSidebar -->|id| SidebarExisting["getChat from user.chatSessions"]
   ChatSidebar -->|no id| SidebarNew["New chat"]
@@ -137,6 +139,15 @@ Some relevant details:
 - **Agent loop:** `stopWhen: stepCountIs(5)`, `maxRetries: 2`,
   `temperature: 0.2`, `repairToolCall` (re-ask; no `Output.object`).
 - **Input:** Enter sends; Shift+Enter inserts a newline.
+- **Draft (`ChatDraft`):** `openChat({ id, variant, mode, text })` routes
+  by `variant` (`"sidebar"` by default, or `"page"`) and, with `text`,
+  stores a draft in `ChatSessionProvider`.
+  - `ChatInput` watches the `draft` prop: it prefills the input and, when
+    `mode` (`DraftMode`) is `"send"`, sends it.
+  - `useRun(draft, handleDraft)` handles each draft object once. Strict
+    Mode, Fast Refresh and `<Activity>` re-run effects with the same object,
+    and those runs are skipped.
+  - The command palette uses it: Tab sends search text to a new sidebar chat.
 - **`client-debug`:** Logs section state, shows non-text **Steps**
   under assistant bubbles, and logs `showPet` parts with invalid input.
 - **`server-debug`:** Logs chat input and `streamText` `onEnd` output in

@@ -27,7 +27,7 @@ export default function ChatOpenOffcanvasButton({
         className
       )}
       aria-label={label ? undefined : "Move to sidebar"}
-      onClick={() => openChat(chat?.id)}
+      onClick={() => openChat({ id: chat?.id })}
     >
       <LucidePanelRight className="size-3.5 flex-none" />
       {label}

@@ -121,7 +121,7 @@ export function DashboardKeyboardProvider({
     };
 
     let actions: CommandActions = {
-      "move-chat-to-sidebar": () => openChat(pageChat.id),
+      "move-chat-to-sidebar": () => openChat({ id: pageChat.id }),
     };
     if (pageChat.isArchived) {
       actions = {

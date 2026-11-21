@@ -20,7 +20,7 @@ import { getLastMessageAt } from "./utils";
 import type { ChatSessionStatus } from "@/prisma/types/generated/browser";
 import type { ChatUIMessage } from "@/types/chat";
 
-export async function handleCreateChatSession(input: {
+export async function handleCreateChatSession(params: {
   id: string;
   title: string;
   message: ChatUIMessage;
@@ -31,7 +31,7 @@ export async function handleCreateChatSession(input: {
     return { success: false, message: "Unauthorized" };
   }
 
-  const parsed = CreateChatSessionSchema.safeParse(input);
+  const parsed = CreateChatSessionSchema.safeParse(params);
   if (!parsed.success) {
     console.error("[handleCreateChatSession] Invalid data", parsed.error);
     return { success: false, message: "Invalid chat session data" };
@@ -58,7 +58,7 @@ export async function handleCreateChatSession(input: {
   return { success: true, id: data.id };
 }
 
-export async function handleUpdateChatMessage(input: {
+export async function handleUpdateChatMessage(params: {
   id: string;
   status: ChatSessionStatus;
   messages: ChatUIMessage[];
@@ -69,7 +69,7 @@ export async function handleUpdateChatMessage(input: {
     return { success: false, message: "Unauthorized" };
   }
 
-  const parsed = UpdateChatMessageSchema.safeParse(input);
+  const parsed = UpdateChatMessageSchema.safeParse(params);
   if (!parsed.success) {
     console.error("[handleUpdateChatMessage] Invalid data", parsed.error);
     return { success: false, message: "Invalid chat message data" };

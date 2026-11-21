@@ -3,6 +3,8 @@ import { LucideArrowUp, LucideSquare } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import TextareaAutoHeight from "@/components/ui/forms/TextareaAutoHeight";
+import { ChatDraft } from "@/features/chat/hooks/use-chat-session";
+import { useRun } from "@/hooks/use-run";
 import { isChatWorking } from "@/lib/utils/db/chat";
 import { mergeClsx } from "@/lib/utils/styles";
 
@@ -32,7 +34,21 @@ function getIsExpanded(textarea: HTMLTextAreaElement, isExpanded: boolean) {
   return textarea.scrollHeight > singleLineHeight;
 }
 
+function shouldSendText({
+  text,
+  isWorking,
+  disabled,
+}: {
+  text: string;
+  isWorking: boolean;
+  disabled: boolean;
+}) {
+  return text.trim().length > 0 && !isWorking && !disabled;
+}
+
 type ChatInputProps = {
+  draft?: ChatDraft;
+  onDraft?: () => void;
   status: ChatStatus;
   disabled?: boolean;
   className?: string;
@@ -41,7 +57,15 @@ type ChatInputProps = {
   onStop: () => void;
 };
 
+/**
+ * @note To only prefill the input, use `draft` in `prefill` mode instead of a
+ * `defaultValue` prop:
+ * - It could reach an already mounted input without a remount, so the chat's UI
+ *   state is kept (e.g. an open sidebar chat).
+ */
 export default function ChatInput({
+  draft,
+  onDraft,
   status,
   disabled = false,
   className,
@@ -53,7 +77,7 @@ export default function ChatInput({
   const [isExpanded, setIsExpanded] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isWorking = isChatWorking(status);
-  const shouldSend = input.trim().length > 0 && !isWorking && !disabled;
+  const shouldSend = shouldSendText({ text: input, isWorking, disabled });
 
   // Watch wraps caused by the input narrowing rather than by typing.
   useEffect(() => {
@@ -72,12 +96,13 @@ export default function ChatInput({
     return () => observer.disconnect();
   }, []);
 
-  const handleSend = async () => {
+  const send = async (value: string) => {
+    const shouldSend = shouldSendText({ text: value, isWorking, disabled });
     if (!shouldSend) {
       return;
     }
 
-    const text = input.trim();
+    const text = value.trim();
     const prevIsExpanded = isExpanded;
 
     setInput("");
@@ -90,11 +115,26 @@ export default function ChatInput({
     }
   };
 
+  const handleDraft = (draft: ChatDraft) => {
+    onDraft?.();
+
+    if (["prefill", "send"].includes(draft.mode)) {
+      setInput(draft.text);
+    }
+    if (draft.mode === "send") {
+      void send(draft.text);
+    }
+  };
+
+  const handleSend = () => send(input);
+
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const textarea = event.target;
     setInput(textarea.value);
     setIsExpanded((prev) => getIsExpanded(textarea, prev));
   };
+
+  useRun(draft, handleDraft);
 
   return (
     <form
