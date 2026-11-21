@@ -10,6 +10,17 @@ import { useUser } from "@/hooks/use-user";
 import { paths } from "@/lib/config/paths";
 import { ChatSession } from "@/prisma/types/generated/browser";
 
+export type ChatVariant = "page" | "sidebar";
+
+export type DraftMode = "prefill" | "send";
+
+export type ChatDraft = {
+  id?: string;
+  variant: ChatVariant;
+  mode: DraftMode;
+  text: string;
+};
+
 type ChatSessionContextType = {
   // Side panel (offcanvas)
   chatId?: string;
@@ -18,12 +29,16 @@ type ChatSessionContextType = {
   setIsOffcanvasOpen: (isOpen: boolean) => void;
   getChat: () => ChatSession | undefined;
   isOpen: (id: string) => boolean;
-  openChat: (id?: string) => void;
+  openChat: (params?: Partial<ChatDraft>) => void;
   closeChat: (id?: string) => void;
 
   // Chat page (/dashboard/chats/[id])
   pageChat?: ChatSession;
   setPageChat: (chat?: ChatSession) => void;
+
+  // Draft chat (command palette)
+  draft?: ChatDraft;
+  setDraft: (draft?: ChatDraft) => void;
 };
 
 const ChatSessionContext = createContext<ChatSessionContextType | undefined>(
@@ -43,6 +58,7 @@ export function ChatSessionProvider({ children }: { children: ReactNode }) {
   const [key, setKey] = useState(() => uuidv7());
   const [pageChat, setPageChat] = useState<ChatSession>();
   const [isOffcanvasOpen, setIsOffcanvasOpen] = useState(false);
+  const [draft, setDraft] = useState<ChatDraft>();
 
   const getChat = () => {
     return user.chatSessions.find((session) => session.id === chatId);
@@ -60,7 +76,26 @@ export function ChatSessionProvider({ children }: { children: ReactNode }) {
     return isPageOpen || isOffcanvasChat;
   };
 
-  const openChat = (id?: string) => {
+  /**
+   * Open a chat in the sidebar (default) or the chat page.
+   *
+   * @note With `text`, it also sets the draft for the target chat.
+   */
+  const openChat = ({
+    id,
+    variant = "sidebar",
+    mode = "prefill",
+    text,
+  }: Partial<ChatDraft> = {}) => {
+    if (text) {
+      setDraft({ id, variant, mode, text });
+    }
+
+    if (variant === "page") {
+      router.push(id ? paths.dashboard.chat(id) : paths.dashboard.chats());
+      return;
+    }
+
     if (id !== chatId) {
       setChatId(id);
       setKey(uuidv7());
@@ -102,6 +137,8 @@ export function ChatSessionProvider({ children }: { children: ReactNode }) {
         closeChat,
         pageChat,
         setPageChat,
+        draft,
+        setDraft,
       }}
     >
       {children}

@@ -15,6 +15,7 @@ A `cmdk` palette inside the existing Preline `Modal` overlay:
 - `Chats` comes first, then one group per `COMMAND_GROUPS` entry.
 - `Agent` includes chat's actions on chat's own page.
 - The arrow keys wrap from the last row to the first and back.
+- `Tab` sends the search text to a new chat in the sidebar.
 
 ## Design choices
 
@@ -39,6 +40,7 @@ flowchart TD
   Chats --> Palette["CommandPalette: renders groups"]
   Commands --> Palette
   Palette -->|select row| Run["item.run()"]
+  Palette -->|Tab| OnTab["onTab → openChat({ mode: 'send', text })"]
 ```
 
 Some relevant details:

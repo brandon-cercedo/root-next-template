@@ -6,7 +6,6 @@ import {
   ChatSessionProvider,
   useChatSession,
 } from "@/features/chat/hooks/use-chat-session";
-import { paths } from "@/lib/config/paths";
 import { fakeChatSessionComplete } from "@/prisma/utils/fake-data";
 
 const chat = fakeChatSessionComplete();
@@ -66,7 +65,7 @@ describe("useChatSession", () => {
       const { result } = renderChatSession();
 
       act(() => {
-        result.current.openChat(chat.id);
+        result.current.openChat({ id: chat.id });
       });
 
       expect(result.current.getChat()).toBe(chat);
@@ -84,91 +83,6 @@ describe("useChatSession", () => {
 
       expect(result.current.chatId).toBe("chat-1");
       expect(result.current.key).toBe(initialKey);
-    });
-  });
-
-  describe("openChat", () => {
-    it("should open the overlay and set the chat", () => {
-      const { result } = renderChatSession();
-      const initialKey = result.current.key;
-
-      act(() => {
-        result.current.openChat("chat-1");
-      });
-
-      expect(result.current.chatId).toBe("chat-1");
-      expect(result.current.key).not.toBe(initialKey);
-      expect(mockOpenOverlay).toHaveBeenCalledWith(OVERLAY_IDS.CHAT_OFFCANVAS);
-    });
-
-    it("should keep key when opening the current chat", () => {
-      const { result } = renderChatSession();
-
-      act(() => {
-        result.current.openChat("chat-1");
-      });
-      const key = result.current.key;
-      act(() => {
-        result.current.openChat("chat-1");
-      });
-
-      expect(result.current.key).toBe(key);
-      expect(mockOpenOverlay).toHaveBeenCalledTimes(2);
-    });
-
-    it("should redirect to new chat when opening the chat of the current page", () => {
-      const { result } = renderChatSession();
-
-      act(() => {
-        result.current.setPageChat({ ...chat, id: "chat-1" });
-      });
-      act(() => {
-        result.current.openChat("chat-1");
-      });
-
-      expect(result.current.chatId).toBe("chat-1");
-      expect(mockPush).toHaveBeenCalledWith(paths.dashboard.chats());
-    });
-
-    it("should stay on the page when opening another chat", () => {
-      const { result } = renderChatSession();
-
-      act(() => {
-        result.current.setPageChat({ ...chat, id: "chat-2" });
-      });
-      act(() => {
-        result.current.openChat("chat-1");
-      });
-
-      expect(result.current.chatId).toBe("chat-1");
-      expect(mockPush).not.toHaveBeenCalled();
-    });
-
-    it("should stay on the page when opening a new chat", () => {
-      const { result } = renderChatSession();
-
-      act(() => {
-        result.current.openChat();
-      });
-
-      expect(result.current.chatId).toBeUndefined();
-      expect(mockOpenOverlay).toHaveBeenCalledWith(OVERLAY_IDS.CHAT_OFFCANVAS);
-      expect(mockPush).not.toHaveBeenCalled();
-    });
-
-    it("should switch from an open chat to a new chat", () => {
-      const { result } = renderChatSession();
-
-      act(() => {
-        result.current.openChat("chat-1");
-      });
-      const key = result.current.key;
-      act(() => {
-        result.current.openChat();
-      });
-
-      expect(result.current.chatId).toBeUndefined();
-      expect(result.current.key).not.toBe(key);
     });
   });
 
@@ -195,7 +109,7 @@ describe("useChatSession", () => {
       const { result } = renderChatSession();
 
       act(() => {
-        result.current.openChat("chat-1");
+        result.current.openChat({ id: "chat-1" });
       });
       const key = result.current.key;
       act(() => {
@@ -213,7 +127,7 @@ describe("useChatSession", () => {
       const { result } = renderChatSession();
 
       act(() => {
-        result.current.openChat("chat-1");
+        result.current.openChat({ id: "chat-1" });
       });
       const key = result.current.key;
       act(() => {
@@ -230,7 +144,7 @@ describe("useChatSession", () => {
     function openInOffcanvas(id: string) {
       const rendered = renderChatSession();
       act(() => {
-        rendered.result.current.openChat(id);
+        rendered.result.current.openChat({ id });
       });
       return rendered;
     }

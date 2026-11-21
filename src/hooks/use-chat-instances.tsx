@@ -84,7 +84,7 @@ type ChatInstances = ReadonlyMap<string, ChatInstance>;
 
 type ChatInstancesContextType = {
   instances: ChatInstances;
-  getOrCreateInstance: (options: {
+  getOrCreateInstance: (params: {
     id: string;
     create: () => ChatInstance;
   }) => ChatInstance;

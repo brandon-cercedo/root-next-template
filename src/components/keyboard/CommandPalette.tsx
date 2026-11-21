@@ -6,7 +6,6 @@ import { useEffect, useRef, useState } from "react";
 
 import { OVERLAY_IDS } from "@/components/constants";
 import { Shortcut } from "@/components/keyboard/config";
-import { useKeyboard } from "@/hooks/use-keyboard";
 import { useModal } from "@/hooks/use-modal";
 import { useOverlay } from "@/hooks/use-overlay";
 import { getShortcutKeys } from "@/lib/keyboard";
@@ -51,7 +50,11 @@ function CommandItem({ item }: { item: CommandPaletteItem }) {
   const suffixes = [
     ...(item.renderSuffixes?.() ?? []),
     item.shortcut && (
-      <KbdList key="shortcut" keys={getShortcutKeys(item.shortcut)} />
+      <KbdList
+        key="shortcut"
+        keys={getShortcutKeys(item.shortcut)}
+        size="xs"
+      />
     ),
   ];
 
@@ -124,7 +127,7 @@ function CommandGroup({ group }: CommandGroupProps) {
           onSelect={() => setIsExpanded(true)}
           className="flex cursor-pointer items-center gap-x-3 rounded-lg px-2 py-1.5 text-[13px] leading-5 text-gray-800 select-none hover:bg-gray-100 focus:bg-gray-100 focus:outline-hidden data-[selected=true]:bg-gray-100 dark:text-neutral-200 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:data-[selected=true]:bg-neutral-700 dark:data-[selected=true]:text-neutral-300"
         >
-          <span className="w-full truncate ps-7 text-xs text-gray-500 dark:text-neutral-400">
+          <span className="w-full ps-7 text-xs text-gray-500 dark:text-neutral-400">
             Show {total - limit} more
             <span className="text-gray-400 dark:text-neutral-500">
               {` · ${total} total`}
@@ -141,12 +144,13 @@ function Content({
   searchText,
   shouldFilter,
   loop,
+  searchSuffixes,
   onSearch,
+  onTab,
 }: CommandPaletteProps) {
   const { isMounted } = useModal();
+  const { close } = useOverlay();
   const inputRef = useRef<HTMLInputElement>(null);
-  const { shortcutsById } = useKeyboard();
-  const paletteToggle = shortcutsById.get("toggle-palette");
 
   useEffect(() => {
     if (!isMounted) {
@@ -162,6 +166,23 @@ function Content({
     input.setAttribute("autofocus", "");
   }, [isMounted]);
 
+  function handleTab(event: React.KeyboardEvent) {
+    if (!onTab || event.shiftKey || event.nativeEvent.isComposing) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const text = searchText?.trim();
+    if (!text) {
+      return;
+    }
+
+    onTab(text);
+    void close(OVERLAY_IDS.COMMAND_PALETTE);
+  }
+
   return (
     <Command
       label="Command menu"
@@ -169,6 +190,10 @@ function Content({
       shouldFilter={shouldFilter}
       loop={loop}
       onKeyDown={(event) => {
+        if (event.key === "Tab") {
+          handleTab(event);
+          return;
+        }
         if (event.key !== "Enter") {
           return;
         }
@@ -177,7 +202,7 @@ function Content({
       }}
     >
       <div className="space-y-0.5 px-2 py-1">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <Command.Input
             ref={inputRef}
             value={searchText}
@@ -185,9 +210,7 @@ function Content({
             placeholder="Type a command or search…"
             className="block w-full rounded-lg border-0 bg-transparent px-0 py-1.5 text-[13px] leading-5 shadow-none ring-0 outline-none focus:border-0 focus:ring-0 focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-neutral-400 dark:placeholder-neutral-500"
           />
-          {paletteToggle?.shortcut && (
-            <KbdList keys={getShortcutKeys(paletteToggle.shortcut)} />
-          )}
+          {searchSuffixes}
         </div>
       </div>
       <Command.List className="max-h-96 scrollbar-thin overflow-y-auto overscroll-contain">
@@ -216,7 +239,9 @@ type CommandPaletteProps = {
   searchText?: string;
   shouldFilter?: boolean; // Toggle cmdk's built-in filtering/sorting.
   loop?: boolean;
+  searchSuffixes?: React.ReactNode[];
   onSearch?: (searchText: string) => void;
+  onTab?: (searchText: string) => void;
 };
 
 export default function CommandPalette({
@@ -224,7 +249,9 @@ export default function CommandPalette({
   searchText,
   shouldFilter = true,
   loop = true,
+  searchSuffixes,
   onSearch,
+  onTab,
 }: CommandPaletteProps) {
   return (
     <Modal
@@ -243,7 +270,9 @@ export default function CommandPalette({
         searchText={searchText}
         shouldFilter={shouldFilter}
         loop={loop}
+        searchSuffixes={searchSuffixes}
         onSearch={onSearch}
+        onTab={onTab}
       />
     </Modal>
   );

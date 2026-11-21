@@ -4,6 +4,10 @@ import { truncate } from "lodash";
 import { TITLE_MAX_LENGTH } from "@/features/chat/schema/chat";
 import { isChatWorking } from "@/lib/utils/db/chat";
 
+import type {
+  ChatDraft,
+  ChatVariant,
+} from "@/features/chat/hooks/use-chat-session";
 import type { ChatSession } from "@/prisma/types/generated/browser";
 import type { ChatUIMessage } from "@/types/chat";
 
@@ -144,4 +148,16 @@ export function getChatIconStatus({
   }
 
   return status;
+}
+
+export function isTargetDraft({
+  draft,
+  chatId,
+  variant,
+}: {
+  draft?: ChatDraft;
+  chatId?: string;
+  variant: ChatVariant;
+}) {
+  return draft?.variant === variant && draft.id === chatId;
 }
