@@ -21,16 +21,18 @@ function getDevelopmentUser(): SeedUser {
   };
 }
 
+const developmentUser = getDevelopmentUser();
+
 export const SEED_USERS: { users: SeedUser[] } = {
   users: [
-    getDevelopmentUser(),
+    developmentUser,
     {
       name: "Brandon Cercedo",
       email: "marloncercedo@gmail.com",
       emailVerified: new Date(),
       image:
         "https://lh3.googleusercontent.com/a/ACg8ocJtKD3HYbmkBpYnH-ACNodCSQsbHeuODUIMnqdwGbtmN4Eoa1l3=s96-c",
-      rawPassword: "root@123",
+      rawPassword: developmentUser.rawPassword,
     },
   ],
 };
