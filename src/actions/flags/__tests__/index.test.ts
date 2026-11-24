@@ -38,7 +38,7 @@ vi.mock("next/headers", () => ({
 
 vi.mock("@/lib/config/envs", () => ({
   isProduction: () => false,
-  isPreview: () => false,
+  isStaging: () => false,
 }));
 
 describe("updateFlagOverrides", () => {

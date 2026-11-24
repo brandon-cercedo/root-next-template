@@ -65,7 +65,7 @@ export function isProduction() {
   return getEnvironment() === "production";
 }
 
-export function isPreview() {
+export function isStaging() {
   return getEnvironment() === "preview";
 }
 
