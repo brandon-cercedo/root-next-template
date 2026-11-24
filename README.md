@@ -61,6 +61,29 @@ A base template to build `Next.js` applications.
 
 You are ready to build your application! 🎉
 
+## ☁️ Deployment
+
+This repo currently runs in two environments: **development** on your
+machine and **staging** on Vercel. **production** is not set up yet.
+
+It is deployed with:
+
+- [Vercel](https://vercel.com): hosts the app and builds every push.
+- [Prisma Postgres](https://www.prisma.io/postgres): hosts the database.
+- [GitHub Actions](https://github.com/features/actions): runs quality
+  checks on pushes and PRs, and applies database migrations.
+
+| Stage       | Trigger                 | Where                                                                        | Database                  |
+| ----------- | ----------------------- | ---------------------------------------------------------------------------- | ------------------------- |
+| Staging     | Push or merge to `main` | Vercel **Production** environment at <https://root-next-template.vercel.app> | Prisma Postgres (staging) |
+| Preview     | PRs and other branches  | Vercel **Preview** environment, a new URL per deploy, no Google sign-in      | Prisma Postgres (staging) |
+| Development | Run `pnpm dev`          | Your machine at <http://localhost:3000>, using envs from `.env.local`        | Local Postgres            |
+
+- **Gotcha:** `isProduction()` returns `true` on the `main` deploy, even
+  though it is staging, because Vercel sets `VERCEL_ENV=production` there.
+- **Moving to real production:** add a new Vercel environment, with
+  its own database, Google OAuth client and GitHub environment.
+
 ## 🛠 Development
 
 ### 🪛 Scripts
@@ -124,3 +147,7 @@ Check out these resources to learn more about writing clean code:
 Thanks to these projects for the inspiration:
 
 - [Bulletproof React](https://github.com/alan2207/bulletproof-react)
+
+## Credits
+
+Icon: <a href="https://www.flaticon.com/free-icons/dice" title="dice icons">Dice icons created by Tanah Basah - Flaticon</a>

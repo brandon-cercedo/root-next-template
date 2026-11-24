@@ -15,7 +15,7 @@ values without redeploying via an encrypted cookie.
   `values` / `overrides` into `FlagProvider`.
 - `FlagToolbar` mounts on dashboard routes when `isAdmin` allows the
   signed-in user (always in development; allowlisted emails in
-  preview/production).
+  staging/production).
 - `FlagsBadge` renders a compact indigo capsule at the bottom-left of the
   main content panel when any flag resolves to `true`. It shows
   `Flag` / `Flags`, the first active flag key, and a `+N more` chip with
@@ -63,8 +63,8 @@ Add to `.env.local` (see `.env.example`):
 FLAGS_SECRET="your-generated-value"
 ```
 
-Use a **different secret per environment** (local, preview, production).
-Do not reuse the same value across dev, preview, and prod.
+Use a **different secret per environment** (local, staging, production).
+Do not reuse the same value across dev, staging, and prod.
 
 ## Considerations
 

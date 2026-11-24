@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { isDevelopment, isPreview, isProduction } from "@/lib/config/envs";
+import { isDevelopment, isStaging, isProduction } from "@/lib/config/envs";
 
 describe("isProduction", () => {
   afterEach(() => {
@@ -11,7 +11,7 @@ describe("isProduction", () => {
     vi.stubEnv("VERCEL_ENV", "production");
 
     expect(isProduction()).toBe(true);
-    expect(isPreview()).toBe(false);
+    expect(isStaging()).toBe(false);
     expect(isDevelopment()).toBe(false);
   });
 
@@ -36,7 +36,7 @@ describe("isProduction", () => {
   });
 });
 
-describe("isPreview", () => {
+describe("isStaging", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
   });
@@ -44,7 +44,7 @@ describe("isPreview", () => {
   it("should be true for VERCEL_ENV preview", () => {
     vi.stubEnv("VERCEL_ENV", "preview");
 
-    expect(isPreview()).toBe(true);
+    expect(isStaging()).toBe(true);
     expect(isProduction()).toBe(false);
     expect(isDevelopment()).toBe(false);
   });
@@ -52,7 +52,7 @@ describe("isPreview", () => {
   it("should be false for production and development", () => {
     vi.stubEnv("VERCEL_ENV", "production");
 
-    expect(isPreview()).toBe(false);
+    expect(isStaging()).toBe(false);
   });
 });
 
@@ -67,7 +67,7 @@ describe("isDevelopment", () => {
 
     expect(isDevelopment()).toBe(true);
     expect(isProduction()).toBe(false);
-    expect(isPreview()).toBe(false);
+    expect(isStaging()).toBe(false);
   });
 
   it("should be true when VERCEL_ENV is unset and NODE_ENV is development", () => {

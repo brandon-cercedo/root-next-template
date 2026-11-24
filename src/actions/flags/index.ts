@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 import { getUser } from "@/actions/db/user";
-import { isPreview, isProduction } from "@/lib/config/envs";
+import { isStaging, isProduction } from "@/lib/config/envs";
 import {
   FLAG_OVERRIDE_COOKIE_NAME,
   FLAG_OVERRIDE_COOKIE_PATH,
@@ -63,7 +63,7 @@ export async function updateFlagOverrides(overrides: PartialFlagOverrides) {
     httpOnly: true,
     path: FLAG_OVERRIDE_COOKIE_PATH,
     sameSite: "lax",
-    secure: isProduction() || isPreview(),
+    secure: isProduction() || isStaging(),
   });
 
   revalidatePath("/dashboard");
