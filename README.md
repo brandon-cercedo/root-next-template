@@ -124,3 +124,7 @@ Check out these resources to learn more about writing clean code:
 Thanks to these projects for the inspiration:
 
 - [Bulletproof React](https://github.com/alan2207/bulletproof-react)
+
+## Credits
+
+Icon: <a href="https://www.flaticon.com/free-icons/dice" title="dice icons">Dice icons created by Tanah Basah - Flaticon</a>
