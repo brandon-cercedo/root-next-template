@@ -1,0 +1,40 @@
+name: Migrate STAGING Database
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "prisma/**"
+      - ".github/workflows/migrate-staging.yaml"
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    name: Apply DB migrations
+    runs-on: ubuntu-24.04
+    environment: Staging
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SKIP_ENV_VALIDATION: "1"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply migrations
+        run: pnpm exec prisma migrate deploy
+
+      - name: Verify migration status
+        run: pnpm exec prisma migrate status
