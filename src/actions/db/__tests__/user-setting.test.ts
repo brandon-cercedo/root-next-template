@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { beforeEach, describe, expect, it, vi } from "vitest";

@@ -34,6 +34,10 @@ function mockLocalStorage() {
 }
 
 beforeEach(() => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
   Object.defineProperty(window, "localStorage", {
     configurable: true,
     value: mockLocalStorage(),

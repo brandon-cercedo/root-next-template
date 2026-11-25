@@ -1,3 +1,4 @@
+// @vitest-environment node
 import bcrypt from "bcryptjs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 

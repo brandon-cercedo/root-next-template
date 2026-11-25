@@ -1,5 +1,7 @@
-import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
+import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { usePreline } from "@/hooks/use-preline";
 
 const mockAutoInit = vi.hoisted(() => vi.fn());
 const usePathname = vi.hoisted(() => vi.fn(() => "/"));
@@ -14,194 +16,130 @@ vi.mock("preline/non-auto", () => ({
   },
 }));
 
-async function waitForAutoInit() {
-  await waitFor(() => {
-    expect(mockAutoInit).toHaveBeenCalled();
+const INIT_DELAY = 100;
+
+async function advance(ms: number) {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(ms);
   });
 }
 
-async function settleAutoInit() {
-  await waitForAutoInit();
+async function renderPreline() {
+  const hook = renderHook(() => usePreline());
+  await advance(INIT_DELAY);
+  return hook;
+}
+
+async function appendAndSettle(node: Node) {
   await act(async () => {
-    await new Promise((resolve) => {
-      setTimeout(resolve, 200);
-    });
+    document.body.appendChild(node);
   });
-  return mockAutoInit.mock.calls.length;
+  await advance(INIT_DELAY);
+}
+
+function createElement(className: string) {
+  const element = document.createElement("div");
+  element.className = className;
+  return element;
 }
 
 describe("usePreline", () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     mockAutoInit.mockClear();
     usePathname.mockReturnValue("/");
   });
 
   afterEach(() => {
     cleanup();
+    vi.useRealTimers();
     document.body.replaceChildren();
   });
 
   it("should load Preline and call autoInit after mount", async () => {
-    const { usePreline } = await import("@/hooks/use-preline");
-    renderHook(() => usePreline());
+    await renderPreline();
 
-    await waitForAutoInit();
+    expect(mockAutoInit).toHaveBeenCalledOnce();
   });
 
   it("should re-initialize Preline when the pathname changes", async () => {
-    const { usePreline } = await import("@/hooks/use-preline");
-    const { rerender } = renderHook(() => usePreline());
-
-    const callsAfterMount = await settleAutoInit();
+    const { rerender } = await renderPreline();
 
     usePathname.mockReturnValue("/dashboard");
     await act(async () => {
       rerender();
     });
+    await advance(INIT_DELAY);
 
-    await waitFor(() => {
-      expect(mockAutoInit.mock.calls.length).toBeGreaterThan(callsAfterMount);
-    });
+    expect(mockAutoInit).toHaveBeenCalledTimes(2);
   });
 
   it("should autoInit when a plugin root is added after mount", async () => {
-    const existing = document.createElement("div");
-    existing.className = "hs-overlay";
-    document.body.appendChild(existing);
+    document.body.appendChild(createElement("hs-overlay"));
+    await renderPreline();
 
-    const { usePreline } = await import("@/hooks/use-preline");
-    renderHook(() => usePreline());
+    await appendAndSettle(createElement("hs-overlay"));
 
-    const callsAfterMount = await settleAutoInit();
-
-    const overlay = document.createElement("div");
-    overlay.className = "hs-overlay";
-    await act(async () => {
-      document.body.appendChild(overlay);
-    });
-
-    await waitFor(() => {
-      expect(mockAutoInit.mock.calls.length).toBeGreaterThan(callsAfterMount);
-    });
+    expect(mockAutoInit).toHaveBeenCalledTimes(2);
   });
 
   it("should ignore Preline backdrop nodes", async () => {
-    const { usePreline } = await import("@/hooks/use-preline");
-    renderHook(() => usePreline());
+    await renderPreline();
 
-    const callsAfterMount = await settleAutoInit();
+    await appendAndSettle(createElement("hs-overlay-backdrop"));
 
-    const backdrop = document.createElement("div");
-    backdrop.className = "hs-overlay-backdrop";
-    await act(async () => {
-      document.body.appendChild(backdrop);
-    });
-
-    await act(async () => {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200);
-      });
-    });
-
-    expect(mockAutoInit).toHaveBeenCalledTimes(callsAfterMount);
+    expect(mockAutoInit).toHaveBeenCalledOnce();
   });
 
   it("should autoInit when a nested plugin root is added", async () => {
-    const { usePreline } = await import("@/hooks/use-preline");
-    renderHook(() => usePreline());
-
-    const callsAfterMount = await settleAutoInit();
+    await renderPreline();
 
     const wrapper = document.createElement("div");
-    const tooltip = document.createElement("div");
-    tooltip.className = "hs-tooltip";
-    wrapper.appendChild(tooltip);
-    await act(async () => {
-      document.body.appendChild(wrapper);
-    });
+    wrapper.appendChild(createElement("hs-tooltip"));
+    await appendAndSettle(wrapper);
 
-    await waitFor(() => {
-      expect(mockAutoInit.mock.calls.length).toBeGreaterThan(callsAfterMount);
-    });
+    expect(mockAutoInit).toHaveBeenCalledTimes(2);
   });
 
   it("should autoInit when a nested data-hs-select is added", async () => {
-    const { usePreline } = await import("@/hooks/use-preline");
-    renderHook(() => usePreline());
-
-    const callsAfterMount = await settleAutoInit();
+    await renderPreline();
 
     const wrapper = document.createElement("div");
     const select = document.createElement("select");
     select.setAttribute("data-hs-select", "{}");
     wrapper.appendChild(select);
-    await act(async () => {
-      document.body.appendChild(wrapper);
-    });
+    await appendAndSettle(wrapper);
 
-    await waitFor(() => {
-      expect(mockAutoInit.mock.calls.length).toBeGreaterThan(callsAfterMount);
-    });
+    expect(mockAutoInit).toHaveBeenCalledTimes(2);
   });
 
   it("should debounce autoInit when plugin roots are added quickly", async () => {
-    const { usePreline } = await import("@/hooks/use-preline");
-    renderHook(() => usePreline());
-
-    const callsAfterMount = await settleAutoInit();
+    await renderPreline();
 
     await act(async () => {
-      const tooltip = document.createElement("div");
-      tooltip.className = "hs-tooltip";
-      document.body.appendChild(tooltip);
-
-      const dropdown = document.createElement("div");
-      dropdown.className = "hs-dropdown";
-      document.body.appendChild(dropdown);
+      document.body.appendChild(createElement("hs-tooltip"));
     });
+    await advance(INIT_DELAY / 2);
+    await appendAndSettle(createElement("hs-dropdown"));
 
-    await act(async () => {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200);
-      });
-    });
-
-    expect(mockAutoInit).toHaveBeenCalledTimes(callsAfterMount + 1);
+    expect(mockAutoInit).toHaveBeenCalledTimes(2);
   });
 
   it("should ignore overlay backdrop templates", async () => {
-    const { usePreline } = await import("@/hooks/use-preline");
-    renderHook(() => usePreline());
+    await renderPreline();
 
-    const callsAfterMount = await settleAutoInit();
-
-    const template = document.createElement("div");
-    template.className = "hs-overlay";
+    const template = createElement("hs-overlay");
     template.setAttribute("data-hs-overlay-backdrop-template", "");
-    await act(async () => {
-      document.body.appendChild(template);
-    });
+    await appendAndSettle(template);
 
-    await act(async () => {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200);
-      });
-    });
-
-    expect(mockAutoInit).toHaveBeenCalledTimes(callsAfterMount);
+    expect(mockAutoInit).toHaveBeenCalledOnce();
   });
 
   it("should not call autoInit after unmount", async () => {
-    const { usePreline } = await import("@/hooks/use-preline");
     const { unmount } = renderHook(() => usePreline());
 
     unmount();
-
-    await act(async () => {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200);
-      });
-    });
+    await advance(INIT_DELAY);
 
     expect(mockAutoInit).not.toHaveBeenCalled();
   });
