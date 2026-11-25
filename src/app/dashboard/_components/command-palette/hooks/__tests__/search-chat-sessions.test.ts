@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { searchChatSessions } from "@/app/dashboard/_components/command-palette/hooks/use-command-palette-search";

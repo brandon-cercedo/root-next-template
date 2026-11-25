@@ -1,3 +1,4 @@
+// @vitest-environment node
 import moment from "moment";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 

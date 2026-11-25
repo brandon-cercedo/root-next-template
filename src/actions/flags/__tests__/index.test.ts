@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { beforeEach, describe, expect, it, vi } from "vitest";

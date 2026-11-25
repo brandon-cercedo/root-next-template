@@ -89,6 +89,10 @@ Enforced by ESLint / Prettier / Commitlint — follow these over conflicting pro
   - File naming: `src/**/*.{test,spec}.ts(x)?`.
   - Parent folder: prefer placing tests under `__tests__` folders.
   - Public and exported APIs: should be covered by tests.
+  - Environments:
+    - jsdom: By default.
+    - node: Start tests that never touch the DOM with
+      `// @vitest-environment node` to make it run faster.
 
 ### Folder Structure
 
